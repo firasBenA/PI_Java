@@ -18,9 +18,9 @@ public class TestMain {
         System.out.println("===== TESTING ARTICLE CRUD =====");
 
         // Create test
-        Article article = new Article(0, "Test Article", "This is a test article content", "test-image.jpg");
+        Article article = new Article(0, "Test Article", "TestContenueArtic", "test-image.jpg");
         serviceArticle.add(article);
-        System.out.println("Article added successfully");
+        System.out.println("Article avec succes");
 
         // Read test
         System.out.println("\nRetrieving all articles:");
@@ -33,14 +33,14 @@ public class TestMain {
         Evenement evenement = new Evenement(
                 0,
                 "Test Event",
-                "This is a test event content",
+                "TestContenueEven",
                 "Conference",
-                "Upcoming",
+                "soon",
                 "Test Location",
                 LocalDate.now()
         );
         serviceEvenement.add(evenement);
-        System.out.println("Event added successfully");
+        System.out.println("Evenement avec succes");
 
         // Read test
         System.out.println("\nRetrieving all events:");

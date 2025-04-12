@@ -22,17 +22,17 @@ public class GestionPersonne {
 
     @FXML
     public void ajouterPersonne(ActionEvent actionEvent) {
-    Personne p = new Personne();
-    p.setNom(tfNom.getText());
-    p.setPrenom(tfPrenom.getText());
-    p.setAge(Integer.parseInt(tfAge.getText()));
+        Personne p = new Personne();
+        p.setNom(tfNom.getText());
+        p.setPrenom(tfPrenom.getText());
+        p.setAge(Integer.parseInt(tfAge.getText()));
 
-    sp.add(p);
+        sp.add(p);
     }
 
     @FXML
     public void afficherPersonnes(ActionEvent actionEvent) {
 
-    lbPersonnes.setText(sp.getAll().toString());
+        lbPersonnes.setText(sp.getAll().toString());
     }
 }

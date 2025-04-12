@@ -5,28 +5,27 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MyDataBase {
-
     private static MyDataBase instance;
-    private final String URL = "jdbc:mysql://127.0.0.1:3310/ehealth_database";
-    private final String USERNAME = "root";
-    private final String PASSWORD = "";
     private Connection cnx;
+
+    private final String URL = "jdbc:mysql://localhost:3310/ehealth_database";
+    private final String USER = "root";
+    private final String PASSWORD = "";
 
     private MyDataBase() {
         try {
-            cnx = DriverManager.getConnection(URL,USERNAME,PASSWORD);
-            System.out.println("Connected .....");
+            cnx = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("Connected ...");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Erreur Base de donnees: ");
         }
     }
 
     public static MyDataBase getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new MyDataBase();
-
+        }
         return instance;
-
     }
 
     public Connection getCnx() {

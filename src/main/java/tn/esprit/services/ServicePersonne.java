@@ -39,7 +39,7 @@ public class ServicePersonne implements IService<Personne> {
 
     @Override
     public List<Personne> getAll() {
-       //todo's
+        //todo's
         //creation req
         //execution req
         // matching entre le resultat et list Personne
@@ -48,17 +48,17 @@ public class ServicePersonne implements IService<Personne> {
         String qry ="SELECT * FROM `personne`";
         try {
             Statement stm = cnx.createStatement();
-         ResultSet rs = stm.executeQuery(qry);
+            ResultSet rs = stm.executeQuery(qry);
 
-         while(rs.next()){
-             Personne p =new Personne();
-             p.setId(rs.getInt(1));
-             p.setNom(rs.getString("nom"));
-             p.setPrenom(rs.getString(3));
-             p.setAge(rs.getInt("age"));
+            while(rs.next()){
+                Personne p =new Personne();
+                p.setId(rs.getInt(1));
+                p.setNom(rs.getString("nom"));
+                p.setPrenom(rs.getString(3));
+                p.setAge(rs.getInt("age"));
 
-             personnes.add(p);
-         }
+                personnes.add(p);
+            }
 
 
         } catch (SQLException e) {

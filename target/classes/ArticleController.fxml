@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ArticleController">
+   <Label text="Article Management" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+   <!-- Input Fields -->
+   <GridPane hgap="10" vgap="10">
+      <Label text="Titre:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+      <TextField fx:id="titreField" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+      <Label text="Contenue:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+      <TextArea fx:id="contenueField" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+      <Label text="Image Path:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+      <TextField fx:id="imageField" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+   </GridPane>
+
+   <!-- Buttons -->
+   <HBox spacing="10">
+      <Button text="Add Article" onAction="#addArticle" />
+      <Button text="Update Article" onAction="#updateArticle" />
+      <Button text="Delete Article" onAction="#deleteArticle" />
+      <Button text="Switch to Evenement" onAction="#switchToEvenement" />
+   </HBox>
+
+   <!-- Table to Display Articles -->
+   <TableView fx:id="articleTable">
+      <columns>
+         <TableColumn text="ID" prefWidth="50">
+            <cellValueFactory><PropertyValueFactory property="id" /></cellValueFactory>
+         </TableColumn>
+         <TableColumn text="Titre" prefWidth="150">
+            <cellValueFactory><PropertyValueFactory property="titre" /></cellValueFactory>
+         </TableColumn>
+         <TableColumn text="Contenue" prefWidth="200">
+            <cellValueFactory><PropertyValueFactory property="contenue" /></cellValueFactory>
+         </TableColumn>
+         <TableColumn text="Image" prefWidth="150">
+            <cellValueFactory><PropertyValueFactory property="image" /></cellValueFactory>
+         </TableColumn>
+      </columns>
+   </TableView>
+</VBox>
