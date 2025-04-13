@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.PatientDashboardController" prefWidth="1080" prefHeight="720">
+    <children>
+
+        <VBox spacing="10" layoutX="50" layoutY="30" prefWidth="980">
+            <Label text="Mes Prescriptions" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+            <TableView fx:id="prescriptionTable" prefHeight="500">
+                <columns>
+                    <TableColumn fx:id="idCol" text="ID" prefWidth="50" />
+                    <TableColumn fx:id="titreCol" text="Titre" prefWidth="150" />
+                    <TableColumn fx:id="contenueCol" text="Contenu" prefWidth="250" />
+                    <TableColumn fx:id="dateCol" text="Date" prefWidth="120" />
+                    <TableColumn fx:id="downloadCol" text="Télécharger" prefWidth="100" />
+                </columns>
+            </TableView>
+        </VBox>
+
+    </children>
+</AnchorPane>

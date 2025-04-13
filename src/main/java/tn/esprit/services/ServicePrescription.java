@@ -5,6 +5,7 @@ import tn.esprit.models.Personne;
 import tn.esprit.models.Prescription;
 import tn.esprit.utils.MyDataBase;
 
+import java.io.File;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -108,6 +109,5 @@ public class ServicePrescription implements IService<Prescription> {
             System.out.println("Error while deleting prescription: " + e.getMessage());
         }
     }
-
 
 }

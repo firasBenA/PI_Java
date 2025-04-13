@@ -17,6 +17,7 @@
                 <Button text="Accueil" onAction="#goHome" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Diagnostique" onAction="#goDiagnostique" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Medecin" onAction="#goGestionMedecin" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
+                <Button text="Patient Dashboard" onAction="#goGestionPatient" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
 
                 <!-- Spacer -->
                 <VBox fx:id="spacer" VBox.vgrow="ALWAYS" />
