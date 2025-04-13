@@ -1,6 +1,7 @@
 package tn.esprit.models;
 
 import java.time.LocalDate;
+import java.sql.Date;
 
 public class Diagnostique {
 
@@ -8,17 +9,19 @@ public class Diagnostique {
     private int dossierMedicalId;
     private int patientId;
     private int medecinId;
-    private LocalDate dateDiagnostique;
+    private Date dateDiagnostique;
     private String nom;
     private String description;
     private String zoneCorps;
-    private LocalDate dateSymptomes;
-    private String status;
+    private Date dateSymptomes;
+    private int status;
     private String selectedSymptoms;
 
 
+
+
     public Diagnostique(){}
-    public Diagnostique(int id, int dossierMedicalId, int patientId, int medecinId, LocalDate dateDiagnostique, String nom, String description, String zoneCorps, LocalDate dateSymptomes, String status, String selectedSymptoms) {
+    public Diagnostique(int id, int dossierMedicalId, int patientId, int medecinId, Date dateDiagnostique, String nom, String description, String zoneCorps, Date dateSymptomes, int status, String selectedSymptoms) {
         this.id = id;
         this.dossierMedicalId = dossierMedicalId;
         this.patientId = patientId;
@@ -32,7 +35,7 @@ public class Diagnostique {
         this.selectedSymptoms = selectedSymptoms;
     }
 
-    public Diagnostique( int dossierMedicalId, int patientId, int medecinId, LocalDate dateDiagnostique, String nom, String description, String zoneCorps, LocalDate dateSymptomes, String status, String selectedSymptoms) {
+    public Diagnostique( int dossierMedicalId, int patientId, int medecinId, Date dateDiagnostique, String nom, String description, String zoneCorps, Date dateSymptomes, int status, String selectedSymptoms) {
         this.dossierMedicalId = dossierMedicalId;
         this.patientId = patientId;
         this.medecinId = medecinId;
@@ -77,11 +80,11 @@ public class Diagnostique {
         this.medecinId = medecinId;
     }
 
-    public LocalDate getDateDiagnostique() {
+    public Date getDateDiagnostique() {
         return dateDiagnostique;
     }
 
-    public void setDateDiagnostique(LocalDate dateDiagnostique) {
+    public void setDateDiagnostique(Date dateDiagnostique) {
         this.dateDiagnostique = dateDiagnostique;
     }
 
@@ -109,19 +112,19 @@ public class Diagnostique {
         this.zoneCorps = zoneCorps;
     }
 
-    public LocalDate getDateSymptomes() {
+    public Date getDateSymptomes() {
         return dateSymptomes;
     }
 
-    public void setDateSymptomes(LocalDate dateSymptomes) {
+    public void setDateSymptomes(Date dateSymptomes) {
         this.dateSymptomes = dateSymptomes;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
