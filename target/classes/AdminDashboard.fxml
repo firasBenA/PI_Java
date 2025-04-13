@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.controllers.AdminDashboard"
+      spacing="20" style="-fx-padding: 20;" stylesheets="@/css/admin.css">
+
+    <!-- En-tête -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <Label text="Gestion des Utilisateurs" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3c4043;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="searchField" promptText="Rechercher par nom, email..." styleClass="search-field" />
+        <Button fx:id="addUserBtn" text="+ Ajouter" />
+    </HBox>
+
+    <!-- Onglets -->
+    <TabPane fx:id="tabPane">
+        <tabs>
+            <Tab fx:id="patientsTab" text="Patients" />
+            <Tab fx:id="medecinsTab" text="Médecins" />
+        </tabs>
+    </TabPane>
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+        <Button text="Déconnexion" onAction="#handleLogout" styleClass="logout-button" />
+    </HBox>
+
+    <!-- Tableau des utilisateurs -->
+    <TableView fx:id="usersTable" styleClass="modern-table">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
+            <TableColumn fx:id="nomColumn" text="Nom" prefWidth="150" />
+            <TableColumn fx:id="prenomColumn" text="Prénom" prefWidth="150" />
+            <TableColumn fx:id="emailColumn" text="Email" prefWidth="250" />
+            <TableColumn fx:id="roleColumn" text="Rôle" prefWidth="120" />
+            <TableColumn fx:id="statusColumn" text="Statut" prefWidth="100" />
+            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="180" />
+        </columns>
+    </TableView>
+</VBox>

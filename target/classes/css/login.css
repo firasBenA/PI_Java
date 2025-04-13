@@ -1,0 +1,82 @@
+.root {
+    -fx-background-color: #f8f9fa;
+}
+
+.title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-fill: #2d3748;
+}
+
+.form-container {
+    -fx-padding: 0 0 0 20px;
+    -fx-min-width: 320px;
+}
+
+.input-label {
+    -fx-text-fill: #4a5568;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.form-field {
+    -fx-pref-height: 40px;
+    -fx-padding: 0 10px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-background-color: white;
+    -fx-font-size: 14px;
+}
+
+.form-field:focused {
+    -fx-border-color: #667eea;
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.2), 10, 0, 0, 0);
+}
+
+.btn-primary {
+    -fx-background-color: #667eea;
+    -fx-text-fill: white;
+    -fx-pref-height: 45px;
+    -fx-min-width: 250px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #5a67d8;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #4c51bf;
+}
+
+.link {
+    -fx-text-fill: #667eea;
+    -fx-border-color: transparent;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+
+.link:hover {
+    -fx-text-fill: #5a67d8;
+}
+
+.error-text {
+    -fx-text-fill: #e53e3e;
+    -fx-font-size: 12px;
+}
+
+.text-muted {
+    -fx-text-fill: #718096;
+    -fx-font-size: 14px;
+}
+
+.separator {
+    -fx-padding: 10px 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px 0 0 0;
+}
