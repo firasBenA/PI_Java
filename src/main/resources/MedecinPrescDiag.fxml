@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1"
+            fx:controller="tn.esprit.controllers.MedecinPrescDiag"
+            prefWidth="1080.0" prefHeight="720.0"
+            style="-fx-background-color: #ecf0f1; -fx-font-family: 'Segoe UI', sans-serif;">
+
+    <children>
+
+        <!-- Title Section -->
+        <VBox spacing="15" layoutX="50.0" layoutY="20.0" prefWidth="980">
+            <Label text="Prescriptions et Diagnostics"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #34495e; -fx-text-alignment: center;" />
+        </VBox>
+
+        <!-- Diagnostics Section -->
+        <VBox spacing="15" layoutX="50.0" layoutY="80.0" prefWidth="980">
+            <Label text="Liste des diagnostics :" style="-fx-font-size: 20px; -fx-text-fill: #2c3e50;" />
+
+            <TableView fx:id="diagnostiqueTable" prefHeight="230.0"
+                       style="-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;">
+                <columns>
+                    <TableColumn fx:id="diagIdCol" text="ID" prefWidth="70"/>
+                    <TableColumn fx:id="symptomsCol" text="Symptômes" prefWidth="320"/>
+                    <TableColumn fx:id="resultCol" text="Résultat" prefWidth="160"/>
+                    <TableColumn fx:id="zoneCorpsCol" text="Zone du corps" prefWidth="160"/>
+                    <TableColumn fx:id="dateDiagCol" text="Date" prefWidth="100"/>
+                    <TableColumn fx:id="actionsDiagCol" text="⚙ Actions" prefWidth="160"/>
+                </columns>
+
+            </TableView>
+        </VBox>
+
+        <!-- Prescriptions Section -->
+        <VBox spacing="15" layoutX="50.0" layoutY="400.0" prefWidth="980">
+            <Label text="Liste des prescriptions :" style="-fx-font-size: 20px; -fx-text-fill: #2c3e50;" />
+
+            <TableView fx:id="prescriptionTable" prefHeight="270.0"
+                       style="-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 14px;">
+                <columns>
+                    <TableColumn fx:id="prescIdCol" text="ID" prefWidth="70"/>
+                    <TableColumn fx:id="titreCol" text="Titre" prefWidth="220"/>
+                    <TableColumn fx:id="contenueCol" text="Contenu" prefWidth="380"/>
+                    <TableColumn fx:id="datePrescCol" text="Date" prefWidth="120"/>
+                    <TableColumn fx:id="actionsPrescCol" text="⚙ Actions" prefWidth="150"/>
+                </columns>
+                <!-- Hover Effect for Rows -->
+
+            </TableView>
+        </VBox>
+
+    </children>
+</AnchorPane>

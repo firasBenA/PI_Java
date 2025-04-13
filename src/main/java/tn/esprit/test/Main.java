@@ -8,12 +8,18 @@ import tn.esprit.utils.MyDataBase;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class Main {
 
 
     public static void main(String[] args) {
+
+
+        java.sql.Date sqlDate = java.sql.Date.valueOf(LocalDate.now());
+
+
 //        Test t1 = Test.getInstance();
 //        Test t2 = Test.getInstance();
 //
@@ -24,7 +30,7 @@ public class Main {
         ServicePersonne sp = new ServicePersonne();
         ServicePrescription sPresc = new ServicePrescription();
 
-        sPresc.add(new Prescription( 1, 19, 3, 1, "TESTJAVA", "test test test JAVA", LocalDateTime.now()));
+        sPresc.add(new Prescription( 1, 19, 3, 1, "TESTJAVA", "test test test JAVA", sqlDate));
 
         ///////// UPDATE //////////////////
         Prescription p = new Prescription();
@@ -33,9 +39,9 @@ public class Main {
         p.setDiagnostique_id(1);
         p.setMedecin_id(3);
         p.setPatient_id(1);
-        p.setTitre("Updated Titre");
+        p.setTitre("Updated Titre.........");
         p.setContenue("Updated contenu");
-        p.setDate_prescription(LocalDateTime.now());
+        p.setDate_prescription(sqlDate);
 
         sPresc.update(p);
         ///////// *** //////////////////
