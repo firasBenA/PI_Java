@@ -160,7 +160,7 @@ public class GestionReponse {
         // Style the success/error alert
         DialogPane dialogPane = alert.getDialogPane();
         System.out.println("Loading stylesheet for alert...");
-        java.net.URL cssUrl = getClass().getResource("src/main/resources/styles.css");
+        java.net.URL cssUrl = getClass().getResource("src/main/resources/tn/esprit/styles/styles.css");
         if (cssUrl == null) {
             System.out.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
         } else {
