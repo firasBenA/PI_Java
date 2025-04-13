@@ -7,13 +7,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import tn.esprit.models.Reclamation;
 import tn.esprit.services.ServiceReclamation;
-import com.jfoenix.controls.JFXAlert;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialogLayout;
-import javafx.stage.Modality;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class ListeReclamation {
 
@@ -25,6 +23,13 @@ public class ListeReclamation {
 
     private final ServiceReclamation service = new ServiceReclamation();
     private ObservableList<Reclamation> observableReclamations;
+
+    // Validation constants
+    private static final int MIN_SUJET_LENGTH = 5;
+    private static final int MAX_SUJET_LENGTH = 100;
+    private static final int MIN_DESCRIPTION_LENGTH = 10;
+    private static final int MAX_DESCRIPTION_LENGTH = 500;
+    private static final Pattern TEXT_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.,!?éèêëàâäîïôöûüç-]+$");
 
     @FXML
     public void initialize() {
@@ -51,6 +56,22 @@ public class ListeReclamation {
                 TFdescription.setText(selected.getDescription());
             }
         });
+
+        // Real-time validation for TFsujet
+        TFsujet.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > MAX_SUJET_LENGTH) {
+                TFsujet.setText(oldValue);
+                showAlert("Avertissement", "Le sujet ne peut pas dépasser " + MAX_SUJET_LENGTH + " caractères !");
+            }
+        });
+
+        // Real-time validation for TFdescription
+        TFdescription.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > MAX_DESCRIPTION_LENGTH) {
+                TFdescription.setText(oldValue);
+                showAlert("Avertissement", "La description ne peut pas dépasser " + MAX_DESCRIPTION_LENGTH + " caractères !");
+            }
+        });
     }
 
     private void loadReclamations() {
@@ -62,13 +83,49 @@ public class ListeReclamation {
     @FXML
     public void Save(ActionEvent actionEvent) {
         try {
-            String sujet = TFsujet.getText();
-            String description = TFdescription.getText();
-            LocalDate date = LocalDate.now(); // Automatically set to current date
+            String sujet = TFsujet.getText().trim();
+            String description = TFdescription.getText().trim();
+            LocalDate date = LocalDate.now();
 
-            // Validate all fields
+            // Validate fields
             if (sujet.isEmpty() || description.isEmpty()) {
                 showAlert("Erreur", "Les champs Sujet et Description doivent être remplis !");
+                return;
+            }
+
+            // Validate sujet length
+            if (sujet.length() < MIN_SUJET_LENGTH) {
+                showAlert("Erreur", "Le sujet doit contenir au moins " + MIN_SUJET_LENGTH + " caractères !");
+                return;
+            }
+            if (sujet.length() > MAX_SUJET_LENGTH) {
+                showAlert("Erreur", "Le sujet ne peut pas dépasser " + MAX_SUJET_LENGTH + " caractères !");
+                return;
+            }
+
+            // Validate description length
+            if (description.length() < MIN_DESCRIPTION_LENGTH) {
+                showAlert("Erreur", "La description doit contenir au moins " + MIN_DESCRIPTION_LENGTH + " caractères !");
+                return;
+            }
+            if (description.length() > MAX_DESCRIPTION_LENGTH) {
+                showAlert("Erreur", "La description ne peut pas dépasser " + MAX_DESCRIPTION_LENGTH + " caractères !");
+                return;
+            }
+
+            // Validate allowed characters
+            if (!TEXT_PATTERN.matcher(sujet).matches()) {
+                showAlert("Erreur", "Le sujet ne peut contenir que des lettres, chiffres, espaces et ponctuations de base (.,!?éèêëàâäîïôöûüç-) !");
+                return;
+            }
+            if (!TEXT_PATTERN.matcher(description).matches()) {
+                showAlert("Erreur", "La description ne peut contenir que des lettres, chiffres, espaces et ponctuations de base (.,!?éèêëàâäîïôöûüç-) !");
+                return;
+            }
+
+            // Optional: Check for unique sujet
+            if (isSujetDuplicate(sujet, -1)) {
+                showAlert("Erreur", "Ce sujet existe déjà ! Veuillez choisir un sujet unique.");
                 return;
             }
 
@@ -95,8 +152,7 @@ public class ListeReclamation {
             // Style the dialog
             DialogPane dialogPane = confirmationAlert.getDialogPane();
             System.out.println("Loading stylesheet for confirmation dialog...");
-            java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
-            if (cssUrl == null) {
+            java.net.URL cssUrl = getClass().getResource("src/main/resources/styles.css");            if (cssUrl == null) {
                 System.out.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
             } else {
                 System.out.println("CSS file found: " + cssUrl.toExternalForm());
@@ -121,25 +177,69 @@ public class ListeReclamation {
                 System.out.println("Ajout de la réclamation annulé.");
             }
         } catch (Exception e) {
-            e.printStackTrace(); // Print the full stack trace for debugging
+            e.printStackTrace();
             showAlert("Erreur", "Problème : " + e.getMessage());
         }
     }
+
     @FXML
     public void Update(ActionEvent actionEvent) {
         try {
             int id = Integer.parseInt(TFid.getText());
-            String sujet = TFsujet.getText();
-            String description = TFdescription.getText();
+            String sujet = TFsujet.getText().trim();
+            String description = TFdescription.getText().trim();
             Reclamation existingReclamation = service.getById(id);
             if (existingReclamation == null) {
                 showAlert("Erreur", "Réclamation non trouvée !");
                 return;
             }
-            LocalDate date = existingReclamation.getDateDebut(); // Retain the original date
-            String etat = existingReclamation.getEtat(); // Retain the original etat
 
-            Reclamation r = new Reclamation(id, sujet, description, date, etat, 1); // 1 = user_id fictif
+            // Validate fields
+            if (sujet.isEmpty() || description.isEmpty()) {
+                showAlert("Erreur", "Les champs Sujet et Description doivent être remplis !");
+                return;
+            }
+
+            // Validate sujet length
+            if (sujet.length() < MIN_SUJET_LENGTH) {
+                showAlert("Erreur", "Le sujet doit contenir au moins " + MIN_SUJET_LENGTH + " caractères !");
+                return;
+            }
+            if (sujet.length() > MAX_SUJET_LENGTH) {
+                showAlert("Erreur", "Le sujet ne peut pas dépasser " + MAX_SUJET_LENGTH + " caractères !");
+                return;
+            }
+
+            // Validate description length
+            if (description.length() < MIN_DESCRIPTION_LENGTH) {
+                showAlert("Erreur", "La description doit contenir au moins " + MIN_DESCRIPTION_LENGTH + " caractères !");
+                return;
+            }
+            if (description.length() > MAX_DESCRIPTION_LENGTH) {
+                showAlert("Erreur", "La description ne peut pas dépasser " + MAX_DESCRIPTION_LENGTH + " caractères !");
+                return;
+            }
+
+            // Validate allowed characters
+            if (!TEXT_PATTERN.matcher(sujet).matches()) {
+                showAlert("Erreur", "Le sujet ne peut contenir que des lettres, chiffres, espaces et ponctuations de base (.,!?éèêëàâäîïôöûüç-) !");
+                return;
+            }
+            if (!TEXT_PATTERN.matcher(description).matches()) {
+                showAlert("Erreur", "La description ne peut contenir que des lettres, chiffres, espaces et ponctuations de base (.,!?éèêëàâäîïôöûüç-) !");
+                return;
+            }
+
+            // Optional: Check for unique sujet (excluding the current reclamation)
+            if (isSujetDuplicate(sujet, id)) {
+                showAlert("Erreur", "Ce sujet existe déjà ! Veuillez choisir un sujet unique.");
+                return;
+            }
+
+            LocalDate date = existingReclamation.getDateDebut();
+            String etat = existingReclamation.getEtat();
+
+            Reclamation r = new Reclamation(id, sujet, description, date, etat, 1);
             service.update(r);
             showAlert("Succès", "Réclamation modifiée !");
             clearFields();
@@ -164,12 +264,15 @@ public class ListeReclamation {
         }
     }
 
-
-    private void clearFields() {
-        TFid.clear();
-        TFsujet.clear();
-        TFdescription.clear();
+    private boolean isSujetDuplicate(String sujet, int currentId) {
+        for (Reclamation reclamation : observableReclamations) {
+            if (reclamation.getSujet().equalsIgnoreCase(sujet) && reclamation.getId() != currentId) {
+                return true;
+            }
+        }
+        return false;
     }
+
     private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -179,7 +282,7 @@ public class ListeReclamation {
         // Style the success/error alert
         DialogPane dialogPane = alert.getDialogPane();
         System.out.println("Loading stylesheet for alert...");
-        java.net.URL cssUrl = getClass().getResource("src/main/resources/styles.css");
+        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css"); // Fixed path
         if (cssUrl == null) {
             System.out.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
         } else {
@@ -189,5 +292,11 @@ public class ListeReclamation {
         }
 
         alert.showAndWait();
+    }
+
+    private void clearFields() {
+        TFid.clear();
+        TFsujet.clear();
+        TFdescription.clear();
     }
 }
