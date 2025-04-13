@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.controllers.GestionReponse"
+            prefHeight="600.0" prefWidth="800.0"
+            styleClass="root-pane"
+            stylesheets="@/styles.css">
+
+    <!-- Main container with padding -->
+    <VBox spacing="15" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
+
+        <!-- Title -->
+        <Text text="Gestion des Réponses" styleClass="title"/>
+
+        <!-- Split layout: ListView on the left, Response form on the right -->
+        <HBox spacing="20" alignment="CENTER" VBox.vgrow="ALWAYS">
+
+            <!-- Left: ListView for Reclamations -->
+            <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400.0">
+                <Text text="Liste des Réclamations" styleClass="label"/>
+                <ListView fx:id="listViewReclamations" prefHeight="400" styleClass="list-view" VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Right: Form to Add Response -->
+            <VBox spacing="15" alignment="TOP_CENTER" prefWidth="400.0">
+                <Text text="Ajouter une Réponse" styleClass="label"/>
+
+                <!-- Grid for Response Form -->
+                <GridPane hgap="10" vgap="10" alignment="CENTER">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" prefWidth="250.0"/>
+                    </columnConstraints>
+
+                    <Text text="Réclamation ID :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label"/>
+                    <TextField fx:id="TFReclamationId" promptText="ID (Auto rempli)" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="text-field"/>
+
+                    <Text text="Sujet :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label"/>
+                    <TextField fx:id="TFReclamationSujet" promptText="Sujet (Auto rempli)" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-field"/>
+
+                    <Text text="Contenu :" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="label"/>
+                    <TextArea fx:id="TAContenu" promptText="Écrire votre réponse ici..." prefHeight="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="text-area"/>
+                </GridPane>
+
+                <!-- Button to Add Response -->
+                <HBox spacing="15" alignment="CENTER">
+                    <Button text="Ajouter Réponse" onAction="#Save" styleClass="button-primary"/>
+                </HBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</AnchorPane>
