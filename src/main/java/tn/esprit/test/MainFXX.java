@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class MainFX extends Application {
+public class MainFXX extends Application {
 
     public static void main(String[] args) {
         launch(args);
@@ -17,12 +17,12 @@ public class MainFX extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        FXMLLoader loader =new FXMLLoader(getClass().getResource("/GestionPersonne.fxml"));
+        FXMLLoader loader =new FXMLLoader(getClass().getResource("/listrdv.fxml"));
         try {
             Parent root = loader.load();
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
-            primaryStage.setTitle("---- Gestion Personne -----");
+            primaryStage.setTitle("---- Gestion RDV -----");
             primaryStage.show();
 
         } catch (IOException e) {

@@ -46,7 +46,7 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>
-                        tn.esprit.test.MainFX
+                        tn.esprit.test.MainFXX
                     </mainClass>
                 </configuration>
             </plugin>

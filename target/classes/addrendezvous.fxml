@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.*?>
+
+<?import javafx.scene.layout.ColumnConstraints?>
+<AnchorPane prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22.0.2"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.controllers.GestionRendezVous">
+   <children>
+      <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+         <children>
+            <Text text="Ajouter un Rendez-vous" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+
+            <GridPane hgap="10.0" vgap="10.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" prefWidth="150.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="300.0" />
+               </columnConstraints>
+               <children>
+                  <!-- Date Field -->
+                  <Label text="Date:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                  <DatePicker fx:id="date" promptText="Date du rendez-vous" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                  <Label fx:id="dateError" textFill="RED" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                  <!-- Type Field -->
+                  <Label text="Type:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                  <ComboBox fx:id="type_rdv" promptText="Type de rendez-vous" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                  <Label fx:id="typeError" textFill="RED" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                  <!-- Medecin Field -->
+                  <Label text="Médecin:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                  <ComboBox fx:id="medecin" promptText="Sélectionnez un médecin" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                  <Label fx:id="medecinError" textFill="RED" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+                  <!-- Cause Field -->
+                  <Label text="Cause:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                  <TextArea fx:id="cause" promptText="Cause du rendez-vous" prefHeight="100.0" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                  <Label fx:id="causeError" textFill="RED" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+               </children>
+            </GridPane>
+
+            <Button text="Enregistrer"
+                    onAction="#save"
+                    prefWidth="150.0"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
