@@ -10,7 +10,7 @@
 <ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.RegisterController">
     <VBox alignment="CENTER" spacing="20" style="-fx-background-color: #f7fafc;">
         <padding>
-            <Insets bottom="50" left="50" right="50" top="50"/>
+            <Insets bottom="50" left="400" right="400" top="50"/>
         </padding>
 
         <!-- Center the content (image and form) -->

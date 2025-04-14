@@ -15,7 +15,9 @@
         <TextField fx:id="searchField" promptText="Rechercher par nom, email..." styleClass="search-field" />
         <Button fx:id="addUserBtn" text="+ Ajouter" />
     </HBox>
-
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+        <Button text="Déconnexion" onAction="#handleLogout" styleClass="logout-button" />
+    </HBox>
     <!-- Onglets -->
     <TabPane fx:id="tabPane">
         <tabs>
@@ -23,9 +25,7 @@
             <Tab fx:id="medecinsTab" text="Médecins" />
         </tabs>
     </TabPane>
-    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
-        <Button text="Déconnexion" onAction="#handleLogout" styleClass="logout-button" />
-    </HBox>
+
 
     <!-- Tableau des utilisateurs -->
     <TableView fx:id="usersTable" styleClass="modern-table">

@@ -66,22 +66,10 @@ public class AdminDashboard {
         });
 
         actionsColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editBtn = new Button("Modifier");
             private final Button toggleBtn = new Button();
-            private final Button deleteBtn = new Button("Supprimer");
-            private final HBox pane = new HBox(5, editBtn, toggleBtn, deleteBtn);
+            private final HBox pane = new HBox(5, toggleBtn);
 
-            {
-                editBtn.setOnAction(e -> editUser(getTableView().getItems().get(getIndex())));
-                toggleBtn.setOnAction(e -> {
-                    try {
-                        toggleUserStatus(getTableView().getItems().get(getIndex()));
-                    } catch (Exception ex) {
-                        showAlert("Erreur", ex.getMessage(), Alert.AlertType.ERROR);
-                    }
-                });
-                deleteBtn.setOnAction(e -> deleteUser(getTableView().getItems().get(getIndex())));
-            }
+
 
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -105,7 +93,7 @@ public class AdminDashboard {
     private void loadUsers() {
         try {
             allUsers = FXCollections.observableArrayList(authService.getAllUsers());
-            filterUsersByRole("ROLE_USER"); // Par défaut afficher les patients
+            filterUsersByRole("ROLE_PATIENT"); // Par défaut afficher les patients
         } catch (Exception e) {
             showAlert("Erreur", "Impossible de charger les utilisateurs: " + e.getMessage(), Alert.AlertType.ERROR);
         }

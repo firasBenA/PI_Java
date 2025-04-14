@@ -146,7 +146,7 @@ public class RegisterController {
             } catch (Exception e) {
                 sceneManager.showAlert("Erreur", e.getMessage(), Alert.AlertType.ERROR);
             } catch (AuthException e) {
-                throw new RuntimeException(e);
+                System.out.println(e.getMessage());
             }
         }
     }
