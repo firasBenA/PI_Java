@@ -12,7 +12,7 @@
             styleClass="root-pane wave-background"
             stylesheets="@./styles.css">
 
-
+    <!-- Main container with padding -->
     <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
 
         <!-- Title -->
@@ -34,7 +34,7 @@
             <TextField fx:id="TFsujet" promptText="Sujet" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="text-field"/>
 
             <Text text="Description :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label"/>
-            <TextField fx:id="TFdescription" promptText="Description" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-field"/>
+            <TextArea fx:id="TFdescription" promptText="Description" prefRowCount="4" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-field"/>
         </GridPane>
 
         <!-- Buttons -->

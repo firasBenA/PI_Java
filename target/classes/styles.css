@@ -11,7 +11,6 @@
     -fx-background-repeat: no-repeat;
 }
 
-/* Title styling */
 .title {
     -fx-font-size: 30px;
     -fx-font-weight: bold;
@@ -28,7 +27,6 @@
     -fx-font-family: "Arial";
 }
 
-/* Text fields styling */
 .text-field {
     -fx-background-color: #ffffff;
     -fx-border-color: #ccecee;
@@ -44,6 +42,50 @@
     -fx-border-color: #095d7e;
     -fx-border-width: 2px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.3, 0, 1);
+}
+
+/* Specific styling for TextArea with class text-field */
+.text-field.text-area {
+    -fx-control-inner-background: #ffffff;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccecee;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-font-family: "Arial";
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0.2, 0, 1);
+}
+
+.text-field.text-area:focused {
+    -fx-border-color: #095d7e;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.3, 0, 1);
+}
+
+/* Style the scroll bars of the TextArea */
+.text-field.text-area .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.text-field.text-area .scroll-bar:vertical .track {
+    -fx-background-color: #ccecee;
+    -fx-background-radius: 5px;
+}
+
+.text-field.text-area .scroll-bar:vertical .thumb {
+    -fx-background-color: #14967f;
+    -fx-background-radius: 5px;
+}
+
+.text-field.text-area .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #095d7e;
+}
+
+/* Hide horizontal scroll bar in TextArea (since wrapText is true) */
+.text-field.text-area .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-pref-height: 0;
 }
 
 /* ScrollPane styling */

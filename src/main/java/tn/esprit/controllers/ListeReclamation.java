@@ -25,7 +25,10 @@ public class ListeReclamation {
     private HBox cardPane;
 
     @FXML
-    private TextField TFsujet, TFdescription;
+    private TextField TFsujet;
+
+    @FXML
+    private TextArea TFdescription;
 
     private final ServiceReclamation service = new ServiceReclamation();
     private ObservableList<Reclamation> observableReclamations;
@@ -255,13 +258,13 @@ public class ListeReclamation {
                 return;
             }
 
-
+            // Validate fields
             if (sujet.isEmpty() || description.isEmpty()) {
                 showAlert("Erreur", "Les champs Sujet et Description doivent être remplis !");
                 return;
             }
 
-            
+            // Validate sujet length
             if (sujet.length() < MIN_SUJET_LENGTH) {
                 showAlert("Erreur", "Le sujet doit contenir au moins " + MIN_SUJET_LENGTH + " caractères !");
                 return;
@@ -345,6 +348,7 @@ public class ListeReclamation {
         alert.setHeaderText(null);
         alert.setContentText(msg);
 
+        // Style the success/error alert
         DialogPane dialogPane = alert.getDialogPane();
         System.out.println("Loading stylesheet for alert...");
         java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
