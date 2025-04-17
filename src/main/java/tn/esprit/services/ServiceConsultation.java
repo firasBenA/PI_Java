@@ -71,4 +71,27 @@ public class ServiceConsultation {
             System.err.println("Erreur lors de la mise à jour de la date: " + e.getMessage());
         }
     }
+
+    public int getConsultationCountForDate(int medecinId, LocalDate date) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM consultation WHERE id_medecin = ? AND date = ?";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, medecinId);
+            stmt.setDate(2, java.sql.Date.valueOf(date));
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération du nombre de consultations : " + e.getMessage());
+        }
+
+        return count;
+    }
+
 }

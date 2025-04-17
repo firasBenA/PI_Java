@@ -7,9 +7,9 @@ public class RendeVous {
     private int patient_id;
     private int medecin_id;
     private LocalDate date;
-    private String statut; // "Refusé", "Approuvé", "En attente"
-    private String type; // "consultation", "urgence", etc.
-    private String cause; // "malade", "bilan", etc.
+    private String statut;
+    private String type;
+    private String cause;
 
     // Constructeurs
     public RendeVous() {

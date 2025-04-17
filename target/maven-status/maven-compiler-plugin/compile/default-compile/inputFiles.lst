@@ -1,3 +1,4 @@
+C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\CalendrierRendezVousController.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\GestionListeRdv.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\GestionRendezVous.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\ListeConsultationsController.java
@@ -7,5 +8,5 @@ C:\PI\javafx_clone\src\main\java\tn\esprit\models\Consultation.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\models\RendeVous.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\services\ServiceAddRdv.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\services\ServiceConsultation.java
-C:\PI\javafx_clone\src\main\java\tn\esprit\test\MainFXX.java
+C:\PI\javafx_clone\src\main\java\tn\esprit\test\MainFX.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\utils\MyDataBase.java

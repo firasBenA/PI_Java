@@ -136,7 +136,6 @@ public class GestionRendezVous implements Initializable {
         medecinError.setText("");
         causeError.setText("");
 
-        // Validation de la date
         if (date.getValue() == null) {
             dateError.setText("La date est obligatoire");
             isValid = false;

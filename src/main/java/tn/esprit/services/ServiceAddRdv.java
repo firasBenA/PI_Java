@@ -19,7 +19,6 @@ public class ServiceAddRdv implements IService<RendeVous> {
 
     @Override
     public void add(RendeVous rdv) {
-        // Désactiver l'auto-commit pour gérer la transaction manuellement
         boolean autoCommit = false;
         try {
             autoCommit = cnx.getAutoCommit();

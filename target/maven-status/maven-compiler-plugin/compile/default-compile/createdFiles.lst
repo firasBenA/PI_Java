@@ -1,8 +1,10 @@
 tn\esprit\services\ServiceAddRdv.class
 tn\esprit\controllers\ModifierRendezVousController.class
 tn\esprit\controllers\GestionListeRdv$1.class
+tn\esprit\controllers\CalendrierRendezVousController$1.class
 tn\esprit\controllers\ListeConsultationsController.class
 tn\esprit\controllers\ListeConsultationsController$1.class
 tn\esprit\controllers\GestionListeRdv.class
+tn\esprit\controllers\CalendrierRendezVousController$1$1.class
+tn\esprit\controllers\CalendrierRendezVousController.class
 tn\esprit\controllers\ListeConsultationsController$2.class
-tn\esprit\test\MainFXX.class

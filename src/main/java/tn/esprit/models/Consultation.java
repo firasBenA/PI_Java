@@ -3,7 +3,6 @@ package tn.esprit.models;
 import java.time.LocalDate;
 
 public class Consultation {
-    // Fields matching your table columns
     private int id;
     private int rendez_vous_id;
     private int patient_id;
@@ -12,15 +11,13 @@ public class Consultation {
     private double prix;
     private String type_consultation;
     private int user_id;
-    private String statut; // Nouveau champ pour le statut
+    private String statut;
 
-    // Additional fields for patient information
     private String patientPrenom;
     private String patientNom;
 
     // Constructors
     public Consultation() {
-        // Default constructor
     }
 
     public Consultation(int rendez_vous_id, int patient_id, int medecin_id, LocalDate date,
@@ -35,7 +32,6 @@ public class Consultation {
         this.statut = "en_attente"; // Valeur par défaut
     }
 
-    // Enhanced constructor with patient names
     public Consultation(int rendez_vous_id, int patient_id, int medecin_id, LocalDate date,
                         double prix, String type_consultation, int user_id,
                         String patientPrenom, String patientNom) {
@@ -144,7 +140,6 @@ public class Consultation {
         this.statut = statut;
     }
 
-    // toString method for debugging (updated with patient names and status)
     @Override
     public String toString() {
         return "Consultation{" +
@@ -161,22 +156,18 @@ public class Consultation {
                 '}';
     }
 
-    // Helper method to get full patient name
     public String getPatientFullName() {
         return (patientPrenom != null ? patientPrenom : "") + " " + (patientNom != null ? patientNom : "");
     }
 
-    // Helper method to check if consultation is approved
     public boolean isApprouvee() {
         return "approuvé".equalsIgnoreCase(statut);
     }
 
-    // Helper method to check if consultation is refused
     public boolean isRefusee() {
         return "refusé".equalsIgnoreCase(statut);
     }
 
-    // Helper method to check if consultation is pending
     public boolean isEnAttente() {
         return "en_attente".equalsIgnoreCase(statut);
     }

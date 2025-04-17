@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.collections.FXCollections?>
+<?import com.mysql.cj.x.protobuf.MysqlxDatatypes.Scalar.String?>
+<VBox spacing="15" alignment="TOP_CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.CalendrierRendezVousController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <ComboBox fx:id="medecinComboBox" promptText="Choisir un médecin" />
+
+    <DatePicker fx:id="datePicker" />
+
+    <HBox spacing="10">
+        <Label text="Type:" />
+        <ComboBox fx:id="typeComboBox">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Consultation" />
+                    <String fx:value="Urgence" />
+                    <String fx:value="Suivi" />
+                </FXCollections>
+            </items>
+        </ComboBox>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Cause:" />
+        <TextField fx:id="causeTextField" promptText="Saisir la cause..." />
+    </HBox>
+
+    <Button fx:id="validerButton" text="Valider le rendez-vous" onAction="#validerRendezVous" />
+</VBox>
