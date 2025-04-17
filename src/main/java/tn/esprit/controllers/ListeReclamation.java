@@ -284,7 +284,7 @@ public class ListeReclamation {
                 return;
             }
 
-            
+
             if (!TEXT_PATTERN.matcher(sujet).matches()) {
                 showAlert("Erreur", "Le sujet ne peut contenir que des lettres, chiffres, espaces et ponctuations de base (.,!?éèêëàâäîïôöûüç-) !");
                 return;
