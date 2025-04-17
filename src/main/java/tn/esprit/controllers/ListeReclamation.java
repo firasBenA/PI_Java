@@ -345,7 +345,6 @@ public class ListeReclamation {
         alert.setHeaderText(null);
         alert.setContentText(msg);
 
-        // Style the success/error alert
         DialogPane dialogPane = alert.getDialogPane();
         System.out.println("Loading stylesheet for alert...");
         java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
