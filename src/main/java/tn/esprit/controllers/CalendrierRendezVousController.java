@@ -1,6 +1,7 @@
 package tn.esprit.controllers;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
@@ -8,6 +9,9 @@ import tn.esprit.models.RendeVous;
 import tn.esprit.services.ServiceAddRdv;
 import tn.esprit.services.ServiceConsultation;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -43,11 +47,21 @@ public class CalendrierRendezVousController {
     }
 
     private void loadMedecins() {
-        List<String> nomsMedecins = serviceConsultation.getNomsMedecins(); // méthode à créer pour récupérer les noms
-        medecinComboBox.getItems().addAll(nomsMedecins);
-        for (String nom : nomsMedecins) {
-            int id = serviceConsultation.getIdMedecinParNom(nom); // méthode à créer
-            medecinMap.put(nom, id);
+        ObservableList<String> medecinsList = FXCollections.observableArrayList();
+        String query = "SELECT nom, prenom FROM user WHERE roles LIKE '%MEDECIN%'";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String nomComplet = rs.getString("prenom") + " " + rs.getString("nom");
+                medecinsList.add(nomComplet);
+            }
+            medecin.setItems(medecinsList);
+
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des médecins : " + e.getMessage());
+            showAlert("Erreur", "Impossible de charger la liste des médecins");
         }
     }
 

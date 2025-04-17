@@ -94,15 +94,6 @@ public class ServiceConsultation {
         return count;
     }
 
-    public List<String> getNomsMedecins() {
-        // retourne tous les noms de médecins
-        return List.of();
-    }
-
-    public int getIdMedecinParNom(String nom) {
-        // retourne l’ID du médecin en fonction de son nom
-        return 0;
-    }
 
 
 }
