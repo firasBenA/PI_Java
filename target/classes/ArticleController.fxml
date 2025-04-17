@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ArticleController">
-   <Label text="Article Management" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+<VBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ArticleController">
+   <Label alignment="CENTER" prefHeight="30.0" prefWidth="560.0" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Articles" />
 
-   <!-- Input Fields -->
-   <GridPane hgap="10" vgap="10">
-      <Label text="Titre:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-      <TextField fx:id="titreField" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+   <GridPane alignment="CENTER" hgap="10" prefHeight="270.0" prefWidth="170.0" vgap="10">
+      <Label text="Titre:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <TextField fx:id="titreField" prefHeight="26.0" prefWidth="277.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-      <Label text="Contenue:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-      <TextArea fx:id="contenueField" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+      <Label text="Contenue:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+      <TextArea fx:id="contenueField" prefHeight="182.0" prefWidth="454.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-      <Label text="Image Path:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-      <TextField fx:id="imageField" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+      <Label text="Image Path:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+      <TextField fx:id="imageField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <columnConstraints>
+         <ColumnConstraints />
+         <ColumnConstraints />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
    </GridPane>
 
-   <!-- Buttons -->
-   <HBox spacing="10">
-      <Button text="Add Article" onAction="#addArticle" />
-      <Button text="Update Article" onAction="#updateArticle" />
-      <Button text="Delete Article" onAction="#deleteArticle" />
-      <Button text="Switch to Evenement" onAction="#switchToEvenement" />
+   <HBox alignment="CENTER" spacing="10">
+      <Button onAction="#addArticle" text="Ajouter" />
+      <Button onAction="#updateArticle" text="Modifier" />
+      <Button onAction="#deleteArticle" text="Supprimer" />
+      <Button onAction="#switchToEvenement" text="Les evenements" />
    </HBox>
 
-   <!-- Table to Display Articles -->
-   <TableView fx:id="articleTable">
+   <TableView fx:id="articleTable" prefHeight="206.0" prefWidth="560.0">
       <columns>
-         <TableColumn text="ID" prefWidth="50">
-            <cellValueFactory><PropertyValueFactory property="id" /></cellValueFactory>
-         </TableColumn>
-         <TableColumn text="Titre" prefWidth="150">
+         <TableColumn prefWidth="150" text="Titre">
             <cellValueFactory><PropertyValueFactory property="titre" /></cellValueFactory>
          </TableColumn>
-         <TableColumn text="Contenue" prefWidth="200">
+         <TableColumn prefWidth="200" text="Contenue">
             <cellValueFactory><PropertyValueFactory property="contenue" /></cellValueFactory>
          </TableColumn>
-         <TableColumn text="Image" prefWidth="150">
+         <TableColumn prefWidth="150" text="Image">
             <cellValueFactory><PropertyValueFactory property="image" /></cellValueFactory>
          </TableColumn>
       </columns>

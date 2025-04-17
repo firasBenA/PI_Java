@@ -27,17 +27,15 @@ public class ArticleController {
 
     @FXML
     public void initialize() {
-        // Load articles from the database
         try {
-            articleList.clear(); // Clear any existing data
-            articleList.addAll(serviceArticle.getAll()); // Fetch data from the database
-            articleTable.setItems(articleList); // Set the data in the TableView
+            articleList.clear();
+            articleList.addAll(serviceArticle.getAll());
+            articleTable.setItems(articleList);
             System.out.println("Loaded " + articleList.size() + " articles from the database.");
         } catch (Exception e) {
-            showAlert("Error", "Failed to load articles: " + e.getMessage());
+            showError("Échec du chargement : " + e.getMessage());
         }
 
-        // Select an article to populate fields
         articleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 titreField.setText(newSelection.getTitre());
@@ -49,7 +47,6 @@ public class ArticleController {
 
     @FXML
     public void addArticle() {
-        // Input validation
         if (!validateArticleInputs()) {
             return;
         }
@@ -64,9 +61,9 @@ public class ArticleController {
             articleList.clear();
             articleList.addAll(serviceArticle.getAll());
             clearFields();
-            showAlert("Success", "Article added successfully!");
+            showAlert("Succès", "Article ajouté avec succès.");
         } catch (Exception e) {
-            showAlert("Error", "Failed to add article: " + e.getMessage());
+            showError("Erreur d'ajout : " + e.getMessage());
         }
     }
 
@@ -74,11 +71,10 @@ public class ArticleController {
     public void updateArticle() {
         Article selectedArticle = articleTable.getSelectionModel().getSelectedItem();
         if (selectedArticle == null) {
-            showAlert("Error", "Please select an article to update.");
+            showError("Veuillez sélectionner un article à modifier.");
             return;
         }
 
-        // Input validation
         if (!validateArticleInputs()) {
             return;
         }
@@ -92,9 +88,9 @@ public class ArticleController {
             articleList.clear();
             articleList.addAll(serviceArticle.getAll());
             clearFields();
-            showAlert("Success", "Article updated successfully!");
+            showAlert("Succès", "Article modifié avec succès.");
         } catch (Exception e) {
-            showAlert("Error", "Failed to update article: " + e.getMessage());
+            showError("Erreur de modification : " + e.getMessage());
         }
     }
 
@@ -102,7 +98,7 @@ public class ArticleController {
     public void deleteArticle() {
         Article selectedArticle = articleTable.getSelectionModel().getSelectedItem();
         if (selectedArticle == null) {
-            showAlert("Error", "Please select an article to delete.");
+            showError("Veuillez sélectionner un article à supprimer.");
             return;
         }
 
@@ -110,9 +106,9 @@ public class ArticleController {
             serviceArticle.delete(selectedArticle);
             articleList.remove(selectedArticle);
             clearFields();
-            showAlert("Success", "Article deleted successfully!");
+            showAlert("Succès", "Article supprimé avec succès.");
         } catch (Exception e) {
-            showAlert("Error", "Failed to delete article: " + e.getMessage());
+            showError("Erreur de suppression : " + e.getMessage());
         }
     }
 
@@ -125,15 +121,15 @@ public class ArticleController {
 
     private boolean validateArticleInputs() {
         if (titreField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Titre cannot be empty.");
+            showError("Le titre est obligatoire.");
             return false;
         }
         if (contenueField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Contenue cannot be empty.");
+            showError("Le contenu est obligatoire.");
             return false;
         }
         if (imageField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Image path cannot be empty.");
+            showError("L'image est obligatoire.");
             return false;
         }
         return true;
@@ -145,9 +141,21 @@ public class ArticleController {
         imageField.clear();
     }
 
+    // Overloaded showAlert methods
+    private void showAlert(String message) {
+        showAlert("Information", message);
+    }
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erreur");
         alert.setContentText(message);
         alert.showAndWait();
     }

@@ -1,63 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.EvenementController">
-    <Label text="Evenement Management" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+<VBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.EvenementController">
+    <Label alignment="CENTER" prefHeight="39.0" prefWidth="760.0" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Evenements" />
 
-    <!-- Input Fields -->
-    <GridPane hgap="10" vgap="10">
-        <Label text="Nom:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-        <TextField fx:id="nomField" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+    <GridPane alignment="CENTER" hgap="10" prefHeight="306.0" prefWidth="802.0" vgap="10">
+        <Label text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="nomField" prefHeight="26.0" prefWidth="690.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-        <Label text="Contenue:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-        <TextArea fx:id="contenueField" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        <Label text="Contenue:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextArea fx:id="contenueField" prefHeight="76.0" prefWidth="351.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-        <Label text="Type:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-        <TextField fx:id="typeField" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+        <Label text="Type:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <ComboBox fx:id="typeComboBox" prefWidth="690.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-        <Label text="Statut:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-        <TextField fx:id="statutField" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        <Label text="Statut:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <ComboBox fx:id="statutComboBox" prefWidth="690.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-        <Label text="Lieux Event:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-        <TextField fx:id="lieuxField" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+        <Label text="Lieux Event:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="lieuxField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-        <Label text="Date Event:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
-        <DatePicker fx:id="dateField" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+        <Label text="Date Event:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <DatePicker fx:id="dateField" prefHeight="26.0" prefWidth="690.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+        </rowConstraints>
     </GridPane>
 
-    <!-- Buttons -->
-    <HBox spacing="10">
-        <Button text="Add Evenement" onAction="#addEvenement" />
-        <Button text="Update Evenement" onAction="#updateEvenement" />
-        <Button text="Delete Evenement" onAction="#deleteEvenement" />
-        <Button text="Switch to Article" onAction="#switchToArticle" />
+    <Label fx:id="statusLabel" alignment="CENTER" opacity="0" prefWidth="760.0" />
+
+    <HBox alignment="CENTER" prefHeight="26.0" prefWidth="667.0" spacing="10">
+        <Button alignment="CENTER" onAction="#addEvenement" text="Ajouter" />
+        <Button alignment="CENTER" onAction="#updateEvenement" text="Modifier" />
+        <Button alignment="CENTER" onAction="#deleteEvenement" text="Supprimer" />
+        <Button alignment="CENTER" onAction="#switchToArticle" text="Articles" />
     </HBox>
 
-    <!-- Table to Display Evenements -->
     <TableView fx:id="evenementTable">
         <columns>
-            <TableColumn text="ID" prefWidth="50">
-                <cellValueFactory><PropertyValueFactory property="id" /></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Nom" prefWidth="150">
+            <TableColumn prefWidth="150" text="Nom">
                 <cellValueFactory><PropertyValueFactory property="nom" /></cellValueFactory>
             </TableColumn>
-            <TableColumn text="Contenue" prefWidth="200">
+            <TableColumn prefWidth="200" text="Contenue">
                 <cellValueFactory><PropertyValueFactory property="contenue" /></cellValueFactory>
             </TableColumn>
-            <TableColumn text="Type" prefWidth="100">
+            <TableColumn prefWidth="100" text="Type">
                 <cellValueFactory><PropertyValueFactory property="type" /></cellValueFactory>
             </TableColumn>
-            <TableColumn text="Statut" prefWidth="100">
+            <TableColumn prefWidth="100" text="Statut">
                 <cellValueFactory><PropertyValueFactory property="statut" /></cellValueFactory>
             </TableColumn>
-            <TableColumn text="Lieux Event" prefWidth="150">
+            <TableColumn prefWidth="150" text="Lieux Event">
                 <cellValueFactory><PropertyValueFactory property="lieuxEvent" /></cellValueFactory>
             </TableColumn>
-            <TableColumn text="Date Event" prefWidth="100">
+            <TableColumn prefWidth="100" text="Date Event">
                 <cellValueFactory><PropertyValueFactory property="dateEvent" /></cellValueFactory>
             </TableColumn>
         </columns>
