@@ -1,14 +1,16 @@
 package tn.esprit.controllers;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 import tn.esprit.models.RendeVous;
-import tn.esprit.services.ServiceConsultation;
 import tn.esprit.services.ServiceAddRdv;
+import tn.esprit.services.ServiceConsultation;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CalendrierRendezVousController {
@@ -26,20 +28,27 @@ public class CalendrierRendezVousController {
 
     @FXML
     public void initialize() {
-        // Exemples : noms + id associés
-        medecinMap.put("Dr. Aissaoui", 1);
-        medecinMap.put("Dr. Ben Amor", 2);
-
-        medecinComboBox.getItems().addAll(medecinMap.keySet());
-        typeComboBox.getItems().addAll("CONSULTATION", "URGENCE", "SUIVI");
+        typeComboBox.setItems(FXCollections.observableArrayList("Consultation", "Suivi", "Urgence"));
+        loadMedecins();
 
         medecinComboBox.setOnAction(e -> {
-            String nom = medecinComboBox.getValue();
-            if (nom != null && medecinMap.containsKey(nom)) {
-                int idMedecin = medecinMap.get(nom);
-                setupCalendar(idMedecin);
+            String selected = medecinComboBox.getValue();
+            if (selected != null) {
+                Integer medecinId = medecinMap.get(selected);
+                if (medecinId != null) {
+                    setupCalendar(medecinId);
+                }
             }
         });
+    }
+
+    private void loadMedecins() {
+        List<String> nomsMedecins = serviceConsultation.getNomsMedecins(); // méthode à créer pour récupérer les noms
+        medecinComboBox.getItems().addAll(nomsMedecins);
+        for (String nom : nomsMedecins) {
+            int id = serviceConsultation.getIdMedecinParNom(nom); // méthode à créer
+            medecinMap.put(nom, id);
+        }
     }
 
     private void setupCalendar(int medecinId) {
@@ -92,7 +101,7 @@ public class CalendrierRendezVousController {
         rv.setCause(cause);
         rv.setStatut("en_attente");
 
-        int currentUserId = getCurrentPatientId(); // à adapter
+        int currentUserId = getCurrentPatientId(); // à adapter selon session
         rv.setIdPatient(currentUserId);
 
         serviceRdv.add(rv);
@@ -107,6 +116,6 @@ public class CalendrierRendezVousController {
     }
 
     private int getCurrentPatientId() {
-        return 1; // à remplacer par ton système d’authentification
+        return 1; // à adapter à ton système d'authentification
     }
 }
