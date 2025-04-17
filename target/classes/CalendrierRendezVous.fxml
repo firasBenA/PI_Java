@@ -4,8 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.collections.FXCollections?>
-
 <?import java.lang.String?>
+
 <VBox spacing="15" alignment="TOP_CENTER" xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.CalendrierRendezVousController">
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
@@ -17,15 +17,7 @@
 
     <HBox spacing="10">
         <Label text="Type:" />
-        <ComboBox fx:id="typeComboBox">
-            <items>
-                <FXCollections fx:factory="observableArrayList">
-                    <String fx:value="Consultation" />
-                    <String fx:value="Urgence" />
-                    <String fx:value="Suivi" />
-                </FXCollections>
-            </items>
-        </ComboBox>
+        <ComboBox fx:id="typeComboBox" />
     </HBox>
 
     <HBox spacing="10">

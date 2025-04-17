@@ -9,12 +9,13 @@ import tn.esprit.models.RendeVous;
 import tn.esprit.services.ServiceAddRdv;
 import tn.esprit.services.ServiceConsultation;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CalendrierRendezVousController {
@@ -27,12 +28,14 @@ public class CalendrierRendezVousController {
 
     private final ServiceConsultation serviceConsultation = new ServiceConsultation();
     private final ServiceAddRdv serviceRdv = new ServiceAddRdv();
-
     private final Map<String, Integer> medecinMap = new HashMap<>();
+
+    private Connection connection;
 
     @FXML
     public void initialize() {
         typeComboBox.setItems(FXCollections.observableArrayList("Consultation", "Suivi", "Urgence"));
+        connectDB();
         loadMedecins();
 
         medecinComboBox.setOnAction(e -> {
@@ -46,22 +49,32 @@ public class CalendrierRendezVousController {
         });
     }
 
+    private void connectDB() {
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
+        } catch (SQLException e) {
+            System.err.println("Erreur de connexion à la base de données : " + e.getMessage());
+        }
+    }
+
     private void loadMedecins() {
         ObservableList<String> medecinsList = FXCollections.observableArrayList();
-        String query = "SELECT nom, prenom FROM user WHERE roles LIKE '%MEDECIN%'";
+        String query = "SELECT id, nom, prenom FROM user WHERE roles LIKE '%MEDECIN%'";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
+                int id = rs.getInt("id");
                 String nomComplet = rs.getString("prenom") + " " + rs.getString("nom");
                 medecinsList.add(nomComplet);
+                medecinMap.put(nomComplet, id);
             }
-            medecin.setItems(medecinsList);
+
+            medecinComboBox.setItems(medecinsList);
 
         } catch (SQLException e) {
             System.err.println("Erreur lors du chargement des médecins : " + e.getMessage());
-            showAlert("Erreur", "Impossible de charger la liste des médecins");
         }
     }
 
