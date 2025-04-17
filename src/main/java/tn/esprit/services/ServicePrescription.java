@@ -1,7 +1,6 @@
 package tn.esprit.services;
 
 import tn.esprit.interfaces.IService;
-import tn.esprit.models.Personne;
 import tn.esprit.models.Prescription;
 import tn.esprit.utils.MyDataBase;
 

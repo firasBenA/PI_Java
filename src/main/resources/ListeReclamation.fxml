@@ -8,18 +8,20 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="tn.esprit.controllers.ListeReclamation"
-            prefHeight="500.0" prefWidth="700.0"
-            styleClass="root-pane"
-            stylesheets="@styles.css">
+            prefHeight="600.0" prefWidth="800.0"
+            styleClass="root-pane wave-background"
+            stylesheets="@./styles.css">
 
     <!-- Main container with padding -->
-    <VBox spacing="15" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
+    <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
 
         <!-- Title -->
         <Text text="Gestion des Réclamations" styleClass="title"/>
 
-        <!-- ListView for Reclamations -->
-        <ListView fx:id="listViewReclamations" prefHeight="200" styleClass="list-view"/>
+        <!-- ScrollPane containing the CardPane (HBox for horizontal cards) -->
+        <ScrollPane fitToHeight="true" prefHeight="260.0" styleClass="scroll-pane" hbarPolicy="ALWAYS" vbarPolicy="NEVER">
+            <HBox fx:id="cardPane" spacing="20" styleClass="card-container"/>
+        </ScrollPane>
 
         <!-- Form Grid for Input Fields -->
         <GridPane hgap="10" vgap="10" alignment="CENTER">
@@ -28,24 +30,18 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="300.0" prefWidth="400.0"/>
             </columnConstraints>
 
-            <Text text="ID :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label"/>
-            <TextField fx:id="TFid" promptText="ID (Auto rempli)" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="text-field"/>
+            <Text text="Sujet :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label"/>
+            <TextField fx:id="TFsujet" promptText="Sujet" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="text-field"/>
 
-            <Text text="Sujet :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label"/>
-            <TextField fx:id="TFsujet" promptText="Sujet" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-field"/>
-
-            <Text text="Description :" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="label"/>
-            <TextField fx:id="TFdescription" promptText="Description" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="text-field"/>
-
-            <!-- Removed DatePicker (DPDate) and TFetat -->
+            <Text text="Description :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label"/>
+            <TextField fx:id="TFdescription" promptText="Description" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-field"/>
         </GridPane>
 
         <!-- Buttons -->
-        <HBox spacing="15" alignment="CENTER">
+        <HBox spacing="20" alignment="CENTER">
             <Button text="Ajouter" onAction="#Save" styleClass="button-primary"/>
             <Button text="Modifier" onAction="#Update" styleClass="button-secondary"/>
             <Button text="Supprimer" onAction="#Delete" styleClass="button-danger"/>
         </HBox>
     </VBox>
-
 </AnchorPane>

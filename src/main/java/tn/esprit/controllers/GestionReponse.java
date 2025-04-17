@@ -35,7 +35,6 @@ public class GestionReponse {
     public void initialize() {
         loadReclamations();
 
-        // Custom cell factory for ListView
         listViewReclamations.setCellFactory(listView -> new ListCell<Reclamation>() {
             @Override
             protected void updateItem(Reclamation reclamation, boolean empty) {
@@ -117,7 +116,7 @@ public class GestionReponse {
             System.out.println("Confirmation dialog result: " + result);
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                // Start a transaction
+
                 Connection cnx = MyDataBase.getInstance().getCnx();
                 cnx.setAutoCommit(false); // Disable auto-commit
                 try {
