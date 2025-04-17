@@ -23,6 +23,13 @@
             <HBox fx:id="cardPane" spacing="20" styleClass="card-container"/>
         </ScrollPane>
 
+        <!-- Pagination Controls -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button fx:id="prevButton" text="Précédent" onAction="#goToPreviousPage" styleClass="button-secondary"/>
+            <Label fx:id="pageLabel" text="Page 1 of 1" styleClass="label"/>
+            <Button fx:id="nextButton" text="Suivant" onAction="#goToNextPage" styleClass="button-primary"/>
+        </HBox>
+
         <!-- Form Grid for Input Fields -->
         <GridPane hgap="10" vgap="10" alignment="CENTER">
             <columnConstraints>

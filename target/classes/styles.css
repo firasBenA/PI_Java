@@ -19,7 +19,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.3, 0, 1);
 }
 
-/* Labels for form fields */
+
 .label {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
@@ -173,7 +173,7 @@
     -fx-font-family: "Arial";
 }
 
-/* Card subtitle (Description) */
+
 .card-subtitle {
     -fx-font-size: 13px;
     -fx-text-fill: #2f4f4f;
@@ -213,7 +213,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.3, 0, 1);
 }
 
-/* Button styling */
+
 .button-primary {
     -fx-background-color: #095d7e;
     -fx-text-fill: #ffffff;

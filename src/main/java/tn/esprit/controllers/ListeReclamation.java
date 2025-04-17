@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ListeReclamation {
 
@@ -30,9 +31,23 @@ public class ListeReclamation {
     @FXML
     private TextArea TFdescription;
 
+    @FXML
+    private Button prevButton;
+
+    @FXML
+    private Button nextButton;
+
+    @FXML
+    private Label pageLabel;
+
     private final ServiceReclamation service = new ServiceReclamation();
     private ObservableList<Reclamation> observableReclamations;
     private Reclamation selectedReclamation;
+
+    // Pagination variables
+    private static final int ITEMS_PER_PAGE = 4;
+    private int currentPage = 1;
+    private int totalPages = 1;
 
     // Validation constants
     private static final int MIN_SUJET_LENGTH = 5;
@@ -60,14 +75,35 @@ public class ListeReclamation {
                 showAlert("Avertissement", "La description ne peut pas dépasser " + MAX_DESCRIPTION_LENGTH + " caractères !");
             }
         });
+
+        // Initialize button states
+        updateButtonStates();
     }
 
     private void loadReclamations() {
+        // Load all reclamations from the service
         List<Reclamation> reclamationList = service.getAll();
         observableReclamations = FXCollections.observableArrayList(reclamationList);
+
+        // Calculate total pages
+        totalPages = (int) Math.ceil((double) observableReclamations.size() / ITEMS_PER_PAGE);
+        if (totalPages == 0) totalPages = 1; // Ensure at least 1 page
+
+        // Adjust current page if it exceeds total pages (e.g., after deletion)
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        // Clear current cards
         cardPane.getChildren().clear();
 
-        for (Reclamation reclamation : observableReclamations) {
+        // Get the reclamations for the current page
+        int startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, observableReclamations.size());
+        List<Reclamation> currentPageReclamations = observableReclamations.subList(startIndex, endIndex);
+
+        // Display reclamations for the current page
+        for (Reclamation reclamation : currentPageReclamations) {
             VBox card = createReclamationCard(reclamation);
             cardPane.getChildren().add(card);
 
@@ -76,6 +112,33 @@ public class ListeReclamation {
             fade.setFromValue(0.0);
             fade.setToValue(1.0);
             fade.play();
+        }
+
+        // Update page label
+        pageLabel.setText("Page " + currentPage + " of " + totalPages);
+
+        // Update button states
+        updateButtonStates();
+    }
+
+    private void updateButtonStates() {
+        prevButton.setDisable(currentPage <= 1);
+        nextButton.setDisable(currentPage >= totalPages);
+    }
+
+    @FXML
+    public void goToPreviousPage(ActionEvent event) {
+        if (currentPage > 1) {
+            currentPage--;
+            loadReclamations();
+        }
+    }
+
+    @FXML
+    public void goToNextPage(ActionEvent event) {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadReclamations();
         }
     }
 
@@ -283,7 +346,6 @@ public class ListeReclamation {
                 showAlert("Erreur", "La description ne peut pas dépasser " + MAX_DESCRIPTION_LENGTH + " caractères !");
                 return;
             }
-
 
             if (!TEXT_PATTERN.matcher(sujet).matches()) {
                 showAlert("Erreur", "Le sujet ne peut contenir que des lettres, chiffres, espaces et ponctuations de base (.,!?éèêëàâäîïôöûüç-) !");
