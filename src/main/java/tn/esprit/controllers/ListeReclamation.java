@@ -255,7 +255,7 @@ public class ListeReclamation {
                 return;
             }
 
-            // Validate fields
+            
             if (sujet.isEmpty() || description.isEmpty()) {
                 showAlert("Erreur", "Les champs Sujet et Description doivent être remplis !");
                 return;
