@@ -122,7 +122,7 @@
     -fx-alignment: center-left;
 }
 
-/* Individual card styling */
+
 .card {
     -fx-background-color: linear-gradient(to bottom right, #ffffff, #f1f9ff);
     -fx-border-color: #ccecee;

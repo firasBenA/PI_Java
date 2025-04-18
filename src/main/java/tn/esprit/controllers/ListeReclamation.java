@@ -153,7 +153,7 @@ public class ListeReclamation {
         sujetTitle.getStyleClass().add("card-title");
         sujetTitle.setWrappingWidth(200);
 
-       
+
         String description = reclamation.getDescription();
         Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
