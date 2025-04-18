@@ -12,10 +12,9 @@
             styleClass="root-pane wave-background"
             stylesheets="./styles.css">
 
-    <!-- Main container with padding -->
+
     <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
 
-        <!-- Title -->
         <Text text="Gestion des Réclamations" styleClass="title"/>
 
         <!-- ScrollPane containing the CardPane (HBox for horizontal cards) -->
@@ -30,7 +29,6 @@
             <Button fx:id="nextButton" text="Suivant" onAction="#goToNextPage" styleClass="button-primary"/>
         </HBox>
 
-        <!-- Form Grid for Input Fields -->
         <GridPane hgap="10" vgap="10" alignment="CENTER">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0"/>

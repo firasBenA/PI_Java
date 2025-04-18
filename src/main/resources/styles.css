@@ -122,7 +122,7 @@
     -fx-alignment: center-left;
 }
 
-
+/* Individual card styling */
 .card {
     -fx-background-color: linear-gradient(to bottom right, #ffffff, #f1f9ff);
     -fx-border-color: #ccecee;
@@ -262,22 +262,23 @@
 
 /* "Voir plus" button styling */
 .button-see-more {
-    -fx-background-color: transparent;
-    -fx-text-fill: #095d7e;
+    -fx-background-color: #095d7e;
+    -fx-text-fill: #ffffff;
     -fx-font-size: 12px;
     -fx-font-family: "Arial";
     -fx-font-weight: bold;
-    -fx-padding: 2px 5px;
-    -fx-border-color: #095d7e;
-    -fx-border-width: 1px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-alignment: center;
+    -fx-max-width: 100px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.3, 0, 1);
 }
 
 .button-see-more:hover {
-    -fx-background-color: #095d7e;
-    -fx-text-fill: #ffffff;
+    -fx-background-color: #14967f;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0.4, 0, 2);
 }
 
 /* Modal dialog styling */

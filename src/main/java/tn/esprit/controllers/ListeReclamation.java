@@ -58,7 +58,7 @@ public class ListeReclamation {
     private static final int MAX_DESCRIPTION_LENGTH = 500;
     private static final Pattern TEXT_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.,!?éèêëàâäîïôöûüç-]+$");
 
-
+    // Description limit for card display
     private static final int DESCRIPTION_DISPLAY_LIMIT = 100;
 
     @FXML
@@ -141,8 +141,8 @@ public class ListeReclamation {
         VBox card = new VBox(10);
         card.getStyleClass().add("card");
         card.setPrefWidth(220);
-        card.setPrefHeight(220);
-        card.setMinHeight(220);
+        card.setPrefHeight(250); // Increased height to accommodate button
+        card.setMinHeight(250);
 
         Region imagePlaceholder = new Region();
         imagePlaceholder.getStyleClass().add("image-placeholder");
@@ -153,23 +153,13 @@ public class ListeReclamation {
         sujetTitle.getStyleClass().add("card-title");
         sujetTitle.setWrappingWidth(200);
 
-
+        // Handle description
         String description = reclamation.getDescription();
         Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
         descriptionText.setWrappingWidth(200);
-
-        HBox descriptionContainer = new HBox(5);
-        if (description.length() > DESCRIPTION_DISPLAY_LIMIT) {
-            descriptionText.setText(description.substring(0, DESCRIPTION_DISPLAY_LIMIT - 3) + "...");
-            Button seeMoreButton = new Button("Voir plus");
-            seeMoreButton.getStyleClass().add("button-see-more");
-            seeMoreButton.setOnAction(event -> showFullDescription(reclamation.getDescription()));
-            descriptionContainer.getChildren().addAll(descriptionText, seeMoreButton);
-        } else {
-            descriptionText.setText(description);
-            descriptionContainer.getChildren().add(descriptionText);
-        }
+        descriptionText.setText(description.length() > DESCRIPTION_DISPLAY_LIMIT ?
+                description.substring(0, DESCRIPTION_DISPLAY_LIMIT) : description);
 
         Text dateLabel = new Text("Date: ");
         dateLabel.getStyleClass().add("card-label");
@@ -185,6 +175,16 @@ public class ListeReclamation {
 
         VBox detailsBox = new VBox(3, dateBox, etatBox);
         detailsBox.getStyleClass().add("card-details");
+
+        // Add "Voir plus" button below description if needed
+        VBox descriptionContainer = new VBox(5);
+        descriptionContainer.getChildren().add(descriptionText);
+        if (description.length() > DESCRIPTION_DISPLAY_LIMIT) {
+            Button seeMoreButton = new Button("Voir plus");
+            seeMoreButton.getStyleClass().add("button-see-more");
+            seeMoreButton.setOnAction(event -> showFullDescription(reclamation.getDescription()));
+            descriptionContainer.getChildren().add(seeMoreButton);
+        }
 
         card.getChildren().addAll(imagePlaceholder, sujetTitle, descriptionContainer, detailsBox);
 
