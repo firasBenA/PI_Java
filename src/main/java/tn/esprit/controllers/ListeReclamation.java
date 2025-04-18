@@ -47,7 +47,7 @@ public class ListeReclamation {
     private Reclamation selectedReclamation;
 
     // Pagination variables
-    private static final int ITEMS_PER_PAGE = 3; // Reverted to original
+    private static final int ITEMS_PER_PAGE = 3; // Kept at 3
     private int currentPage = 1;
     private int totalPages = 1;
 
@@ -59,7 +59,7 @@ public class ListeReclamation {
     private static final Pattern TEXT_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.,!?éèêëàâäîïôöûüç-]+$");
 
     // Description limit for card display
-    private static final int DESCRIPTION_DISPLAY_LIMIT = 120; // Adjusted for new size
+    private static final int DESCRIPTION_DISPLAY_LIMIT = 110; // Adjusted for new size
 
     @FXML
     public void initialize() {
@@ -138,25 +138,25 @@ public class ListeReclamation {
     }
 
     private VBox createReclamationCard(Reclamation reclamation) {
-        VBox card = new VBox(12); // Adjusted spacing
+        VBox card = new VBox(10); // Adjusted spacing to original
         card.getStyleClass().add("card");
-        card.setPrefWidth(260); // Adjusted from 300
-        card.setPrefHeight(300); // Adjusted from 350
-        card.setMinHeight(300);
+        card.setPrefWidth(240); // Adjusted from 260
+        card.setPrefHeight(280); // Adjusted from 300
+        card.setMinHeight(280);
 
         Region imagePlaceholder = new Region();
         imagePlaceholder.getStyleClass().add("image-placeholder");
-        imagePlaceholder.setPrefHeight(80); // Adjusted from 100
-        imagePlaceholder.setPrefWidth(80);
+        imagePlaceholder.setPrefHeight(75); // Adjusted from 80
+        imagePlaceholder.setPrefWidth(75);
 
         Text sujetTitle = new Text(reclamation.getSujet());
         sujetTitle.getStyleClass().add("card-title");
-        sujetTitle.setWrappingWidth(230); // Adjusted from 270
+        sujetTitle.setWrappingWidth(210); // Adjusted from 230
 
         String description = reclamation.getDescription();
         Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
-        descriptionText.setWrappingWidth(230); // Adjusted from 270
+        descriptionText.setWrappingWidth(210); // Adjusted from 230
         descriptionText.setText(description.length() > DESCRIPTION_DISPLAY_LIMIT ?
                 description.substring(0, DESCRIPTION_DISPLAY_LIMIT) : description);
 
@@ -172,11 +172,11 @@ public class ListeReclamation {
         HBox etatBox = new HBox(etatText);
         etatBox.getStyleClass().add("etat-container");
 
-        VBox detailsBox = new VBox(4); // Adjusted spacing
+        VBox detailsBox = new VBox(3); // Adjusted spacing to original
         detailsBox.getStyleClass().add("card-details");
         detailsBox.getChildren().addAll(dateBox, etatBox);
 
-        VBox descriptionContainer = new VBox(6); // Adjusted spacing
+        VBox descriptionContainer = new VBox(5); // Adjusted spacing to original
         descriptionContainer.getChildren().add(descriptionText);
         if (description.length() > DESCRIPTION_DISPLAY_LIMIT) {
             Button seeMoreButton = new Button("Voir plus");
