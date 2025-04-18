@@ -5,7 +5,6 @@ tn\esprit\controllers\GestionReclamation$1.class
 tn\esprit\models\Diagnostique.class
 tn\esprit\utils\MyDataBase.class
 tn\esprit\controllers\GestionReclamation.class
-tn\esprit\controllers\UneSeuleReclamation.class
 tn\esprit\controllers\GestionReponse.class
 tn\esprit\services\ServicePrescription.class
 tn\esprit\test\TestMain.class
