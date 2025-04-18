@@ -5,11 +5,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.Reclamation;
 import tn.esprit.services.ServiceReclamation;
@@ -18,7 +21,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ListeReclamation {
 
@@ -45,7 +47,7 @@ public class ListeReclamation {
     private Reclamation selectedReclamation;
 
     // Pagination variables
-    private static final int ITEMS_PER_PAGE = 4;
+    private static final int ITEMS_PER_PAGE = 3;
     private int currentPage = 1;
     private int totalPages = 1;
 
@@ -55,6 +57,9 @@ public class ListeReclamation {
     private static final int MIN_DESCRIPTION_LENGTH = 10;
     private static final int MAX_DESCRIPTION_LENGTH = 500;
     private static final Pattern TEXT_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.,!?éèêëàâäîïôöûüç-]+$");
+
+    
+    private static final int DESCRIPTION_DISPLAY_LIMIT = 100;
 
     @FXML
     public void initialize() {
@@ -81,43 +86,33 @@ public class ListeReclamation {
     }
 
     private void loadReclamations() {
-        // Load all reclamations from the service
         List<Reclamation> reclamationList = service.getAll();
         observableReclamations = FXCollections.observableArrayList(reclamationList);
 
-        // Calculate total pages
         totalPages = (int) Math.ceil((double) observableReclamations.size() / ITEMS_PER_PAGE);
-        if (totalPages == 0) totalPages = 1; // Ensure at least 1 page
+        if (totalPages == 0) totalPages = 1;
 
-        // Adjust current page if it exceeds total pages (e.g., after deletion)
         if (currentPage > totalPages) {
             currentPage = totalPages;
         }
 
-        // Clear current cards
         cardPane.getChildren().clear();
 
-        // Get the reclamations for the current page
         int startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, observableReclamations.size());
         List<Reclamation> currentPageReclamations = observableReclamations.subList(startIndex, endIndex);
 
-        // Display reclamations for the current page
         for (Reclamation reclamation : currentPageReclamations) {
             VBox card = createReclamationCard(reclamation);
             cardPane.getChildren().add(card);
 
-            // Add fade-in animation
             FadeTransition fade = new FadeTransition(Duration.millis(500), card);
             fade.setFromValue(0.0);
             fade.setToValue(1.0);
             fade.play();
         }
 
-        // Update page label
         pageLabel.setText("Page " + currentPage + " of " + totalPages);
-
-        // Update button states
         updateButtonStates();
     }
 
@@ -149,29 +144,38 @@ public class ListeReclamation {
         card.setPrefHeight(220);
         card.setMinHeight(220);
 
-        // Circular placeholder for an image/icon
         Region imagePlaceholder = new Region();
         imagePlaceholder.getStyleClass().add("image-placeholder");
         imagePlaceholder.setPrefHeight(70);
         imagePlaceholder.setPrefWidth(70);
 
-        // Title (Sujet)
         Text sujetTitle = new Text(reclamation.getSujet());
         sujetTitle.getStyleClass().add("card-title");
         sujetTitle.setWrappingWidth(200);
 
-        // Subtitle (Description)
-        Text descriptionText = new Text(reclamation.getDescription());
+        // Handle description: truncate if too long and add "Voir plus" button
+        String description = reclamation.getDescription();
+        Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
         descriptionText.setWrappingWidth(200);
 
-        // Details (Date only, ID removed)
+        HBox descriptionContainer = new HBox(5);
+        if (description.length() > DESCRIPTION_DISPLAY_LIMIT) {
+            descriptionText.setText(description.substring(0, DESCRIPTION_DISPLAY_LIMIT - 3) + "...");
+            Button seeMoreButton = new Button("Voir plus");
+            seeMoreButton.getStyleClass().add("button-see-more");
+            seeMoreButton.setOnAction(event -> showFullDescription(reclamation.getDescription()));
+            descriptionContainer.getChildren().addAll(descriptionText, seeMoreButton);
+        } else {
+            descriptionText.setText(description);
+            descriptionContainer.getChildren().add(descriptionText);
+        }
+
         Text dateLabel = new Text("Date: ");
         dateLabel.getStyleClass().add("card-label");
         Text dateText = new Text(reclamation.getDateDebut().toString());
         dateText.getStyleClass().add("card-text");
 
-        // État badge
         Text etatText = new Text(reclamation.getEtat());
         etatText.getStyleClass().add("etat-badge");
 
@@ -182,7 +186,7 @@ public class ListeReclamation {
         VBox detailsBox = new VBox(3, dateBox, etatBox);
         detailsBox.getStyleClass().add("card-details");
 
-        card.getChildren().addAll(imagePlaceholder, sujetTitle, descriptionText, detailsBox);
+        card.getChildren().addAll(imagePlaceholder, sujetTitle, descriptionContainer, detailsBox);
 
         card.setOnMouseClicked(event -> {
             if (selectedReclamation != null) {
@@ -201,6 +205,37 @@ public class ListeReclamation {
         return card;
     }
 
+    private void showFullDescription(String fullDescription) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Description complète");
+
+        VBox dialogContent = new VBox(10);
+        dialogContent.setPadding(new javafx.geometry.Insets(20));
+        dialogContent.getStyleClass().add("modal-dialog");
+
+        Text descriptionText = new Text(fullDescription);
+        descriptionText.getStyleClass().add("modal-text");
+        descriptionText.setWrappingWidth(400);
+
+        Button closeButton = new Button("Fermer");
+        closeButton.getStyleClass().add("button-secondary");
+        closeButton.setOnAction(event -> dialog.close());
+
+        dialogContent.getChildren().addAll(descriptionText, closeButton);
+
+        Scene dialogScene = new Scene(dialogContent, 450, 300);
+        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
+        if (cssUrl != null) {
+            dialogScene.getStylesheets().add(cssUrl.toExternalForm());
+        } else {
+            System.err.println("Error: CSS file not found for modal dialog at /tn/esprit/styles/styles.css");
+        }
+
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
+    }
+
     @FXML
     public void Save(ActionEvent actionEvent) {
         try {
@@ -208,13 +243,11 @@ public class ListeReclamation {
             String description = TFdescription.getText().trim();
             LocalDate date = LocalDate.now();
 
-            // Validate fields
             if (sujet.isEmpty() || description.isEmpty()) {
                 showAlert("Erreur", "Les champs Sujet et Description doivent être remplis !");
                 return;
             }
 
-            // Validate sujet length
             if (sujet.length() < MIN_SUJET_LENGTH) {
                 showAlert("Erreur", "Le sujet doit contenir au moins " + MIN_SUJET_LENGTH + " caractères !");
                 return;
@@ -224,7 +257,6 @@ public class ListeReclamation {
                 return;
             }
 
-            // Validate description length
             if (description.length() < MIN_DESCRIPTION_LENGTH) {
                 showAlert("Erreur", "La description doit contenir au moins " + MIN_DESCRIPTION_LENGTH + " caractères !");
                 return;
@@ -234,7 +266,6 @@ public class ListeReclamation {
                 return;
             }
 
-            // Validate allowed characters
             if (!TEXT_PATTERN.matcher(sujet).matches()) {
                 showAlert("Erreur", "Le sujet ne peut contenir que des lettres, chiffres, espaces et ponctuations de base (.,!?éèêëàâäîïôöûüç-) !");
                 return;
@@ -244,23 +275,16 @@ public class ListeReclamation {
                 return;
             }
 
-            // Optional: Check for unique sujet
             if (isSujetDuplicate(sujet, -1)) {
                 showAlert("Erreur", "Ce sujet existe déjà ! Veuillez choisir un sujet unique.");
                 return;
             }
 
-            // Log the date to confirm it's not null
             System.out.println("Date before creating Reclamation: " + date);
-
-            // etat will be set to "EnAttente" in the Reclamation constructor
-            Reclamation r = new Reclamation(sujet, description, date, null, 1); // 1 = user_id fictif
-
-            // Log the dateDebut and etat to confirm they're set
+            Reclamation r = new Reclamation(sujet, description, date, null, 1);
             System.out.println("Reclamation dateDebut after creation: " + r.getDateDebut());
             System.out.println("Reclamation etat after creation: " + r.getEtat());
 
-            // Show confirmation dialog
             Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmationAlert.setTitle("Confirmation");
             confirmationAlert.setHeaderText("Ajouter une réclamation");
@@ -270,7 +294,6 @@ public class ListeReclamation {
                     "Date : " + date + "\n" +
                     "État : EnAttente");
 
-            // Style the dialog
             DialogPane dialogPane = confirmationAlert.getDialogPane();
             System.out.println("Loading stylesheet for confirmation dialog...");
             java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
@@ -287,7 +310,6 @@ public class ListeReclamation {
             System.out.println("Confirmation dialog result: " + result);
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                // User confirmed, proceed with adding the reclamation
                 System.out.println("User confirmed, adding reclamation...");
                 service.add(r);
                 System.out.println("Reclamation added, showing success alert...");
@@ -295,7 +317,6 @@ public class ListeReclamation {
                 clearFields();
                 loadReclamations();
             } else {
-                // User canceled
                 System.out.println("Ajout de la réclamation annulé.");
             }
         } catch (Exception e) {
@@ -321,13 +342,11 @@ public class ListeReclamation {
                 return;
             }
 
-            // Validate fields
             if (sujet.isEmpty() || description.isEmpty()) {
                 showAlert("Erreur", "Les champs Sujet et Description doivent être remplis !");
                 return;
             }
 
-            // Validate sujet length
             if (sujet.length() < MIN_SUJET_LENGTH) {
                 showAlert("Erreur", "Le sujet doit contenir au moins " + MIN_SUJET_LENGTH + " caractères !");
                 return;
@@ -337,7 +356,6 @@ public class ListeReclamation {
                 return;
             }
 
-            // Validate description length
             if (description.length() < MIN_DESCRIPTION_LENGTH) {
                 showAlert("Erreur", "La description doit contenir au moins " + MIN_DESCRIPTION_LENGTH + " caractères !");
                 return;
@@ -356,7 +374,6 @@ public class ListeReclamation {
                 return;
             }
 
-            // Optional: Check for unique sujet (excluding the current reclamation)
             if (isSujetDuplicate(sujet, id)) {
                 showAlert("Erreur", "Ce sujet existe déjà ! Veuillez choisir un sujet unique.");
                 return;
@@ -410,14 +427,12 @@ public class ListeReclamation {
         alert.setHeaderText(null);
         alert.setContentText(msg);
 
-        // Style the success/error alert
         DialogPane dialogPane = alert.getDialogPane();
         System.out.println("Loading stylesheet for alert...");
         java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
         if (cssUrl == null) {
-            System.out.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
+            System.err.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
         } else {
-            System.out.println("CSS file found: " + cssUrl.toExternalForm());
             dialogPane.getStylesheets().add(cssUrl.toExternalForm());
             dialogPane.getStyleClass().add("sweet-alert");
         }
