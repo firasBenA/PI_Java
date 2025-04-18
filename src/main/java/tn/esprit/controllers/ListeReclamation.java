@@ -47,7 +47,7 @@ public class ListeReclamation {
     private Reclamation selectedReclamation;
 
     // Pagination variables
-    private static final int ITEMS_PER_PAGE = 3;
+    private static final int ITEMS_PER_PAGE = 2; // Reduced to fit larger cards
     private int currentPage = 1;
     private int totalPages = 1;
 
@@ -59,7 +59,7 @@ public class ListeReclamation {
     private static final Pattern TEXT_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.,!?éèêëàâäîïôöûüç-]+$");
 
     // Description limit for card display
-    private static final int DESCRIPTION_DISPLAY_LIMIT = 100;
+    private static final int DESCRIPTION_DISPLAY_LIMIT = 150; // Increased for larger cards
 
     @FXML
     public void initialize() {
@@ -138,25 +138,25 @@ public class ListeReclamation {
     }
 
     private VBox createReclamationCard(Reclamation reclamation) {
-        VBox card = new VBox(10);
+        VBox card = new VBox(15); // Increased spacing
         card.getStyleClass().add("card");
-        card.setPrefWidth(220);
-        card.setPrefHeight(250);
-        card.setMinHeight(250);
+        card.setPrefWidth(300); // Increased from 220
+        card.setPrefHeight(350); // Increased from 250
+        card.setMinHeight(350);
 
         Region imagePlaceholder = new Region();
         imagePlaceholder.getStyleClass().add("image-placeholder");
-        imagePlaceholder.setPrefHeight(70);
-        imagePlaceholder.setPrefWidth(70);
+        imagePlaceholder.setPrefHeight(100); // Increased from 70
+        imagePlaceholder.setPrefWidth(100);
 
         Text sujetTitle = new Text(reclamation.getSujet());
         sujetTitle.getStyleClass().add("card-title");
-        sujetTitle.setWrappingWidth(200);
+        sujetTitle.setWrappingWidth(270); // Increased from 200
 
         String description = reclamation.getDescription();
         Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
-        descriptionText.setWrappingWidth(200);
+        descriptionText.setWrappingWidth(270); // Increased from 200
         descriptionText.setText(description.length() > DESCRIPTION_DISPLAY_LIMIT ?
                 description.substring(0, DESCRIPTION_DISPLAY_LIMIT) : description);
 
@@ -172,10 +172,10 @@ public class ListeReclamation {
         HBox etatBox = new HBox(etatText);
         etatBox.getStyleClass().add("etat-container");
 
-        VBox detailsBox = new VBox(3, dateBox, etatBox);
+        VBox detailsBox = new VBox(5, dateBox, etatBox); // Increased spacing
         detailsBox.getStyleClass().add("card-details");
 
-        VBox descriptionContainer = new VBox(5);
+        VBox descriptionContainer = new VBox(8); // Increased spacing
         descriptionContainer.getChildren().add(descriptionText);
         if (description.length() > DESCRIPTION_DISPLAY_LIMIT) {
             Button seeMoreButton = new Button("Voir plus");
@@ -212,21 +212,17 @@ public class ListeReclamation {
         dialogContent.setPadding(new javafx.geometry.Insets(20));
         dialogContent.getStyleClass().add("modal-dialog");
 
-        // Add a title to the dialog
         Text dialogTitle = new Text("Détails de la Réclamation");
         dialogTitle.getStyleClass().add("modal-title");
 
-        // Description text
         Text descriptionText = new Text(fullDescription);
         descriptionText.getStyleClass().add("modal-text");
         descriptionText.setWrappingWidth(400);
 
-        // Close button
         Button closeButton = new Button("Fermer");
         closeButton.getStyleClass().add("modal-close-button");
         closeButton.setOnAction(event -> dialog.close());
 
-        // Center the button
         HBox buttonContainer = new HBox();
         buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
         buttonContainer.getChildren().add(closeButton);
@@ -234,14 +230,13 @@ public class ListeReclamation {
         dialogContent.getChildren().addAll(dialogTitle, descriptionText, buttonContainer);
 
         Scene dialogScene = new Scene(dialogContent, 500, 350);
-        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles.css");
+        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
         if (cssUrl != null) {
             dialogScene.getStylesheets().add(cssUrl.toExternalForm());
         } else {
-            System.err.println("Error: CSS file not found for modal dialog at /tn/esprit/styles.css");
+            System.err.println("Error: CSS file not found for modal dialog at /tn/esprit/styles/styles.css");
         }
 
-        // Add fade-in animation for the dialog
         FadeTransition fade = new FadeTransition(Duration.millis(300), dialogContent);
         fade.setFromValue(0.0);
         fade.setToValue(1.0);
