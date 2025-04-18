@@ -51,7 +51,7 @@ public class ListeReclamation {
     private int currentPage = 1;
     private int totalPages = 1;
 
-    
+    // Validation constants
     private static final int MIN_SUJET_LENGTH = 5;
     private static final int MAX_SUJET_LENGTH = 100;
     private static final int MIN_DESCRIPTION_LENGTH = 10;
