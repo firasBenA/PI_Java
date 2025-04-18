@@ -141,7 +141,7 @@ public class ListeReclamation {
         VBox card = new VBox(10);
         card.getStyleClass().add("card");
         card.setPrefWidth(220);
-        card.setPrefHeight(250); // Increased height to accommodate button
+        card.setPrefHeight(250);
         card.setMinHeight(250);
 
         Region imagePlaceholder = new Region();
@@ -153,7 +153,6 @@ public class ListeReclamation {
         sujetTitle.getStyleClass().add("card-title");
         sujetTitle.setWrappingWidth(200);
 
-        // Handle description
         String description = reclamation.getDescription();
         Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
@@ -176,7 +175,6 @@ public class ListeReclamation {
         VBox detailsBox = new VBox(3, dateBox, etatBox);
         detailsBox.getStyleClass().add("card-details");
 
-        // Add "Voir plus" button below description if needed
         VBox descriptionContainer = new VBox(5);
         descriptionContainer.getChildren().add(descriptionText);
         if (description.length() > DESCRIPTION_DISPLAY_LIMIT) {
@@ -210,27 +208,44 @@ public class ListeReclamation {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Description complète");
 
-        VBox dialogContent = new VBox(10);
+        VBox dialogContent = new VBox(15);
         dialogContent.setPadding(new javafx.geometry.Insets(20));
         dialogContent.getStyleClass().add("modal-dialog");
 
+        // Add a title to the dialog
+        Text dialogTitle = new Text("Détails de la Réclamation");
+        dialogTitle.getStyleClass().add("modal-title");
+
+        // Description text
         Text descriptionText = new Text(fullDescription);
         descriptionText.getStyleClass().add("modal-text");
         descriptionText.setWrappingWidth(400);
 
+        // Close button
         Button closeButton = new Button("Fermer");
-        closeButton.getStyleClass().add("button-secondary");
+        closeButton.getStyleClass().add("modal-close-button");
         closeButton.setOnAction(event -> dialog.close());
 
-        dialogContent.getChildren().addAll(descriptionText, closeButton);
+        // Center the button
+        HBox buttonContainer = new HBox();
+        buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
+        buttonContainer.getChildren().add(closeButton);
 
-        Scene dialogScene = new Scene(dialogContent, 450, 300);
-        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
+        dialogContent.getChildren().addAll(dialogTitle, descriptionText, buttonContainer);
+
+        Scene dialogScene = new Scene(dialogContent, 500, 350);
+        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles.css");
         if (cssUrl != null) {
             dialogScene.getStylesheets().add(cssUrl.toExternalForm());
         } else {
-            System.err.println("Error: CSS file not found for modal dialog at /tn/esprit/styles/styles.css");
+            System.err.println("Error: CSS file not found for modal dialog at /tn/esprit/styles.css");
         }
+
+        // Add fade-in animation for the dialog
+        FadeTransition fade = new FadeTransition(Duration.millis(300), dialogContent);
+        fade.setFromValue(0.0);
+        fade.setToValue(1.0);
+        fade.play();
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();
