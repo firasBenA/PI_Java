@@ -58,7 +58,7 @@ public class ListeReclamation {
     private static final int MAX_DESCRIPTION_LENGTH = 500;
     private static final Pattern TEXT_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.,!?éèêëàâäîïôöûüç-]+$");
 
-    
+
     private static final int DESCRIPTION_DISPLAY_LIMIT = 100;
 
     @FXML
@@ -153,7 +153,7 @@ public class ListeReclamation {
         sujetTitle.getStyleClass().add("card-title");
         sujetTitle.setWrappingWidth(200);
 
-        // Handle description: truncate if too long and add "Voir plus" button
+       
         String description = reclamation.getDescription();
         Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
