@@ -1,12 +1,11 @@
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\models\Article.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\models\Evenement.java
-C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\services\ServicePersonne.java
+C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\models\User.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\services\ServiceArticle.java
-C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\GestionPersonne.java
-C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\models\Personne.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\ArticleController.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\EvenementController.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\test\TestMain.java
+C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\services\ServiceUser.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\test\MainFX.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\utils\MyDataBase.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\services\ServiceEvenement.java

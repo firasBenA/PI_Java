@@ -1,5 +1,7 @@
 package tn.esprit.models;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class Article {
     private int id;
@@ -7,8 +9,11 @@ public class Article {
     private String contenue;
     private String image;
 
-    public Article() {
+    // Lists to manage relationships
+    private List<Evenement> evenements = new ArrayList<>();
+    private List<Integer> userLikes = new ArrayList<>(); // Store IDs of users who liked this article
 
+    public Article() {
     }
 
     public Article(int id, String titre, String contenue, String image) {
@@ -17,7 +22,6 @@ public class Article {
         this.titre = titre;
         this.contenue = contenue;
         this.image = image;
-
     }
 
     public int getId() {
@@ -52,6 +56,47 @@ public class Article {
         this.image = image;
     }
 
+    // Methods for relationship management
+    public List<Evenement> getEvenements() {
+        return evenements;
+    }
+
+    public void setEvenements(List<Evenement> evenements) {
+        this.evenements = evenements;
+    }
+
+    public void addEvenement(Evenement evenement) {
+        if (!this.evenements.contains(evenement)) {
+            this.evenements.add(evenement);
+        }
+    }
+
+    public void removeEvenement(Evenement evenement) {
+        this.evenements.remove(evenement);
+    }
+
+    public List<Integer> getUserLikes() {
+        return userLikes;
+    }
+
+    public void setUserLikes(List<Integer> userLikes) {
+        this.userLikes = userLikes;
+    }
+
+    public void addUserLike(int userId) {
+        if (!this.userLikes.contains(userId)) {
+            this.userLikes.add(userId);
+        }
+    }
+
+    public void removeUserLike(int userId) {
+        this.userLikes.remove(Integer.valueOf(userId));
+    }
+
+    public int getLikeCount() {
+        return userLikes.size();
+    }
+
     @Override
     public String toString() {
         return "Article{" +
@@ -59,6 +104,7 @@ public class Article {
                 ", titre='" + titre + '\'' +
                 ", contenue='" + contenue + '\'' +
                 ", image='" + image + '\'' +
+                ", likesCount=" + getLikeCount() +
                 '}';
     }
 }

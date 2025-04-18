@@ -1,6 +1,8 @@
 package tn.esprit.models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Evenement {
     private int id;
@@ -11,9 +13,10 @@ public class Evenement {
     private String lieuxEvent;
     private LocalDate dateEvent;
 
+    private List<Article> articles = new ArrayList<>();
+    private List<Integer> participants = new ArrayList<>(); // Store IDs of users participating in this event
 
-    public Evenement(){
-
+    public Evenement() {
     }
 
     public Evenement(int id, String nom, String contenue, String type,
@@ -28,6 +31,7 @@ public class Evenement {
         this.dateEvent = dateEvent;
     }
 
+    // Getters and setters for existing fields
     public int getId() {
         return id;
     }
@@ -84,6 +88,47 @@ public class Evenement {
         this.dateEvent = dateEvent;
     }
 
+    // Methods for relationship management
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
+    }
+
+    public void addArticle(Article article) {
+        if (!this.articles.contains(article)) {
+            this.articles.add(article);
+        }
+    }
+
+    public void removeArticle(Article article) {
+        this.articles.remove(article);
+    }
+
+    public List<Integer> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Integer> participants) {
+        this.participants = participants;
+    }
+
+    public void addParticipant(int userId) {
+        if (!this.participants.contains(userId)) {
+            this.participants.add(userId);
+        }
+    }
+
+    public void removeParticipant(int userId) {
+        this.participants.remove(Integer.valueOf(userId));
+    }
+
+    public int getParticipantCount() {
+        return participants.size();
+    }
+
     @Override
     public String toString() {
         return "Evenement{" +
@@ -94,8 +139,7 @@ public class Evenement {
                 ", statut='" + statut + '\'' +
                 ", lieuxEvent='" + lieuxEvent + '\'' +
                 ", dateEvent=" + dateEvent +
+                ", participantCount=" + getParticipantCount() +
                 '}';
     }
 }
-
-
