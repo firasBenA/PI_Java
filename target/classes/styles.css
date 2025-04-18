@@ -118,7 +118,7 @@
 /* Card container (HBox) styling */
 .card-container {
     -fx-background-color: transparent;
-    -fx-padding: 10px 10px 20px 10px;
+    -fx-padding: 10px 10px 20px 10px; /* Reverted to original */
     -fx-alignment: center-left;
 }
 
@@ -129,8 +129,8 @@
     -fx-border-width: 1px;
     -fx-border-radius: 15px;
     -fx-background-radius: 15px;
-    -fx-padding: 15px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0.3, 0, 2);
+    -fx-padding: 15px; /* Reverted to original */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0.3, 0, 2); /* Reverted */
     -fx-font-family: "Arial";
     -fx-font-size: 14px;
     -fx-alignment: top-center;
@@ -142,7 +142,7 @@
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
     -fx-rotate: 2;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 12, 0.4, 0, 3);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 12, 0.4, 0, 3); /* Reverted */
     -fx-translate-y: -5px;
 }
 
@@ -165,7 +165,7 @@
 
 /* Card title (Sujet) */
 .card-title {
-    -fx-font-size: 16px;
+    -fx-font-size: 16px; /* Reverted to original */
     -fx-font-weight: bold;
     -fx-text-fill: #095d7e;
     -fx-font-family: "Arial";
@@ -173,7 +173,7 @@
 
 /* Card subtitle (Description) */
 .card-subtitle {
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; /* Reverted to original */
     -fx-text-fill: #2f4f4f;
     -fx-font-family: "Arial";
     -fx-opacity: 0.9;
@@ -181,19 +181,19 @@
 
 /* Card details (ID, Date) */
 .card-details {
-    -fx-padding: 5px 0 0 0;
+    -fx-padding: 5px 0 0 0; /* Reverted to original */
     -fx-alignment: center-left;
 }
 
 .card-label {
     -fx-font-weight: bold;
     -fx-text-fill: #14967f;
-    -fx-font-size: 12px;
+    -fx-font-size: 12px; /* Reverted to original */
 }
 
 .card-text {
     -fx-text-fill: #2f4f4f;
-    -fx-font-size: 12px;
+    -fx-font-size: 12px; /* Reverted to original */
 }
 
 /* État badge */
@@ -204,9 +204,9 @@
 .etat-badge {
     -fx-background-color: #14967f;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 11px;
+    -fx-font-size: 11px; /* Reverted to original */
     -fx-font-weight: bold;
-    -fx-padding: 4px 10px;
+    -fx-padding: 4px 10px; /* Reverted to original */
     -fx-background-radius: 12px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0.3, 0, 1);
 }
@@ -264,14 +264,14 @@
 .button-see-more {
     -fx-background-color: #095d7e;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 12px;
+    -fx-font-size: 12px; /* Reverted to original */
     -fx-font-family: "Arial";
     -fx-font-weight: bold;
-    -fx-padding: 8px 16px;
+    -fx-padding: 8px 16px; /* Reverted to original */
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-alignment: center;
-    -fx-max-width: 100px;
+    -fx-max-width: 100px; /* Reverted to original */
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.3, 0, 1);
 }
 
