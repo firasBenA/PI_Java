@@ -122,4 +122,26 @@ public class ServiceReclamation implements IService<Reclamation> {
             System.out.println("Erreur lors de la suppression : " + e.getMessage());
         }
     }
+    public List<Reclamation> getByEtat(String etat) {
+        List<Reclamation> list = new ArrayList<>();
+        String qry = "SELECT * FROM reclamation WHERE etat = ? ORDER BY date_debut DESC";
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(qry);
+            pstm.setString(1, etat);
+            ResultSet rs = pstm.executeQuery();
+            while (rs.next()) {
+                Reclamation r = new Reclamation();
+                r.setId(rs.getInt("id"));
+                r.setSujet(rs.getString("sujet"));
+                r.setDescription(rs.getString("description"));
+                r.setDateDebut(rs.getDate("date_debut").toLocalDate());
+                r.setEtat(rs.getString("etat"));
+                r.setUserId(rs.getInt("user_id"));
+                list.add(r);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors de la récupération par état : " + e.getMessage());
+        }
+        return list;
+    }
 }
