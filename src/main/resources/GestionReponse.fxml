@@ -24,6 +24,11 @@
             <!-- Left: ListView for Reclamations -->
             <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400.0">
                 <Text text="Liste des Réclamations" styleClass="label"/>
+                <!-- Filter by Etat -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Filtrer par état :" styleClass="label"/>
+                    <ComboBox fx:id="filterEtatComboBox" prefWidth="150.0" styleClass="combo-box"/>
+                </HBox>
                 <ListView fx:id="listViewReclamations" prefHeight="400" styleClass="list-view" VBox.vgrow="ALWAYS"/>
             </VBox>
 

@@ -27,12 +27,20 @@ public class GestionReponse {
     @FXML
     private TextArea TAContenu;
 
+    @FXML
+    private ComboBox<String> filterEtatComboBox;
+
     private final ServiceReclamation serviceReclamation = new ServiceReclamation();
     private final ServiceReponse serviceReponse = new ServiceReponse();
     private ObservableList<Reclamation> observableReclamations;
 
     @FXML
     public void initialize() {
+        // Initialize ComboBox with filter options
+        filterEtatComboBox.setItems(FXCollections.observableArrayList("Tous", "En Attente", "Traité"));
+        filterEtatComboBox.setValue("Tous"); // Default selection
+        filterEtatComboBox.setOnAction(event -> loadReclamations()); // Refresh on selection change
+
         loadReclamations();
 
         listViewReclamations.setCellFactory(listView -> new ListCell<Reclamation>() {
@@ -42,7 +50,8 @@ public class GestionReponse {
                 if (empty || reclamation == null) {
                     setText(null);
                 } else {
-                    setText("ID: " + reclamation.getId() + " | Sujet: " + reclamation.getSujet() + " | Date: " + reclamation.getDateDebut() + " | État: " + reclamation.getEtat());
+                    // Exclude ID from display
+                    setText("Sujet: " + reclamation.getSujet() + " | Date: " + reclamation.getDateDebut() + " | État: " + reclamation.getEtat());
                 }
             }
         });
@@ -58,7 +67,16 @@ public class GestionReponse {
     }
 
     private void loadReclamations() {
-        List<Reclamation> reclamationList = serviceReclamation.getAll();
+        String selectedEtat = filterEtatComboBox.getValue();
+        List<Reclamation> reclamationList;
+
+        // Load reclamations based on filter
+        if (selectedEtat == null || selectedEtat.equals("Tous")) {
+            reclamationList = serviceReclamation.getAll();
+        } else {
+            reclamationList = serviceReclamation.getByEtat(selectedEtat);
+        }
+
         observableReclamations = FXCollections.observableArrayList(reclamationList);
         listViewReclamations.setItems(observableReclamations);
     }
@@ -116,7 +134,6 @@ public class GestionReponse {
             System.out.println("Confirmation dialog result: " + result);
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
-
                 Connection cnx = MyDataBase.getInstance().getCnx();
                 cnx.setAutoCommit(false); // Disable auto-commit
                 try {
@@ -150,6 +167,7 @@ public class GestionReponse {
             showAlert("Erreur", "Problème : " + e.getMessage());
         }
     }
+
     private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -159,7 +177,7 @@ public class GestionReponse {
         // Style the success/error alert
         DialogPane dialogPane = alert.getDialogPane();
         System.out.println("Loading stylesheet for alert...");
-        java.net.URL cssUrl = getClass().getResource("src/main/resources/tn/esprit/styles/styles.css");
+        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
         if (cssUrl == null) {
             System.out.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
         } else {
