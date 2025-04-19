@@ -18,7 +18,7 @@ public class Reclamation {
         this.sujet = sujet;
         this.description = description;
         this.dateDebut = dateDebut;
-        this.etat = "EnAttente"; // Default to "EnAttente" for new reclamations
+        this.etat = "En Attente"; // Default to "EnAttente" for new reclamations
         this.userId = userId;
     }
 

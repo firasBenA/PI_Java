@@ -11,13 +11,11 @@
 
     <children>
 
-        <!-- Title Section -->
         <VBox spacing="15" layoutX="50.0" layoutY="20.0" prefWidth="980">
             <Label text="Prescriptions et Diagnostics"
                    style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #34495e; -fx-text-alignment: center;" />
         </VBox>
 
-        <!-- Diagnostics Section -->
         <VBox spacing="15" layoutX="50.0" layoutY="80.0" prefWidth="980">
             <Label text="Liste des diagnostics :" style="-fx-font-size: 20px; -fx-text-fill: #2c3e50;" />
 
@@ -48,7 +46,6 @@
                     <TableColumn fx:id="datePrescCol" text="Date" prefWidth="120"/>
                     <TableColumn fx:id="actionsPrescCol" text="⚙ Actions" prefWidth="150"/>
                 </columns>
-                <!-- Hover Effect for Rows -->
 
             </TableView>
         </VBox>

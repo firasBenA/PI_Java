@@ -51,7 +51,7 @@ public class PatientDashboardController implements Initializable {
             {
                 btn.setOnAction(e -> {
                     Prescription p = getTableView().getItems().get(getIndex());
-                    downloadPdf(p.getId());
+                  //  downloadPdf(p.getId());
                 });
             }
 
@@ -75,7 +75,7 @@ public class PatientDashboardController implements Initializable {
         prescriptionTable.setItems(masterData);
     }
 
-    private void downloadPdf(int prescriptionId) {
+    /*private void downloadPdf(int prescriptionId) {
         try {
             File file = ServicePrescription.downloadPDF(prescriptionId);
             if (file != null) {
@@ -87,7 +87,6 @@ public class PatientDashboardController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }
-
 

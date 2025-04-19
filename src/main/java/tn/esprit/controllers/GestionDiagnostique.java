@@ -11,15 +11,12 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Diagnostique;
-import tn.esprit.models.Personne;
 import tn.esprit.services.ServiceDiagnostique;
-import tn.esprit.services.ServicePersonne;
 
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GestionDiagnostique {
