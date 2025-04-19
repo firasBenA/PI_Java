@@ -4,6 +4,7 @@ import tn.esprit.interfaces.IService;
 import tn.esprit.models.Prescription;
 import tn.esprit.utils.MyDataBase;
 
+import java.io.File;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,10 +52,16 @@ public class ServicePrescription implements IService<Prescription> {
                 p.setId(rs.getInt(1));
                 p.setTitre(rs.getString("titre"));
                 p.setContenue(rs.getString("contenue"));
+                p.setDiagnostique_id(rs.getInt("diagnostique_id"));
+                p.setDossier_medical_id(rs.getInt("dossier_medical_id"));
+                p.setMedecin_id(rs.getInt("medecin_id"));
+                p.setPatient_id(rs.getInt("patient_id"));
+
                 ///date convertion
                 java.sql.Date sqlDate = rs.getDate("date_prescription");
-                LocalDateTime dateTime = sqlDate.toLocalDate().atStartOfDay();
-                p.setDate_prescription(dateTime);
+                Date utilDate = new Date(sqlDate.getTime());
+                p.setDate_prescription(utilDate);
+
                 //////
 
                 prescriptions.add(p);
@@ -82,7 +89,7 @@ public class ServicePrescription implements IService<Prescription> {
             pstm.setInt(4, prescription.getPatient_id());
             pstm.setString(5, prescription.getTitre());
             pstm.setString(6, prescription.getContenue());
-            pstm.setTimestamp(7, Timestamp.valueOf(prescription.getDate_prescription()));
+            pstm.setDate(7, prescription.getDate_prescription());
             pstm.setInt(8, prescription.getId());
 
             pstm.executeUpdate();
@@ -91,13 +98,11 @@ public class ServicePrescription implements IService<Prescription> {
         }
     }
 
-
     @Override
     public void delete(Prescription prescription) {
         String qry = "DELETE FROM `prescription` WHERE `id` = ?";
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(qry);
-            pstm.setInt(1, prescription.getId());
+        try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
+            pstm.setInt(1, prescription.getId());  // Use prescription.getId() instead of id
             pstm.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error while deleting prescription: " + e.getMessage());
