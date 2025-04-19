@@ -53,9 +53,10 @@
                     <TextArea fx:id="TAContenu" promptText="Écrire votre réponse ici..." prefHeight="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="text-area"/>
                 </GridPane>
 
-                <!-- Button to Add Response -->
+                <!-- Buttons -->
                 <HBox spacing="15" alignment="CENTER">
                     <Button text="Ajouter Réponse" onAction="#Save" styleClass="button-primary"/>
+                    <Button text="Download Excel" onAction="#downloadExcel" styleClass="button-secondary"/>
                 </HBox>
             </VBox>
         </HBox>
