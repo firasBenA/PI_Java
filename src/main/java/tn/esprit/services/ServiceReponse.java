@@ -69,7 +69,26 @@ import java.util.List;
                 System.out.println("Erreur lors de la mise à jour : " + e.getMessage());
             }
         }
-
+        public List<Reponse> getByReclamationId(int reclamationId) {
+            List<Reponse> list = new ArrayList<>();
+            String qry = "SELECT * FROM reponse WHERE reclamation_id = ?";
+            try {
+                PreparedStatement pstm = cnx.prepareStatement(qry);
+                pstm.setInt(1, reclamationId);
+                ResultSet rs = pstm.executeQuery();
+                while (rs.next()) {
+                    Reponse r = new Reponse();
+                    r.setId(rs.getInt("id"));
+                    r.setContenu(rs.getString("contenu"));
+                    r.setDateReponse(rs.getDate("date_de_reponse").toLocalDate());
+                    r.setReclamationId(rs.getInt("reclamation_id"));
+                    list.add(r);
+                }
+            } catch (SQLException e) {
+                System.out.println("Erreur lors de la récupération par reclamation_id : " + e.getMessage());
+            }
+            return list;
+        }
         @Override
         public void delete(Reponse reponse) {
             String qry = "DELETE FROM reponse WHERE id = ?";

@@ -5,12 +5,18 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import tn.esprit.models.Reclamation;
 import tn.esprit.models.Reponse;
 import tn.esprit.services.ServiceReclamation;
 import tn.esprit.services.ServiceReponse;
 import tn.esprit.utils.MyDataBase;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
@@ -38,8 +44,8 @@ public class GestionReponse {
     public void initialize() {
         // Initialize ComboBox with filter options
         filterEtatComboBox.setItems(FXCollections.observableArrayList("Tous", "En Attente", "Traité"));
-        filterEtatComboBox.setValue("Tous"); // Default selection
-        filterEtatComboBox.setOnAction(event -> loadReclamations()); // Refresh on selection change
+        filterEtatComboBox.setValue("Tous");
+        filterEtatComboBox.setOnAction(event -> loadReclamations());
 
         loadReclamations();
 
@@ -50,7 +56,6 @@ public class GestionReponse {
                 if (empty || reclamation == null) {
                     setText(null);
                 } else {
-                    // Exclude ID from display
                     setText("Sujet: " + reclamation.getSujet() + " | Date: " + reclamation.getDateDebut() + " | État: " + reclamation.getEtat());
                 }
             }
@@ -70,7 +75,6 @@ public class GestionReponse {
         String selectedEtat = filterEtatComboBox.getValue();
         List<Reclamation> reclamationList;
 
-        // Load reclamations based on filter
         if (selectedEtat == null || selectedEtat.equals("Tous")) {
             reclamationList = serviceReclamation.getAll();
         } else {
@@ -113,7 +117,6 @@ public class GestionReponse {
             confirmationAlert.setTitle("Confirmation");
             confirmationAlert.setHeaderText("Ajouter une réponse");
             confirmationAlert.setContentText("Voulez-vous vraiment ajouter cette réponse ?\n\n" +
-                    "Réclamation ID : " + reclamationId + "\n" +
                     "Sujet de la réclamation : " + selectedReclamation.getSujet() + "\n" +
                     "Contenu : " + contenu + "\n" +
                     "Date : " + date);
@@ -135,7 +138,7 @@ public class GestionReponse {
 
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 Connection cnx = MyDataBase.getInstance().getCnx();
-                cnx.setAutoCommit(false); // Disable auto-commit
+                cnx.setAutoCommit(false);
                 try {
                     System.out.println("User confirmed, adding response...");
                     serviceReponse.add(reponse);
@@ -145,7 +148,7 @@ public class GestionReponse {
                     serviceReclamation.update(selectedReclamation);
                     System.out.println("Reclamation status updated to Traité");
 
-                    cnx.commit(); // Commit the transaction
+                    cnx.commit();
                     System.out.println("Transaction committed successfully");
 
                     System.out.println("Response added, showing success alert...");
@@ -153,11 +156,11 @@ public class GestionReponse {
                     clearFields();
                     loadReclamations();
                 } catch (Exception e) {
-                    cnx.rollback(); // Roll back on error
+                    cnx.rollback();
                     System.out.println("Transaction rolled back due to error: " + e.getMessage());
-                    throw e; // Re-throw to be caught by the outer catch block
+                    throw e;
                 } finally {
-                    cnx.setAutoCommit(true); // Restore auto-commit
+                    cnx.setAutoCommit(true);
                 }
             } else {
                 System.out.println("Ajout de la réponse annulé.");
@@ -168,13 +171,95 @@ public class GestionReponse {
         }
     }
 
+    @FXML
+    public void downloadExcel(ActionEvent actionEvent) {
+        try {
+            // Fetch all reclamations based on current filter
+            String selectedEtat = filterEtatComboBox.getValue();
+            List<Reclamation> reclamationList = (selectedEtat == null || selectedEtat.equals("Tous"))
+                    ? serviceReclamation.getAll()
+                    : serviceReclamation.getByEtat(selectedEtat);
+
+            // Create Excel workbook and sheet
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Reclamations and Responses");
+
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Reclamation ID", "Sujet", "Description", "Date", "État", "Response Contenu", "Response Date"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                // Optional: Style header
+                CellStyle headerStyle = workbook.createCellStyle();
+                Font font = workbook.createFont();
+                font.setBold(true);
+                headerStyle.setFont(font);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Populate data rows
+            int rowNum = 1;
+            for (Reclamation reclamation : reclamationList) {
+                List<Reponse> responses = serviceReponse.getByReclamationId(reclamation.getId());
+                if (responses.isEmpty()) {
+                    // Reclamation without responses
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(reclamation.getId());
+                    row.createCell(1).setCellValue(reclamation.getSujet());
+                    row.createCell(2).setCellValue(reclamation.getDescription());
+                    row.createCell(3).setCellValue(reclamation.getDateDebut().toString());
+                    row.createCell(4).setCellValue(reclamation.getEtat());
+                } else {
+                    // Reclamation with one or more responses
+                    for (Reponse response : responses) {
+                        Row row = sheet.createRow(rowNum++);
+                        row.createCell(0).setCellValue(reclamation.getId());
+                        row.createCell(1).setCellValue(reclamation.getSujet());
+                        row.createCell(2).setCellValue(reclamation.getDescription());
+                        row.createCell(3).setCellValue(reclamation.getDateDebut().toString());
+                        row.createCell(4).setCellValue(reclamation.getEtat());
+                        row.createCell(5).setCellValue(response.getContenu());
+                        row.createCell(6).setCellValue(response.getDateReponse().toString());
+                    }
+                }
+            }
+
+            // Auto-size columns
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Open file chooser to save the Excel file
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Excel File");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+            fileChooser.setInitialFileName("Reclamations_Responses.xlsx");
+            File file = fileChooser.showSaveDialog(listViewReclamations.getScene().getWindow());
+
+            if (file != null) {
+                try (FileOutputStream fileOut = new FileOutputStream(file)) {
+                    workbook.write(fileOut);
+                    showAlert("Succès", "Fichier Excel exporté avec succès à : " + file.getAbsolutePath());
+                }
+            } else {
+                System.out.println("Exportation annulée.");
+            }
+
+            // Close workbook
+            workbook.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Problème lors de l'exportation Excel : " + e.getMessage());
+        }
+    }
+
     private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(msg);
 
-        // Style the success/error alert
         DialogPane dialogPane = alert.getDialogPane();
         System.out.println("Loading stylesheet for alert...");
         java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
