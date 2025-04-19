@@ -42,12 +42,15 @@ public class ListeReclamation {
     @FXML
     private Label pageLabel;
 
+    @FXML
+    private ComboBox<String> filterEtatComboBox; // New ComboBox for filtering by etat
+
     private final ServiceReclamation service = new ServiceReclamation();
     private ObservableList<Reclamation> observableReclamations;
     private Reclamation selectedReclamation;
 
     // Pagination variables
-    private static final int ITEMS_PER_PAGE = 3; // Kept at 3
+    private static final int ITEMS_PER_PAGE = 3;
     private int currentPage = 1;
     private int totalPages = 1;
 
@@ -59,10 +62,15 @@ public class ListeReclamation {
     private static final Pattern TEXT_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.,!?éèêëàâäîïôöûüç-]+$");
 
     // Description limit for card display
-    private static final int DESCRIPTION_DISPLAY_LIMIT = 110; // Adjusted for new size
+    private static final int DESCRIPTION_DISPLAY_LIMIT = 110;
 
     @FXML
     public void initialize() {
+        // Initialize ComboBox with filter options
+        filterEtatComboBox.setItems(FXCollections.observableArrayList("Tous", "En Attente", "Traité"));
+        filterEtatComboBox.setValue("Tous"); // Default selection
+        filterEtatComboBox.setOnAction(event -> loadReclamations()); // Refresh on selection change
+
         loadReclamations();
 
         // Real-time validation for TFsujet
@@ -86,7 +94,16 @@ public class ListeReclamation {
     }
 
     private void loadReclamations() {
-        List<Reclamation> reclamationList = service.getAll();
+        String selectedEtat = filterEtatComboBox.getValue();
+        List<Reclamation> reclamationList;
+
+        // Load reclamations based on filter
+        if (selectedEtat == null || selectedEtat.equals("Tous")) {
+            reclamationList = service.getAll();
+        } else {
+            reclamationList = service.getByEtat(selectedEtat);
+        }
+
         observableReclamations = FXCollections.observableArrayList(reclamationList);
 
         totalPages = (int) Math.ceil((double) observableReclamations.size() / ITEMS_PER_PAGE);
@@ -138,25 +155,25 @@ public class ListeReclamation {
     }
 
     private VBox createReclamationCard(Reclamation reclamation) {
-        VBox card = new VBox(10); // Adjusted spacing to original
+        VBox card = new VBox(10);
         card.getStyleClass().add("card");
-        card.setPrefWidth(240); // Adjusted from 260
-        card.setPrefHeight(280); // Adjusted from 300
+        card.setPrefWidth(240);
+        card.setPrefHeight(280);
         card.setMinHeight(280);
 
         Region imagePlaceholder = new Region();
         imagePlaceholder.getStyleClass().add("image-placeholder");
-        imagePlaceholder.setPrefHeight(75); // Adjusted from 80
+        imagePlaceholder.setPrefHeight(75);
         imagePlaceholder.setPrefWidth(75);
 
         Text sujetTitle = new Text(reclamation.getSujet());
         sujetTitle.getStyleClass().add("card-title");
-        sujetTitle.setWrappingWidth(210); // Adjusted from 230
+        sujetTitle.setWrappingWidth(210);
 
         String description = reclamation.getDescription();
         Text descriptionText = new Text();
         descriptionText.getStyleClass().add("card-subtitle");
-        descriptionText.setWrappingWidth(210); // Adjusted from 230
+        descriptionText.setWrappingWidth(210);
         descriptionText.setText(description.length() > DESCRIPTION_DISPLAY_LIMIT ?
                 description.substring(0, DESCRIPTION_DISPLAY_LIMIT) : description);
 
@@ -172,11 +189,11 @@ public class ListeReclamation {
         HBox etatBox = new HBox(etatText);
         etatBox.getStyleClass().add("etat-container");
 
-        VBox detailsBox = new VBox(3); // Adjusted spacing to original
+        VBox detailsBox = new VBox(3);
         detailsBox.getStyleClass().add("card-details");
         detailsBox.getChildren().addAll(dateBox, etatBox);
 
-        VBox descriptionContainer = new VBox(5); // Adjusted spacing to original
+        VBox descriptionContainer = new VBox(5);
         descriptionContainer.getChildren().add(descriptionText);
         if (description.length() > DESCRIPTION_DISPLAY_LIMIT) {
             Button seeMoreButton = new Button("Voir plus");
