@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane styleClass="trensparent" stylesheets="@CSS/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.PrescriptionController" prefHeight="350.0" prefWidth="250.0">
+    <center>
+        <VBox prefHeight="300.0" prefWidth="231.0">
+            <padding>
+                <Insets bottom="8.0" left="8.0" right="8.0" top="10.0" />
+            </padding>
+            <styleClass>
+                <String fx:value="white-background" />
+                <String fx:value="shadow" />
+                <String fx:value="diagnostiqueCard" />
+            </styleClass>
+            <children>
+                <Label text="ORDONNANCE MÉDICALE" prefHeight="17.0" prefWidth="214.0">
+                    <font>
+                        <Font name="Berlin Sans FB" size="18.0" />
+                    </font>
+                </Label>
+                <Separator prefHeight="11.0" prefWidth="217.0">
+                    <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                    </padding>
+                </Separator>
+
+                <!-- DOCTOR INFO -->
+                <VBox>
+                    <children>
+                        <HBox prefHeight="24.0" prefWidth="217.0">
+                            <children>
+                                <Label text="Dr." textFill="#398ab9" prefWidth="29.0">
+                                    <font><Font name="Berlin Sans FB" size="18.0"/></font>
+                                </Label>
+                                <Label fx:id="nom" text="Ben Achour" prefWidth="72.0">
+                                    <font><Font name="Berlin Sans FB" size="14.0"/></font>
+                                </Label>
+                                <Label fx:id="prenom" text="Firas" prefWidth="76.0">
+                                    <font><Font name="Berlin Sans FB" size="14.0"/></font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox prefHeight="24.0" prefWidth="217.0">
+                            <children>
+                                <Label text="Contact : " textFill="#398ab9" prefWidth="86.0">
+                                    <font><Font name="Berlin Sans FB" size="18.0"/></font>
+                                </Label>
+                                <Label fx:id="numTel" text="25027101" prefWidth="132.0">
+                                    <font><Font name="Berlin Sans FB" size="14.0"/></font>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                    <styleClass>
+                        <String fx:value="trensparent" />
+                        <String fx:value="grey-background" />
+                        <String fx:value="shadow" />
+                    </styleClass>
+                    <VBox.margin>
+                        <Insets bottom="10.0" />
+                    </VBox.margin>
+                    <padding>
+                        <Insets top="4.0" bottom="4.0" left="4.0" right="4.0" />
+                    </padding>
+                </VBox>
+
+                <!-- PRESCRIPTION INFO -->
+                <VBox prefHeight="140.0">
+                    <children>
+                        <HBox prefHeight="24.0">
+                            <children>
+                                <Label text="Titre : " textFill="#398ab9" prefWidth="52.0">
+                                    <font><Font name="Berlin Sans FB" size="18.0"/></font>
+                                </Label>
+                                <Label fx:id="titre" text="Ordonnace 1" prefWidth="152.0">
+                                    <font><Font name="Berlin Sans FB" size="14.0"/></font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox prefHeight="24.0">
+                            <children>
+                                <Label text="Date : " textFill="#398ab9" prefWidth="60.0">
+                                    <font><Font name="Berlin Sans FB" size="18.0"/></font>
+                                </Label>
+                                <Label fx:id="datePrescription" text="03/03/2025" prefWidth="152.0">
+                                    <font><Font name="Berlin Sans FB" size="14.0"/></font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <VBox>
+                            <children>
+                                <Label text="Contenu : " textFill="#398ab9" prefWidth="85.0">
+                                    <font><Font name="Berlin Sans FB" size="18.0"/></font>
+                                </Label>
+                                <Label fx:id="contenue" alignment="TOP_LEFT" text="Lorem ipsum...&#10;lorem epsom..." wrapText="true" prefHeight="67.0" prefWidth="207.0">
+                                    <font><Font name="Berlin Sans FB" size="14.0"/></font>
+                                    <padding><Insets left="4.0" top="4.0"/></padding>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                    <styleClass>
+                        <String fx:value="trensparent" />
+                        <String fx:value="grey-background" />
+                        <String fx:value="shadow" />
+                    </styleClass>
+                    <padding><Insets top="4.0" bottom="4.0" left="4.0" right="4.0"/></padding>
+                </VBox>
+
+                <!-- SIGNATURE -->
+                <HBox>
+                    <children>
+                        <Label text="Signature Medecin :" prefWidth="148.0">
+                            <font><Font name="Segoe UI Black" size="11.0"/></font>
+                            <padding><Insets top="4.0"/></padding>
+                        </Label>
+                        <Separator prefWidth="118.0"/>
+                    </children>
+                </HBox>
+
+                <!-- FOOTER TEXT -->
+                <Label text="Cette ordonnance est valable pour une durée limitée." prefWidth="232.0">
+                    <font><Font name="System Italic" size="8.0"/></font>
+                </Label>
+            </children>
+        </VBox>
+    </center>
+
+    <!-- BOTTOM BUTTONS -->
+    <bottom>
+        <HBox alignment="CENTER" prefHeight="40.0" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="modifyBtn" text="Modifier" prefHeight="25.0" prefWidth="100.0" onAction="#onModifyClicked" />
+                <Button fx:id="deleteBtn" text="Supprimer" prefHeight="25.0" prefWidth="107.0" onAction="#onDeleteClicked" />
+            </children>
+            <styleClass>
+                <String fx:value="diagnostiqueCard" />
+                <String fx:value="shadow" />
+                <String fx:value="white-background" />
+            </styleClass>
+            <BorderPane.margin><Insets top="10.0"/></BorderPane.margin>
+        </HBox>
+    </bottom>
+</BorderPane>

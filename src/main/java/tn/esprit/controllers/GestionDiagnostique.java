@@ -11,15 +11,12 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Diagnostique;
-import tn.esprit.models.Personne;
 import tn.esprit.services.ServiceDiagnostique;
-import tn.esprit.services.ServicePersonne;
 
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GestionDiagnostique {
@@ -92,18 +89,14 @@ public class GestionDiagnostique {
     //////
 
     public void initialize() {
-        // Initialize symptoms list
         initSymptoms();
 
-        // Fetch doctors from database and populate combo box
         doctorIdMap = ServiceDiagnostique.getDoctors();
         doctorComboBox.getItems().addAll(doctorIdMap.keySet());
 
-        // Handle select symptom button
         selectSymptomButton.setOnAction(e -> handleSelectSymptom());
     }
 
-    // Initialize symptoms list
     private void initSymptoms() {
         ObservableList<String> symptoms = FXCollections.observableArrayList(
                 "itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", "shivering", "chills",
@@ -181,18 +174,15 @@ public class GestionDiagnostique {
         Tooltip errorTooltip = new Tooltip("Sélection requise !");
         Tooltip.install(doctorComboBox, errorTooltip);
 
-        // Call the service to diagnose
         Map<String, String> result = ServiceDiagnostique.diagnose(selectedSymptoms);
 
         String disease = result.getOrDefault("disease", "Inconnu");
         String description = result.getOrDefault("description", "Pas de description");
 
-        // Display diagnosis result
         resultLabel.setText("Maladie: " + disease + "\nDescription: " + description);
 
-        // Prepare all required data
         int doctorId = doctorIdMap.get(selectedDoctor);
-        Date currentDate = new Date(System.currentTimeMillis()); // dateDiagnostique
+        Date currentDate = new Date(System.currentTimeMillis());
 
         Diagnostique diag = new Diagnostique();
         diag.setNom(disease);
@@ -205,10 +195,8 @@ public class GestionDiagnostique {
         diag.setDateSymptomes(Date.valueOf(LocalDate.now()));
         diag.setStatus(0);
 
-        // Save the diagnosis
         ServiceDiagnostique.saveDiagnosis(diag);
 
-        // Show an alert and wait for user to click OK before navigating to the home screen
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Diagnostic effectué");
         alert.setHeaderText(null);
@@ -219,9 +207,9 @@ public class GestionDiagnostique {
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
                     Parent root = loader.load();
-                    Stage stage = (Stage) resultLabel.getScene().getWindow(); // Get the current stage
-                    stage.setScene(new Scene(root)); // Set the home scene
-                    stage.show(); // Show the home screen
+                    Stage stage = (Stage) resultLabel.getScene().getWindow();
+                    stage.setScene(new Scene(root));
+                    stage.show();
                 } catch (IOException e) {
                     e.printStackTrace();
                     resultLabel.setText("❌ Une erreur est survenue lors du changement de page.");

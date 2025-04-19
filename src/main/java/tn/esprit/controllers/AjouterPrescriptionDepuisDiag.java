@@ -2,21 +2,15 @@ package tn.esprit.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import tn.esprit.models.Diagnostique;
 import tn.esprit.models.Prescription;
-import tn.esprit.services.ServiceDiagnostique;
 import tn.esprit.services.ServicePrescription;
 
-import java.sql.Date;
-
-
-import java.sql.Connection;      // For the database connection
-import java.sql.DriverManager;   // To connect to the database
-import java.sql.PreparedStatement; // For executing parameterized SQL queries
-import java.sql.SQLException;    // To handle SQL exceptions
-import java.sql.Date;           // For date handling
+import java.sql.*;
 import java.time.LocalDate;
 
 
@@ -35,7 +29,7 @@ public class AjouterPrescriptionDepuisDiag {
     private Label errorLabel;
 
     @FXML
-    private Label diagnostiqueIdLabel;  // Add this label to display the Diagnostique ID
+    private Label diagnostiqueIdLabel;
 
     private Diagnostique diagnostique;
 
@@ -43,9 +37,9 @@ public class AjouterPrescriptionDepuisDiag {
 
     public void setDiagnostique(Diagnostique diagnostique) {
         this.diagnostique = diagnostique;
-        // Set the diagnostique ID to the label
         diagnostiqueIdLabel.setText("Diagnostique ID: " + diagnostique.getId());
     }
+
 
     public void ajouterPrescription(ActionEvent event) {
         String titre = titreField.getText();
