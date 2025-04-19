@@ -1,52 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="tn.esprit.controllers.ListeReclamation"
-            prefHeight="600.0" prefWidth="800.0"
-            styleClass="root-pane wave-background"
-            stylesheets="./styles.css">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="root-pane wave-background" stylesheets="./styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ListeReclamation">
 
 
-    <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
+    <VBox alignment="CENTER" spacing="20" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
 
-        <Text text="Gestion des Réclamations" styleClass="title"/>
+        <Text styleClass="title" text="Gestion des Réclamations" />
 
         <!-- ScrollPane containing the CardPane (HBox for horizontal cards) -->
-        <ScrollPane fitToHeight="true" prefHeight="260.0" styleClass="scroll-pane" hbarPolicy="ALWAYS" vbarPolicy="NEVER">
-            <HBox fx:id="cardPane" spacing="20" styleClass="card-container"/>
+        <ScrollPane fitToHeight="true" hbarPolicy="ALWAYS" prefHeight="306.0" prefWidth="760.0" styleClass="scroll-pane" vbarPolicy="NEVER">
+            <HBox fx:id="cardPane" spacing="20" styleClass="card-container" />
         </ScrollPane>
 
         <!-- Pagination Controls -->
-        <HBox spacing="10" alignment="CENTER">
-            <Button fx:id="prevButton" text="Précédent" onAction="#goToPreviousPage" styleClass="button-secondary"/>
-            <Label fx:id="pageLabel" text="Page 1 of 1" styleClass="label"/>
-            <Button fx:id="nextButton" text="Suivant" onAction="#goToNextPage" styleClass="button-primary"/>
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="prevButton" onAction="#goToPreviousPage" styleClass="button-secondary" text="Précédent" />
+            <Label fx:id="pageLabel" styleClass="label" text="Page 1 of 1" />
+            <Button fx:id="nextButton" onAction="#goToNextPage" styleClass="button-primary" text="Suivant" />
         </HBox>
 
-        <GridPane hgap="10" vgap="10" alignment="CENTER">
+        <GridPane alignment="CENTER" hgap="10" vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="300.0" prefWidth="400.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="300.0" prefWidth="400.0" />
             </columnConstraints>
 
-            <Text text="Sujet :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label"/>
-            <TextField fx:id="TFsujet" promptText="Sujet" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="text-field"/>
+            <Text styleClass="label" text="Sujet :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="TFsujet" promptText="Sujet" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-            <Text text="Description :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label"/>
-            <TextArea fx:id="TFdescription" promptText="Description" prefRowCount="4" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-field"/>
+            <Text styleClass="label" text="Description :" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextArea fx:id="TFdescription" prefRowCount="4" promptText="Description" styleClass="text-field" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
         </GridPane>
 
         <!-- Buttons -->
-        <HBox spacing="20" alignment="CENTER">
-            <Button text="Ajouter" onAction="#Save" styleClass="button-primary"/>
-            <Button text="Modifier" onAction="#Update" styleClass="button-secondary"/>
-            <Button text="Supprimer" onAction="#Delete" styleClass="button-danger"/>
+        <HBox alignment="CENTER" spacing="20">
+            <Button onAction="#Save" styleClass="button-primary" text="Ajouter" />
+            <Button onAction="#Update" styleClass="button-secondary" text="Modifier" />
+            <Button onAction="#Delete" styleClass="button-danger" text="Supprimer" />
         </HBox>
     </VBox>
 </AnchorPane>
