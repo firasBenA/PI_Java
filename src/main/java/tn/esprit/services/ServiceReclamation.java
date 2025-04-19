@@ -51,7 +51,7 @@ public class ServiceReclamation implements IService<Reclamation> {
     @Override
     public List<Reclamation> getAll() {
         List<Reclamation> list = new ArrayList<>();
-        String qry = "SELECT * FROM reclamation";
+        String qry = "SELECT * FROM reclamation order by date_debut desc";
         try {
             Statement stm = cnx.createStatement();
             ResultSet rs = stm.executeQuery(qry);
