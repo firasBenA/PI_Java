@@ -1,5 +1,4 @@
 tn\esprit\test\MainFX.class
-AppController.class
 tn\esprit\controllers\ArticleController.class
 tn\esprit\controllers\EvenementController.class
 tn\esprit\utils\MyDataBase.class
