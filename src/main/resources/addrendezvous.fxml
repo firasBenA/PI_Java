@@ -72,7 +72,7 @@
             </padding>
             <Label text="Nouveau Rendez-vous" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #095d7e;"/>
 
-            <GridPane hgap="10" vgap="15">
+            <GridPane hgap="10" vgap="5">
                <columnConstraints>
                   <ColumnConstraints percentWidth="30"/>
                   <ColumnConstraints percentWidth="70"/>
@@ -84,28 +84,56 @@
                   <RowConstraints minHeight="100"/>
                </rowConstraints>
 
+               <!-- Médecin -->
                <Label text="Médecin:" GridPane.rowIndex="0" GridPane.columnIndex="0"
                       style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
                <ComboBox fx:id="medecin" promptText="Choisissez un médecin"
                          GridPane.rowIndex="0" GridPane.columnIndex="1"
                          style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label fx:id="medecinError" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                      style="-fx-text-fill: red; -fx-font-size: 12px;">
+                  <GridPane.margin>
+                     <Insets top="30"/>
+                  </GridPane.margin>
+               </Label>
 
+               <!-- Type -->
                <Label text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"
                       style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
                <ComboBox fx:id="type_rdv" promptText="Type de consultation"
                          GridPane.rowIndex="1" GridPane.columnIndex="1"
                          style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label fx:id="typeError" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                      style="-fx-text-fill: red; -fx-font-size: 12px;">
+                  <GridPane.margin>
+                     <Insets top="30"/>
+                  </GridPane.margin>
+               </Label>
 
+               <!-- Date -->
                <Label text="Date:" GridPane.rowIndex="2" GridPane.columnIndex="0"
                       style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
                <DatePicker fx:id="datePicker" GridPane.rowIndex="2" GridPane.columnIndex="1"
                            style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label fx:id="dateError" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                      style="-fx-text-fill: red; -fx-font-size: 12px;">
+                  <GridPane.margin>
+                     <Insets top="30"/>
+                  </GridPane.margin>
+               </Label>
 
+               <!-- Détails -->
                <Label text="Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0"
                       style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
                <TextArea fx:id="cause" promptText="Décrivez votre problème"
                          GridPane.rowIndex="3" GridPane.columnIndex="1"
                          style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label fx:id="causeError" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                      style="-fx-text-fill: red; -fx-font-size: 12px;">
+                  <GridPane.margin>
+                     <Insets top="5"/>
+                  </GridPane.margin>
+               </Label>
             </GridPane>
 
             <Button text="Confirmer le Rendez-vous" onAction="#save"
