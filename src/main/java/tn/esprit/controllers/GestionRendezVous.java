@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import tn.esprit.models.RendeVous;
 import tn.esprit.services.ServiceAddRdv;
@@ -14,7 +13,6 @@ import tn.esprit.services.ServiceAddRdv;
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -25,7 +23,6 @@ public class GestionRendezVous implements Initializable {
     @FXML private ComboBox<String> type_rdv;
     @FXML private ComboBox<String> medecin;
     @FXML private TextArea cause;
-    @FXML private DatePicker calendar;
 
     // Labels pour les messages d'erreur
     @FXML private Label dateError;
@@ -49,8 +46,8 @@ public class GestionRendezVous implements Initializable {
         // Chargement des médecins
         loadMedecins();
 
-        // Configurer le calendrier
-        configureCalendar();
+        // Configurer le DatePicker
+        configureDatePicker();
 
         // Effacer les messages d'erreur lorsqu'on modifie les champs
         date.valueProperty().addListener((obs, oldVal, newVal) -> dateError.setText(""));
@@ -64,8 +61,8 @@ public class GestionRendezVous implements Initializable {
         cause.textProperty().addListener((obs, oldVal, newVal) -> causeError.setText(""));
     }
 
-    private void configureCalendar() {
-        calendar.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+    private void configureDatePicker() {
+        date.setDayCellFactory(new Callback<DatePicker, DateCell>() {
             @Override
             public DateCell call(DatePicker param) {
                 return new DateCell() {
@@ -85,6 +82,12 @@ public class GestionRendezVous implements Initializable {
                             }
 
                             setTooltip(new Tooltip(count + " consultation(s) ce jour"));
+
+                            // Désactiver les dates passées
+                            if (item.isBefore(LocalDate.now())) {
+                                setDisable(true);
+                                setStyle("-fx-background-color: #eeeeee;");
+                            }
                         }
                     }
                 };
@@ -138,9 +141,9 @@ public class GestionRendezVous implements Initializable {
                 rdvCountByDate.put(date, count);
             }
 
-            // Rafraîchir le calendrier
-            calendar.setValue(null);
-            calendar.show();
+            // Rafraîchir le DatePicker
+            date.setValue(null);
+            date.show();
         } catch (SQLException e) {
             System.err.println("Erreur lors du chargement des rendez-vous du médecin : " + e.getMessage());
         }
