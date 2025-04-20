@@ -8,21 +8,21 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionRendezVous">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.controllers.GestionRendezVous"
+            stylesheets="@Styles/style.css">
+
    <top>
-      <HBox style="-fx-background-color: #095d7e;" alignment="CENTER" spacing="20" padding="15">
-         <Text text="eHealth" fill="white" style="-fx-font-size: 24px; -fx-font-weight: bold;">
-            <font>
-               <Font name="Segoe UI" size="24"/>
-            </font>
+      <HBox styleClass="header" alignment="CENTER" spacing="20" padding="15">
+         <Text styleClass="header-text" text="eHealth">
             <effect>
                <DropShadow color="#14967f" radius="3"/>
             </effect>
          </Text>
          <Rectangle width="2" height="30" fill="#ccecee"/>
-         <Label text="Prise de Rendez-vous" textFill="white" style="-fx-font-size: 18px;"/>
+         <Label styleClass="header-label" text="Prise de Rendez-vous"/>
          <HBox spacing="10" HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
-            <Button text="Mon Compte" style="-fx-background-color: #14967f; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            <Button styleClass="header-button" text="Mon Compte"/>
          </HBox>
       </HBox>
    </top>
@@ -36,8 +36,8 @@
 
          <!-- Section Calendrier -->
          <VBox GridPane.columnIndex="0" spacing="15" alignment="TOP_CENTER">
-            <Label text="Disponibilités" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #095d7e;"/>
-            <DatePicker fx:id="date" style="-fx-font-size: 14px;" styleClass="custom-date-picker">
+            <Label styleClass="form-label" text="Disponibilités"/>
+            <DatePicker fx:id="date" styleClass="custom-date-picker">
                <GridPane.margin>
                   <Insets bottom="10"/>
                </GridPane.margin>
@@ -45,22 +45,22 @@
             <VBox spacing="5" alignment="CENTER_LEFT">
                <HBox spacing="5" alignment="CENTER_LEFT">
                   <Rectangle width="20" height="20" fill="#e2fcd6" stroke="#095d7e" strokeWidth="1"/>
-                  <Label text="Disponible (0-1 consultation)" style="-fx-text-fill: #095d7e;"/>
+                  <Label styleClass="form-label" text="Disponible (0-1 consultation)"/>
                </HBox>
                <HBox spacing="5" alignment="CENTER_LEFT">
                   <Rectangle width="20" height="20" fill="#14967f" stroke="#095d7e" strokeWidth="1"/>
-                  <Label text="Occupé (2 consultations)" style="-fx-text-fill: #095d7e;"/>
+                  <Label styleClass="form-label" text="Occupé (2 consultations)"/>
                </HBox>
                <HBox spacing="5" alignment="CENTER_LEFT">
                   <Rectangle width="20" height="20" fill="#095d7e" stroke="#095d7e" strokeWidth="1"/>
-                  <Label text="Complet (3+ consultations)" style="-fx-text-fill: #095d7e;"/>
+                  <Label styleClass="form-label" text="Complet (3+ consultations)"/>
                </HBox>
             </VBox>
          </VBox>
 
          <!-- Formulaire -->
-         <VBox GridPane.columnIndex="1" spacing="15" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
-            <Label text="Nouveau Rendez-vous" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #095d7e;"/>
+         <VBox GridPane.columnIndex="1" styleClass="form-container" spacing="15">
+            <Label styleClass="form-label" text="Nouveau Rendez-vous"/>
 
             <GridPane hgap="10" vgap="15">
                <columnConstraints>
@@ -68,27 +68,27 @@
                   <ColumnConstraints percentWidth="70"/>
                </columnConstraints>
 
-               <Label text="Médecin:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
-               <ComboBox fx:id="medecin" GridPane.rowIndex="0" GridPane.columnIndex="1" promptText="Choisissez un médecin" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label styleClass="form-label" text="Médecin:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+               <ComboBox fx:id="medecin" styleClass="form-field" promptText="Choisissez un médecin" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-               <Label text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
-               <ComboBox fx:id="type_rdv" GridPane.rowIndex="1" GridPane.columnIndex="1" promptText="Type de consultation" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label styleClass="form-label" text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+               <ComboBox fx:id="type_rdv" styleClass="form-field" promptText="Type de consultation" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-               <Label text="Date:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
-               <DatePicker fx:id="datePicker" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label styleClass="form-label" text="Date:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+               <DatePicker fx:id="datePicker" styleClass="form-field" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-               <Label text="Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
-               <TextArea fx:id="cause" GridPane.rowIndex="3" GridPane.columnIndex="1" promptText="Décrivez votre problème" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
+               <Label styleClass="form-label" text="Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+               <TextArea fx:id="cause" styleClass="form-field" promptText="Décrivez votre problème" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             </GridPane>
 
-            <Button text="Confirmer le Rendez-vous" style="-fx-background-color: #14967f; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 8 20; -fx-background-radius: 5;" onAction="#save"/>
+            <Button styleClass="submit-button" text="Confirmer le Rendez-vous" onAction="#save"/>
          </VBox>
       </GridPane>
    </center>
 
    <bottom>
-      <HBox style="-fx-background-color: #095d7e;" alignment="CENTER" padding="10">
-         <Label text="© 2025 eHealth - Tous droits réservés" textFill="white"/>
+      <HBox styleClass="footer" alignment="CENTER" padding="10">
+         <Label styleClass="footer-label" text="© 2025 eHealth - Tous droits réservés"/>
       </HBox>
    </bottom>
 </BorderPane>
