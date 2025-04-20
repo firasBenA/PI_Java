@@ -6,12 +6,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import tn.esprit.models.RendeVous;
 import tn.esprit.services.ServiceAddRdv;
 
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class GestionRendezVous implements Initializable {
@@ -20,6 +25,7 @@ public class GestionRendezVous implements Initializable {
     @FXML private ComboBox<String> type_rdv;
     @FXML private ComboBox<String> medecin;
     @FXML private TextArea cause;
+    @FXML private DatePicker calendar;
 
     // Labels pour les messages d'erreur
     @FXML private Label dateError;
@@ -29,6 +35,8 @@ public class GestionRendezVous implements Initializable {
 
     private Connection connection;
     private final ServiceAddRdv serviceAddRdv = new ServiceAddRdv();
+    private Map<LocalDate, Integer> rdvCountByDate = new HashMap<>();
+    private int currentMedecinId = -1;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -41,11 +49,101 @@ public class GestionRendezVous implements Initializable {
         // Chargement des médecins
         loadMedecins();
 
+        // Configurer le calendrier
+        configureCalendar();
+
         // Effacer les messages d'erreur lorsqu'on modifie les champs
         date.valueProperty().addListener((obs, oldVal, newVal) -> dateError.setText(""));
         type_rdv.valueProperty().addListener((obs, oldVal, newVal) -> typeError.setText(""));
-        medecin.valueProperty().addListener((obs, oldVal, newVal) -> medecinError.setText(""));
+        medecin.valueProperty().addListener((obs, oldVal, newVal) -> {
+            medecinError.setText("");
+            if (newVal != null && !newVal.isEmpty()) {
+                updateMedecinSelection();
+            }
+        });
         cause.textProperty().addListener((obs, oldVal, newVal) -> causeError.setText(""));
+    }
+
+    private void configureCalendar() {
+        calendar.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(DatePicker param) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (item != null && !empty && currentMedecinId != -1) {
+                            int count = rdvCountByDate.getOrDefault(item, 0);
+
+                            if (count >= 3) {
+                                setStyle("-fx-background-color: #ffcccc;"); // Rouge
+                            } else if (count == 2) {
+                                setStyle("-fx-background-color: #ffebcc;"); // Orange
+                            } else if (count <= 1) {
+                                setStyle("-fx-background-color: #ccffcc;"); // Vert
+                            }
+
+                            setTooltip(new Tooltip(count + " consultation(s) ce jour"));
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+    private void updateMedecinSelection() {
+        String[] nomPrenom = medecin.getValue().split(" ");
+        if (nomPrenom.length < 2) {
+            medecinError.setText("Format du médecin invalide");
+            return;
+        }
+
+        String prenom = nomPrenom[0];
+        String nom = nomPrenom[1];
+
+        try {
+            String medecinQuery = "SELECT id FROM user WHERE nom = ? AND prenom = ?";
+            try (PreparedStatement psMedecin = connection.prepareStatement(medecinQuery)) {
+                psMedecin.setString(1, nom);
+                psMedecin.setString(2, prenom);
+                ResultSet rs = psMedecin.executeQuery();
+                if (rs.next()) {
+                    currentMedecinId = rs.getInt("id");
+                    loadRendezVousForMedecin();
+                } else {
+                    medecinError.setText("Médecin non trouvé");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération de l'ID du médecin : " + e.getMessage());
+            showAlert("Erreur", "Problème lors de la sélection du médecin");
+        }
+    }
+
+    private void loadRendezVousForMedecin() {
+        rdvCountByDate.clear();
+
+        if (currentMedecinId == -1) return;
+
+        String query = "SELECT date, COUNT(*) as count FROM rendez_vous WHERE medecin_id = ? GROUP BY date";
+
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setInt(1, currentMedecinId);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                LocalDate date = rs.getDate("date").toLocalDate();
+                int count = rs.getInt("count");
+                rdvCountByDate.put(date, count);
+            }
+
+            // Rafraîchir le calendrier
+            calendar.setValue(null);
+            calendar.show();
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des rendez-vous du médecin : " + e.getMessage());
+        }
     }
 
     private void connectDB() {
@@ -81,28 +179,10 @@ public class GestionRendezVous implements Initializable {
     void save(ActionEvent event) {
         if (validerFormulaire()) {
             try {
-                // Extraction de l'ID du médecin
-                String[] nomPrenom = medecin.getValue().split(" ");
-                if (nomPrenom.length < 2) {
-                    medecinError.setText("Format du médecin invalide");
+                // Vérifier si le médecin est sélectionné
+                if (currentMedecinId == -1) {
+                    medecinError.setText("Veuillez sélectionner un médecin");
                     return;
-                }
-
-                String prenom = nomPrenom[0];
-                String nom = nomPrenom[1];
-                int idMedecin = -1;
-
-                String medecinQuery = "SELECT id FROM user WHERE nom = ? AND prenom = ?";
-                try (PreparedStatement psMedecin = connection.prepareStatement(medecinQuery)) {
-                    psMedecin.setString(1, nom);
-                    psMedecin.setString(2, prenom);
-                    ResultSet rs = psMedecin.executeQuery();
-                    if (rs.next()) {
-                        idMedecin = rs.getInt("id");
-                    } else {
-                        medecinError.setText("Médecin non trouvé");
-                        return;
-                    }
                 }
 
                 // Création et sauvegarde du rendez-vous
@@ -110,7 +190,7 @@ public class GestionRendezVous implements Initializable {
                 rdv.setDate(date.getValue());
                 rdv.setType(type_rdv.getValue());
                 rdv.setCause(cause.getText());
-                rdv.setIdMedecin(idMedecin);
+                rdv.setIdMedecin(currentMedecinId);
                 rdv.setIdPatient(1); // À remplacer par l'ID du patient connecté
                 rdv.setStatut("en_attente"); // Statut par défaut
 
@@ -120,7 +200,9 @@ public class GestionRendezVous implements Initializable {
                 showAlert("Succès", "Rendez-vous enregistré avec succès");
                 clearFields();
 
-            } catch (SQLException e) {
+                // Mettre à jour le calendrier après l'ajout
+                loadRendezVousForMedecin();
+            } catch (Exception e) {
                 System.err.println("Erreur lors de l'ajout du rendez-vous : " + e.getMessage());
                 showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");
             }
@@ -169,7 +251,6 @@ public class GestionRendezVous implements Initializable {
         date.setValue(null);
         type_rdv.getSelectionModel().clearSelection();
         cause.clear();
-        medecin.getSelectionModel().clearSelection();
     }
 
     private void showAlert(String title, String message) {
@@ -190,6 +271,8 @@ public class GestionRendezVous implements Initializable {
                 if (rs.next()) {
                     String nomMedecin = rs.getString("prenom") + " " + rs.getString("nom");
                     medecin.setValue(nomMedecin);
+                    currentMedecinId = rdv.getIdMedecin();
+                    loadRendezVousForMedecin();
                 }
             }
 
