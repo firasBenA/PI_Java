@@ -8,15 +8,20 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.controllers.GestionRendezVous">
 
    <top>
-      <HBox style="-fx-background-color: #095d7e; -fx-alignment: CENTER; -fx-spacing: 20; -fx-padding: 15;">
-         <Text text="eHealth" fill="white" style="-fx-font-size: 24px; -fx-font-weight: bold;">
+      <HBox style="-fx-background-color: #095d7e;" alignment="CENTER" spacing="20">
+         <padding>
+            <Insets top="15" right="15" bottom="15" left="15"/>
+         </padding>
+         <Text fill="WHITE" style="-fx-font-size: 24px; -fx-font-weight: bold;">
             <effect>
                <DropShadow color="#14967f" radius="3"/>
             </effect>
+            eHealth
          </Text>
          <Rectangle width="2" height="30" fill="#ccecee"/>
          <Label text="Prise de Rendez-vous" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
@@ -27,19 +32,22 @@
    </top>
 
    <center>
-      <GridPane hgap="20" vgap="20" alignment="CENTER" style="-fx-background-color: #ccecee;" padding="30">
+      <GridPane hgap="20" vgap="20" alignment="CENTER" style="-fx-background-color: #ccecee;">
+         <padding>
+            <Insets top="30" right="30" bottom="30" left="30"/>
+         </padding>
          <columnConstraints>
             <ColumnConstraints percentWidth="40"/>
             <ColumnConstraints percentWidth="60"/>
          </columnConstraints>
 
-         <!-- Section Calendrier -->
+         <!-- Calendar Section -->
          <VBox GridPane.columnIndex="0" spacing="15" alignment="TOP_CENTER">
             <Label text="Disponibilités" style="-fx-text-fill: #095d7e; -fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <DatePicker fx:id="date" style="-fx-font-size: 14px; -fx-background-radius: 15; -fx-border-radius: 15;">
-               <GridPane.margin>
+            <DatePicker fx:id="date" style="-fx-font-size: 14px;">
+               <VBox.margin>
                   <Insets bottom="10"/>
-               </GridPane.margin>
+               </VBox.margin>
             </DatePicker>
             <VBox spacing="5" alignment="CENTER_LEFT">
                <HBox spacing="5" alignment="CENTER_LEFT">
@@ -57,9 +65,11 @@
             </VBox>
          </VBox>
 
-         <!-- Formulaire -->
-         <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);"
-               GridPane.columnIndex="1" spacing="15">
+         <!-- Form Section -->
+         <VBox GridPane.columnIndex="1" spacing="15" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+            <padding>
+               <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
             <Label text="Nouveau Rendez-vous" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #095d7e;"/>
 
             <GridPane hgap="10" vgap="15">
@@ -67,21 +77,34 @@
                   <ColumnConstraints percentWidth="30"/>
                   <ColumnConstraints percentWidth="70"/>
                </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="35"/>
+                  <RowConstraints minHeight="35"/>
+                  <RowConstraints minHeight="35"/>
+                  <RowConstraints minHeight="100"/>
+               </rowConstraints>
 
-               <Label text="Médecin:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
-               <ComboBox fx:id="medecin" promptText="Choisissez un médecin" GridPane.rowIndex="0" GridPane.columnIndex="1"
+               <Label text="Médecin:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                      style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
+               <ComboBox fx:id="medecin" promptText="Choisissez un médecin"
+                         GridPane.rowIndex="0" GridPane.columnIndex="1"
                          style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
 
-               <Label text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
-               <ComboBox fx:id="type_rdv" promptText="Type de consultation" GridPane.rowIndex="1" GridPane.columnIndex="1"
+               <Label text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                      style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
+               <ComboBox fx:id="type_rdv" promptText="Type de consultation"
+                         GridPane.rowIndex="1" GridPane.columnIndex="1"
                          style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
 
-               <Label text="Date:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
+               <Label text="Date:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                      style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
                <DatePicker fx:id="datePicker" GridPane.rowIndex="2" GridPane.columnIndex="1"
                            style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
 
-               <Label text="Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
-               <TextArea fx:id="cause" promptText="Décrivez votre problème" GridPane.rowIndex="3" GridPane.columnIndex="1"
+               <Label text="Détails:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                      style="-fx-text-fill: #095d7e; -fx-font-weight: bold;"/>
+               <TextArea fx:id="cause" promptText="Décrivez votre problème"
+                         GridPane.rowIndex="3" GridPane.columnIndex="1"
                          style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;"/>
             </GridPane>
 
@@ -92,7 +115,10 @@
    </center>
 
    <bottom>
-      <HBox style="-fx-background-color: #095d7e;" alignment="CENTER" padding="10">
+      <HBox style="-fx-background-color: #095d7e;" alignment="CENTER">
+         <padding>
+            <Insets top="10" right="10" bottom="10" left="10"/>
+         </padding>
          <Label text="© 2025 eHealth - Tous droits réservés" style="-fx-text-fill: white;"/>
       </HBox>
    </bottom>
