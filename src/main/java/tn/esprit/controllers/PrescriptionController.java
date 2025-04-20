@@ -2,10 +2,12 @@ package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import tn.esprit.models.Prescription;
 import tn.esprit.models.User;
@@ -44,11 +46,16 @@ public class PrescriptionController {
     private Prescription currentPrescription;
 
 
+    private Node cardNode;
+    private Pane parentContainer;
 
 
-    public void setData(Prescription prescription){
 
+
+    public void setData(Prescription prescription, javafx.scene.Node cardNode, javafx.scene.layout.Pane parentContainer) {
         this.currentPrescription = prescription;
+        this.cardNode = cardNode;
+        this.parentContainer = parentContainer;
 
         ServiceUser patientService = new ServiceUser();
         User patient = patientService.getUserById(prescription.getPatient_id());
@@ -61,6 +68,7 @@ public class PrescriptionController {
         prenom.setText(patient.getPrenom());
     }
 
+
     @FXML
     private void onDeleteClicked() {
         ServicePrescription service = new ServicePrescription();
@@ -68,11 +76,14 @@ public class PrescriptionController {
 
         if (result) {
             System.out.println("Prescription supprimée !");
-            deleteBtn.getScene().getWindow().hide();
+            if (parentContainer != null && cardNode != null) {
+                parentContainer.getChildren().remove(cardNode);
+            }
         } else {
             System.out.println("Erreur lors de la suppression.");
         }
     }
+
 
     @FXML
     private void onModifyClicked() {

@@ -18,7 +18,6 @@ public class PrescriptionCardsController implements Initializable {
     @FXML
     private GridPane Container;
 
-    // Track column and row globally
     private int col = 0;
     private int row = 0;
 
@@ -42,11 +41,10 @@ public class PrescriptionCardsController implements Initializable {
             BorderPane card = loader.load();
 
             PrescriptionController controller = loader.getController();
-            controller.setData(prescription);
+            controller.setData(prescription, card, Container);
 
             Container.add(card, col, row);
 
-            // Update col and row for next card
             col++;
             if (col == 3) {
                 col = 0;
@@ -56,6 +54,7 @@ public class PrescriptionCardsController implements Initializable {
             e.printStackTrace();
         }
     }
+
 
     public void addNewPrescription(Prescription prescription) {
         addCardToGrid(prescription); // reuses same logic
