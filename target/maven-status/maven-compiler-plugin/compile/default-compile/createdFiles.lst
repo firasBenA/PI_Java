@@ -9,6 +9,8 @@ tn\esprit\controllers\ListeConsultationsController$2.class
 tn\esprit\controllers\GestionListeRdv$1.class
 tn\esprit\models\RendeVous$TypeRendezVous.class
 tn\esprit\controllers\ListeConsultationsController.class
+tn\esprit\controllers\GestionRendezVous$1$1.class
+tn\esprit\controllers\GestionRendezVous$1.class
 tn\esprit\controllers\GestionRendezVous.class
 tn\esprit\models\Consultation.class
 tn\esprit\models\RendeVous.class

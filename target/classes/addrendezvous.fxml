@@ -2,52 +2,96 @@
 
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.*?>
-
 <?import javafx.scene.layout.ColumnConstraints?>
-<AnchorPane prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22.0.2"
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.control.DatePicker?>
+
+<?import javafx.scene.shape.Rectangle?>
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22.0.2"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.controllers.GestionRendezVous">
    <children>
-      <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+      <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
          <children>
-            <Text text="Ajouter un Rendez-vous" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+            <Text text="Gestion des Rendez-vous" style="-fx-font-size: 24; -fx-font-weight: bold;" />
 
-            <GridPane hgap="10.0" vgap="10.0">
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" prefWidth="150.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="300.0" />
-               </columnConstraints>
+            <HBox spacing="20.0" alignment="CENTER_LEFT">
                <children>
-                  <!-- Date Field -->
-                  <Label text="Date:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                  <DatePicker fx:id="date" promptText="Date du rendez-vous" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-                  <Label fx:id="dateError" textFill="RED" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                  <!-- Section Médecin -->
+                  <VBox spacing="10.0" prefWidth="300.0">
+                     <children>
+                        <Label text="Sélectionnez un médecin:" style="-fx-font-weight: bold;"/>
+                        <ComboBox fx:id="medecin" promptText="Sélectionnez un médecin" prefWidth="250.0"/>
+                        <Label fx:id="medecinError" textFill="RED" />
 
-                  <!-- Type Field -->
-                  <Label text="Type:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                  <ComboBox fx:id="type_rdv" promptText="Type de rendez-vous" GridPane.rowIndex="2" GridPane.columnIndex="1" />
-                  <Label fx:id="typeError" textFill="RED" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                        <!-- Calendrier -->
+                        <DatePicker fx:id="calendar" showWeekNumbers="true" prefWidth="250.0" editable="false"/>
+                     </children>
+                  </VBox>
 
-                  <!-- Medecin Field -->
-                  <Label text="Médecin:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-                  <ComboBox fx:id="medecin" promptText="Sélectionnez un médecin" GridPane.rowIndex="4" GridPane.columnIndex="1" />
-                  <Label fx:id="medecinError" textFill="RED" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                  <!-- Formulaire RDV -->
+                  <VBox spacing="10.0">
+                     <children>
+                        <GridPane hgap="10.0" vgap="10.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" prefWidth="200.0" />
+                           </columnConstraints>
+                           <children>
+                              <!-- Date Field -->
+                              <Label text="Date:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                              <DatePicker fx:id="date" promptText="Date du rendez-vous" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                              <Label fx:id="dateError" textFill="RED" GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
-                  <!-- Cause Field -->
-                  <Label text="Cause:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
-                  <TextArea fx:id="cause" promptText="Cause du rendez-vous" prefHeight="100.0" GridPane.rowIndex="6" GridPane.columnIndex="1" />
-                  <Label fx:id="causeError" textFill="RED" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+                              <!-- Type Field -->
+                              <Label text="Type:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                              <ComboBox fx:id="type_rdv" promptText="Type de rendez-vous" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                              <Label fx:id="typeError" textFill="RED" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                              <!-- Cause Field -->
+                              <Label text="Cause:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                              <TextArea fx:id="cause" promptText="Cause du rendez-vous" prefHeight="100.0" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                              <Label fx:id="causeError" textFill="RED" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                           </children>
+                        </GridPane>
+
+                        <Button text="Enregistrer"
+                                onAction="#save"
+                                prefWidth="150.0"
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" />
+                     </children>
+                  </VBox>
                </children>
-            </GridPane>
+            </HBox>
 
-            <Button text="Enregistrer"
-                    onAction="#save"
-                    prefWidth="150.0"
-                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" />
+            <!-- Légende -->
+            <HBox spacing="20.0" alignment="CENTER">
+               <children>
+                  <HBox spacing="5.0" alignment="CENTER_LEFT">
+                     <children>
+                        <Rectangle fill="GREEN" width="20.0" height="20.0" stroke="BLACK"/>
+                        <Label text="0-1 consultation"/>
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0" alignment="CENTER_LEFT">
+                     <children>
+                        <Rectangle fill="ORANGE" width="20.0" height="20.0" stroke="BLACK"/>
+                        <Label text="2 consultations"/>
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0" alignment="CENTER_LEFT">
+                     <children>
+                        <Rectangle fill="RED" width="20.0" height="20.0" stroke="BLACK"/>
+                        <Label text="3+ consultations"/>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
          </children>
       </VBox>
    </children>

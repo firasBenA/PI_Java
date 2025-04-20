@@ -28,9 +28,6 @@
                         <Label text="Sélectionnez un médecin:" style="-fx-font-weight: bold;"/>
                         <ComboBox fx:id="medecin" promptText="Sélectionnez un médecin" prefWidth="250.0"/>
                         <Label fx:id="medecinError" textFill="RED" />
-
-                        <!-- Calendrier -->
-                        <DatePicker fx:id="calendar" showWeekNumbers="true" prefWidth="250.0" editable="false"/>
                      </children>
                   </VBox>
 
