@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="your.java.package.controllers.ProduitController" prefWidth="600" prefHeight="400">
+    <children>
+        <TableView fx:id="tableProduit" layoutX="20" layoutY="20" prefWidth="560" prefHeight="200">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" />
+                <TableColumn fx:id="colName" text="Name" />
+                <TableColumn fx:id="colPrice" text="Price" />
+            </columns>
+        </TableView>
+
+       <TextField fx:id="tfNom" layoutX="20" layoutY="230" promptText="Nom"/>
+<TextArea fx:id="taDescription" layoutX="20" layoutY="270" prefHeight="60" prefWidth="200" promptText="Description"/>
+<TextField fx:id="tfPrix" layoutX="250" layoutY="230" promptText="Prix"/>
+<TextField fx:id="tfStock" layoutX="250" layoutY="270" promptText="Stock"/>
+<TextField fx:id="tfImage" layoutX="250" layoutY="310" promptText="Image URL"/>
+
+<Button text="Add" layoutX="20" layoutY="340" onAction="#addProduit"/>
+<Button text="Update" layoutX="100" layoutY="340" onAction="#updateProduit"/>
+<Button text="Delete" layoutX="180" layoutY="340" onAction="#deleteProduit"/>
+
+    </children>
+</AnchorPane>
