@@ -1,4 +1,9 @@
 package tn.esprit.models;
 
-public class Admin {
+public class Admin extends User {
+    public Admin() {
+        super();
+        getRoles().clear();
+        this.getRoles().add("ROLE_ADMIN");
+    }
 }

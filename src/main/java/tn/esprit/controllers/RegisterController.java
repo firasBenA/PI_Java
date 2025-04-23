@@ -6,6 +6,9 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import tn.esprit.models.Admin;
+import tn.esprit.models.Medecin;
+import tn.esprit.models.Patient;
 import tn.esprit.models.User;
 import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
@@ -13,6 +16,7 @@ import tn.esprit.utils.SceneManager;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -70,26 +74,12 @@ public class RegisterController {
     public void initialize() {
         initializeFields();
         setupRoleListener();
-
-
-        // Vérification de l'injection
-        Objects.requireNonNull(passwordContainer, "passwordContainer doit être injecté depuis FXML");
-
-        // Création dynamique
-
-        visiblePasswordField.setManaged(false);
-
-
-
-        // Configuration du toggle
         setupPasswordToggle();
     }
 
     private void initializeFields() {
         sexeComboBox.getItems().addAll("Homme", "Femme", "Autre");
         roleComboBox.getItems().addAll("ROLE_PATIENT", "ROLE_MEDECIN");
-
-        // Initialisation du champ password visible
         visiblePasswordField = new TextField();
         visiblePasswordField.setManaged(false);
         visiblePasswordField.setVisible(false);
@@ -98,13 +88,6 @@ public class RegisterController {
         passwordContainer.getChildren().add(visiblePasswordField);
     }
 
-    private void setupPasswordToggle() {
-        // Vérification supplémentaire
-        if (togglePasswordButton == null) {
-            throw new IllegalStateException("togglePasswordButton non injecté!");
-        }
-        togglePasswordButton.setOnAction(e -> togglePasswordVisibility());
-    }
     private void setupRoleListener() {
         roleComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             boolean isMedecin = "ROLE_MEDECIN".equals(newVal);
@@ -113,10 +96,14 @@ public class RegisterController {
         });
     }
 
+    private void setupPasswordToggle() {
+        Objects.requireNonNull(togglePasswordButton, "togglePasswordButton non injecté!");
+        togglePasswordButton.setOnAction(e -> togglePasswordVisibility());
+    }
+
     private void togglePasswordVisibility() {
         passwordVisible = !passwordVisible;
-
-        if(passwordVisible) {
+        if (passwordVisible) {
             visiblePasswordField.setText(passwordField.getText());
             visiblePasswordField.setManaged(true);
             visiblePasswordField.setVisible(true);
@@ -134,19 +121,23 @@ public class RegisterController {
     @FXML
     private void handleRegister() {
         resetErrors();
-
-        if(validateForm()) {
-            User user = createUserFromForm();
-            String rawPassword = getPassword();
+        if (validateForm()) {
             try {
-                user.hashPassword(rawPassword); // Cryptage ici
+                User user = createUserFromForm();
+                String rawPassword = getPassword();
+                user.hashPassword(rawPassword);
+                System.out.println("Registering user: " + user.getClass().getSimpleName() + ", user_type: " + user.getUserType() + ", role: " + user.getRoles());
                 authService.register(user);
                 sceneManager.showLoginScene();
-                sceneManager.showAlert("Succès", "Compte créé avec succès!", Alert.AlertType.INFORMATION);
-            } catch (Exception e) {
-                sceneManager.showAlert("Erreur", e.getMessage(), Alert.AlertType.ERROR);
+                sceneManager.showAlert("Succès", "Compte créé avec succès !", Alert.AlertType.INFORMATION);
             } catch (AuthException e) {
-                System.out.println(e.getMessage());
+                sceneManager.showAlert("Erreur", e.getMessage(), Alert.AlertType.ERROR);
+                System.err.println("Registration error: " + e.getMessage());
+                e.printStackTrace();
+            } catch (Exception e) {
+                sceneManager.showAlert("Erreur", "Erreur inattendue : " + (e.getMessage() != null ? e.getMessage() : "Erreur inconnue"), Alert.AlertType.ERROR);
+                System.err.println("Unexpected error: " + e.getClass().getName() + " - " + (e.getMessage() != null ? e.getMessage() : "No message"));
+                e.printStackTrace();
             }
         }
     }
@@ -154,80 +145,70 @@ public class RegisterController {
     private boolean validateForm() {
         boolean isValid = true;
 
-        // Validation nom
-        if(nomField.getText().trim().isEmpty()) {
+        if (nomField.getText().trim().isEmpty()) {
             nomError.setText("Le nom est requis");
             nomError.setVisible(true);
             isValid = false;
         }
 
-        // Validation prénom
-        if(prenomField.getText().trim().isEmpty()) {
+        if (prenomField.getText().trim().isEmpty()) {
             prenomError.setText("Le prénom est requis");
             prenomError.setVisible(true);
             isValid = false;
         }
 
-        // Validation email
-        if(!emailField.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+        if (!emailField.getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
             emailError.setText("Format email invalide");
             emailError.setVisible(true);
             isValid = false;
         }
 
-        // Validation âge
         try {
             int age = Integer.parseInt(ageField.getText());
-            if(age < 1 || age > 120) throw new NumberFormatException();
+            if (age < 1 || age > 120) throw new NumberFormatException();
         } catch (NumberFormatException e) {
             ageError.setText("Âge invalide (1-120)");
             ageError.setVisible(true);
             isValid = false;
         }
 
-        // Validation adresse
-        if(adresseField.getText().trim().isEmpty()) {
+        if (adresseField.getText().trim().isEmpty()) {
             adresseError.setText("L'adresse est requise");
             adresseError.setVisible(true);
             isValid = false;
         }
 
-        // Validation sexe
-        if(sexeComboBox.getValue() == null) {
+        if (sexeComboBox.getValue() == null) {
             sexeError.setText("Veuillez sélectionner un sexe");
             sexeError.setVisible(true);
             isValid = false;
         }
 
-        // Validation téléphone
-        if(!telephoneField.getText().matches("^\\d{8}$")) {
+        if (!telephoneField.getText().matches("^\\d{8}$")) {
             telephoneError.setText("Téléphone invalide (8 chiffres)");
             telephoneError.setVisible(true);
             isValid = false;
         }
 
-        // Validation mot de passe
-        if(getPassword().length() < 6) {
+        if (getPassword().length() < 6) {
             passwordError.setText("Minimum 6 caractères");
             passwordError.setVisible(true);
             isValid = false;
         }
 
-        // Validation rôle
-        if(roleComboBox.getValue() == null) {
+        if (roleComboBox.getValue() == null) {
             roleError.setText("Veuillez sélectionner un rôle");
             roleError.setVisible(true);
             isValid = false;
         }
 
-        // Validation médecin
-        if("ROLE_MEDECIN".equals(roleComboBox.getValue())) {
-            if(specialiteField.getText().trim().isEmpty()) {
+        if ("ROLE_MEDECIN".equals(roleComboBox.getValue())) {
+            if (specialiteField.getText().trim().isEmpty()) {
                 specialiteError.setText("Spécialité requise");
                 specialiteError.setVisible(true);
                 isValid = false;
             }
-            if(certificatFile == null) {
+            if (certificatFile == null) {
                 certificatError.setText("Certificat requis");
                 certificatError.setVisible(true);
                 isValid = false;
@@ -238,7 +219,22 @@ public class RegisterController {
     }
 
     private User createUserFromForm() {
-        User user = new User();
+        User user;
+        String role = roleComboBox.getValue();
+        switch (role) {
+            case "ROLE_ADMIN":
+                user = new Admin();
+                break;
+            case "ROLE_PATIENT":
+                user = new Patient();
+                break;
+            case "ROLE_MEDECIN":
+                user = new Medecin();
+                break;
+            default:
+                throw new IllegalStateException("Rôle invalide : " + role);
+        }
+
         user.setNom(nomField.getText().trim());
         user.setPrenom(prenomField.getText().trim());
         user.setEmail(emailField.getText().trim());
@@ -246,16 +242,15 @@ public class RegisterController {
         user.setAdresse(adresseField.getText().trim());
         user.setSexe(sexeComboBox.getValue());
         user.setTelephone(telephoneField.getText().trim());
-        user.getRoles().add(roleComboBox.getValue());
-
+        user.setRoles(new ArrayList<>(Arrays.asList(role)));
         user.setCreatedAt(LocalDateTime.now());
 
-        if("ROLE_MEDECIN".equals(roleComboBox.getValue())) {
+        if ("ROLE_MEDECIN".equals(role)) {
             user.setSpecialite(specialiteField.getText().trim());
             user.setCertificat(certificatFile.getAbsolutePath());
         }
 
-        if(imageFile != null) {
+        if (imageFile != null) {
             user.setImageProfil(imageFile.getAbsolutePath());
         }
 
@@ -263,9 +258,7 @@ public class RegisterController {
     }
 
     private String getPassword() {
-        return passwordVisible ?
-                visiblePasswordField.getText() :
-                passwordField.getText();
+        return passwordVisible ? visiblePasswordField.getText() : passwordField.getText();
     }
 
     private void resetErrors() {
@@ -291,9 +284,8 @@ public class RegisterController {
                 new FileChooser.ExtensionFilter("PDF", "*.pdf"),
                 new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
         );
-
         certificatFile = fileChooser.showOpenDialog(null);
-        if(certificatFile != null) {
+        if (certificatFile != null) {
             certificatPathLabel.setText(certificatFile.getName());
         }
     }
@@ -305,9 +297,8 @@ public class RegisterController {
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
         );
-
         imageFile = fileChooser.showOpenDialog(null);
-        if(imageFile != null) {
+        if (imageFile != null) {
             imagePathLabel.setText(imageFile.getName());
         }
     }

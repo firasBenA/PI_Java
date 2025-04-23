@@ -67,9 +67,9 @@ public class AdminDashboard {
 
         actionsColumn.setCellFactory(param -> new TableCell<>() {
             private final Button toggleBtn = new Button();
-            private final HBox pane = new HBox(5, toggleBtn);
-
-
+            private final Button editBtn = new Button("Modifier");
+            private final Button deleteBtn = new Button("Supprimer");
+            private final HBox pane = new HBox(5, toggleBtn, editBtn, deleteBtn);
 
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -84,6 +84,15 @@ public class AdminDashboard {
                     } else {
                         toggleBtn.setText("Bloquer");
                     }
+                    toggleBtn.setOnAction(e -> {
+                        try {
+                            toggleUserStatus(user);
+                        } catch (AuthException ex) {
+                            showAlert("Erreur", ex.getMessage(), Alert.AlertType.ERROR);
+                        }
+                    });
+                    editBtn.setOnAction(e -> editUser(user));
+                    deleteBtn.setOnAction(e -> deleteUser(user));
                     setGraphic(pane);
                 }
             }
@@ -94,8 +103,9 @@ public class AdminDashboard {
         try {
             allUsers = FXCollections.observableArrayList(authService.getAllUsers());
             filterUsersByRole("ROLE_PATIENT"); // Par défaut afficher les patients
-        } catch (Exception e) {
-            showAlert("Erreur", "Impossible de charger les utilisateurs: " + e.getMessage(), Alert.AlertType.ERROR);
+        } catch (AuthException e) {
+            showAlert("Erreur", "Impossible de charger les utilisateurs : " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 
@@ -120,19 +130,19 @@ public class AdminDashboard {
 
     @FXML
     private void handleAddUser() {
-        // Implémentation de l'ajout d'utilisateur
         showUserForm(null);
     }
 
     private void showUserForm(User user) {
-        // Code pour afficher le formulaire
+        // TODO: Implement user form for adding/editing users
+        showAlert("Information", "Formulaire d'ajout/modification non implémenté.", Alert.AlertType.INFORMATION);
     }
 
     private void editUser(User user) {
         showUserForm(user);
     }
 
-    private void toggleUserStatus(User user) throws Exception {
+    private void toggleUserStatus(User user) throws AuthException {
         authService.toggleUserStatus(user.getId());
         loadUsers();
         showAlert("Succès", "Statut utilisateur mis à jour", Alert.AlertType.INFORMATION);
@@ -150,10 +160,9 @@ public class AdminDashboard {
                 authService.deleteUser(user.getId());
                 loadUsers();
                 showAlert("Succès", "Utilisateur supprimé avec succès", Alert.AlertType.INFORMATION);
-            } catch (Exception e) {
-                showAlert("Erreur", e.getMessage(), Alert.AlertType.ERROR);
             } catch (AuthException e) {
-                throw new RuntimeException(e);
+                showAlert("Erreur", "Échec de la suppression : " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
             }
         }
     }
@@ -168,37 +177,34 @@ public class AdminDashboard {
 
     @FXML
     private void handleLogout() {
-        try {
-            // ysakr l fenetre
-            Stage currentStage = (Stage) usersTable.getScene().getWindow();
-            currentStage.close();
-
-            // login
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/Login.fxml"));
-            Parent root = loader.load();
-
-            Stage loginStage = new Stage();
-            loginStage.setScene(new Scene(root));
-            loginStage.setTitle("Connexion");
-            loginStage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Erreur", "Échec de la déconnexion", Alert.AlertType.ERROR);
+        if (sceneManager != null) {
+            sceneManager.showLoginScene();
+        } else {
+            try {
+                Stage currentStage = (Stage) usersTable.getScene().getWindow();
+                currentStage.close();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/Login.fxml"));
+                Parent root = loader.load();
+                Stage loginStage = new Stage();
+                loginStage.setScene(new Scene(root));
+                loginStage.setTitle("Connexion");
+                loginStage.show();
+            } catch (Exception e) {
+                showAlert("Erreur", "Échec de la déconnexion : " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
+            }
         }
     }
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
-        // Vous pouvez initialiser des éléments UI avec les infos utilisateur ici
     }
 
     public void setAuthService(AuthService authService) {
-        authService = authService;
+        // Note: authService is instantiated directly in this class
     }
 
     public void setSceneManager(SceneManager sceneManager) {
         this.sceneManager = sceneManager;
     }
-
-
 }

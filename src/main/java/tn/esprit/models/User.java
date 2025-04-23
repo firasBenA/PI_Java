@@ -2,199 +2,107 @@ package tn.esprit.models;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.*;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
-    private Integer  id;
+    private Integer id;
     private String email;
     private List<String> roles = new ArrayList<>();
+    private String userType;
     private String password;
     private String nom;
     private String prenom;
-    private Integer  age;
+    private Integer age;
     private String adresse;
     private String sexe;
     private String telephone;
     private String imageProfil;
     private String specialite;
     private String certificat;
-    private Float latitude;
-    private Float longitude;
+    private Double latitude;
+    private Double longitude;
     private Boolean emailAuthEnabled = true;
     private String emailAuthCode = "";
     private LocalDateTime createdAt;
-    private Integer  failedLoginAttempts = 0;
+    private Integer failedLoginAttempts = 0;
     private LocalDateTime lockUntil;
 
     public User() {
         this.createdAt = LocalDateTime.now();
+        this.userType = determineUserType();
     }
 
-    public Integer  getId() {
-        return id;
+    protected String determineUserType() {
+        if (this instanceof Admin) return "ADMIN";
+        if (this instanceof Patient) return "PATIENT";
+        if (this instanceof Medecin) return "MEDECIN";
+        throw new IllegalStateException("Type d'utilisateur invalide : instance de User non autorisée.");
     }
 
-    public void setId(Integer  id) {
-        this.id = id;
-    }
+    public String getUserType() { return userType; }
+    public void setUserType(String userType) { this.userType = userType; }
 
-    public List<String> getRoles() {
-        return roles;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
+    public List<String> getRoles() { return new ArrayList<>(roles); }
+    public void setRoles(List<String> roles) { this.roles = new ArrayList<>(roles); }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getNom() { return nom; }
+    public void setNom(String nom) { this.nom = nom; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getPrenom() { return prenom; }
+    public void setPrenom(String prenom) { this.prenom = prenom; }
 
-    public String getNom() {
-        return nom;
-    }
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
 
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
+    public String getAdresse() { return adresse; }
+    public void setAdresse(String adresse) { this.adresse = adresse; }
 
-    public String getPrenom() {
-        return prenom;
-    }
+    public String getSexe() { return sexe; }
+    public void setSexe(String sexe) { this.sexe = sexe; }
 
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
+    public String getTelephone() { return telephone; }
+    public void setTelephone(String telephone) { this.telephone = telephone; }
 
-    public Integer  getAge() {
-        return age;
-    }
+    public String getImageProfil() { return imageProfil; }
+    public void setImageProfil(String imageProfil) { this.imageProfil = imageProfil; }
 
-    public void setAge(Integer  age) {
-        this.age = age;
-    }
+    public String getSpecialite() { return specialite; }
+    public void setSpecialite(String specialite) { this.specialite = specialite; }
 
-    public String getAdresse() {
-        return adresse;
-    }
+    public String getCertificat() { return certificat; }
+    public void setCertificat(String certificat) { this.certificat = certificat; }
 
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
-    }
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
 
-    public String getSexe() {
-        return sexe;
-    }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
 
-    public void setSexe(String sexe) {
-        this.sexe = sexe;
-    }
+    public Boolean getEmailAuthEnabled() { return emailAuthEnabled; }
+    public void setEmailAuthEnabled(Boolean emailAuthEnabled) { this.emailAuthEnabled = emailAuthEnabled; }
 
-    public String getTelephone() {
-        return telephone;
-    }
+    public String getEmailAuthCode() { return emailAuthCode; }
+    public void setEmailAuthCode(String emailAuthCode) { this.emailAuthCode = emailAuthCode; }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public String getImageProfil() {
-        return imageProfil;
-    }
+    public Integer getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(Integer failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
 
-    public void setImageProfil(String imageProfil) {
-        this.imageProfil = imageProfil;
-    }
-
-    public String getSpecialite() {
-        return specialite;
-    }
-
-    public void setSpecialite(String specialite) {
-        this.specialite = specialite;
-    }
-
-    public String getCertificat() {
-        return certificat;
-    }
-
-    public void setCertificat(String certificat) {
-        this.certificat = certificat;
-    }
-
-    public Float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Float latitude) {
-        this.latitude = latitude;
-    }
-
-    public Float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Float longitude) {
-        this.longitude = longitude;
-    }
-
-    public Boolean getEmailAuthEnabled() {
-        return emailAuthEnabled;
-    }
-
-    public void setEmailAuthEnabled(Boolean emailAuthEnabled) {
-        this.emailAuthEnabled = emailAuthEnabled;
-    }
-
-    public String getEmailAuthCode() {
-        return emailAuthCode;
-    }
-
-    public void setEmailAuthCode(String emailAuthCode) {
-        this.emailAuthCode = emailAuthCode;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Integer  getFailedLoginAttempts() {
-        return failedLoginAttempts;
-    }
-
-    public void setFailedLoginAttempts(Integer  failedLoginAttempts) {
-        this.failedLoginAttempts = failedLoginAttempts;
-    }
-
-    public LocalDateTime getLockUntil() {
-        return lockUntil;
-    }
-
-    public void setLockUntil(LocalDateTime lockUntil) {
-        this.lockUntil = lockUntil;
-    }
-
-    //public boolean isEmailAuthEnabled() {
-      //  return false;
-    //}
+    public LocalDateTime getLockUntil() { return lockUntil; }
+    public void setLockUntil(LocalDateTime lockUntil) { this.lockUntil = lockUntil; }
 
     public void hashPassword(String plainPassword) {
         this.password = BCrypt.hashpw(plainPassword, BCrypt.gensalt(13));
@@ -203,5 +111,4 @@ public class User {
     public boolean checkPassword(String candidate) {
         return BCrypt.checkpw(candidate, this.password);
     }
-
 }
