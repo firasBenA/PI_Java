@@ -1,17 +1,18 @@
 package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import tn.esprit.models.User;
 import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
 import tn.esprit.utils.SceneManager;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,8 +27,10 @@ public class AdminDashboard {
     @FXML private TabPane tabPane;
     @FXML private Tab patientsTab;
     @FXML private Tab medecinsTab;
-    @FXML private VBox patientUserCards;
-    @FXML private VBox medecinUserCards;
+    @FXML private Tab blockedTab;
+    @FXML private FlowPane patientUserCards;
+    @FXML private FlowPane medecinUserCards;
+    @FXML private FlowPane blockedUserCards;
 
     private User currentUser;
     private SceneManager sceneManager;
@@ -67,6 +70,8 @@ public class AdminDashboard {
                 displayUsers("PATIENT");
             } else if (newTab == medecinsTab) {
                 displayUsers("MEDECIN");
+            } else if (newTab == blockedTab) {
+                displayUsers("BLOCKED");
             }
         });
     }
@@ -78,11 +83,9 @@ public class AdminDashboard {
     }
 
     private void displayUsers(String userType) {
-        VBox targetCards = userType.equals("PATIENT") ? patientUserCards : medecinUserCards;
+        FlowPane targetCards = getTargetCards(userType);
         targetCards.getChildren().clear();
-        List<User> filteredUsers = allUsers.stream()
-                .filter(user -> user.getUserType().equals(userType))
-                .toList();
+        List<User> filteredUsers = getFilteredUsers(userType);
 
         for (User user : filteredUsers) {
             targetCards.getChildren().add(createUserCard(user));
@@ -91,15 +94,15 @@ public class AdminDashboard {
 
     private void filterUsers(String keyword) {
         String selectedTab = tabPane.getSelectionModel().getSelectedItem().getText();
-        String userType = selectedTab.equals("Patients") ? "PATIENT" : "MEDECIN";
-        VBox targetCards = userType.equals("PATIENT") ? patientUserCards : medecinUserCards;
+        String userType = selectedTab.equals("Patients") ? "PATIENT" :
+                selectedTab.equals("Médecins") ? "MEDECIN" : "BLOCKED";
+        FlowPane targetCards = getTargetCards(userType);
         targetCards.getChildren().clear();
 
-        List<User> filteredUsers = allUsers.stream()
-                .filter(user -> user.getUserType().equals(userType) &&
-                        (user.getNom().toLowerCase().contains(keyword.toLowerCase()) ||
-                                user.getPrenom().toLowerCase().contains(keyword.toLowerCase()) ||
-                                user.getEmail().toLowerCase().contains(keyword.toLowerCase())))
+        List<User> filteredUsers = getFilteredUsers(userType).stream()
+                .filter(user -> user.getNom().toLowerCase().contains(keyword.toLowerCase()) ||
+                        user.getPrenom().toLowerCase().contains(keyword.toLowerCase()) ||
+                        user.getEmail().toLowerCase().contains(keyword.toLowerCase()))
                 .toList();
 
         for (User user : filteredUsers) {
@@ -107,12 +110,37 @@ public class AdminDashboard {
         }
     }
 
+    private FlowPane getTargetCards(String userType) {
+        return switch (userType) {
+            case "PATIENT" -> patientUserCards;
+            case "MEDECIN" -> medecinUserCards;
+            case "BLOCKED" -> blockedUserCards;
+            default -> throw new IllegalArgumentException("Invalid user type: " + userType);
+        };
+    }
+
+    private List<User> getFilteredUsers(String userType) {
+        return allUsers.stream()
+                .filter(user -> {
+                    if (userType.equals("BLOCKED")) {
+                        return user.getRoles().contains("ROLE_BLOCKED");
+                    }
+                    return user.getUserType().equals(userType) && !user.getRoles().contains("ROLE_BLOCKED");
+                })
+                .toList();
+    }
+
     private VBox createUserCard(User user) {
         VBox card = new VBox(10);
         card.getStyleClass().add("user-card");
 
+        // Image and Info in HBox
+        HBox content = new HBox(15);
+        content.getStyleClass().add("card-content");
+
         // Profile Image
         ImageView profileImage = new ImageView();
+        profileImage.getStyleClass().add("user-image");
         profileImage.setFitWidth(80);
         profileImage.setFitHeight(80);
 
@@ -120,12 +148,9 @@ public class AdminDashboard {
         Image image = null;
         if (imagePath != null && !imagePath.trim().isEmpty()) {
             try {
-                // Try loading the image as a resource or file
                 if (imagePath.startsWith("/")) {
-                    // Resource path
                     image = new Image(getClass().getResourceAsStream(imagePath));
                 } else {
-                    // File path or URL
                     image = new Image(imagePath);
                 }
             } catch (Exception e) {
@@ -138,38 +163,75 @@ public class AdminDashboard {
                 image = new Image(getClass().getResourceAsStream(DEFAULT_PROFILE_IMAGE));
             } catch (Exception e) {
                 LOGGER.severe("Failed to load default profile image: " + DEFAULT_PROFILE_IMAGE + ". Error: " + e.getMessage());
-                image = new Image("file:src/main/resources/images/default_profile.png"); // Fallback
+                image = new Image("file:src/main/resources/images/default_profile.png");
             }
         }
         profileImage.setImage(image);
 
         // User Info
+        VBox infoBox = new VBox(5);
         Text name = new Text(user.getPrenom() + " " + user.getNom());
         name.getStyleClass().add("user-name");
 
         Text email = new Text("Email: " + user.getEmail());
-        Text adresse = new Text("Adresse: " + user.getAdresse());
-        Text sexe = new Text("Sexe: " + user.getSexe());
-        Text age = new Text("Âge: " + user.getAge());
+        Text role = new Text("Rôle: " + user.getUserType());
 
-        VBox infoBox = new VBox(5, email, adresse, sexe, age);
-
+        infoBox.getChildren().addAll(name, email, role);
         if (user.getUserType().equals("MEDECIN")) {
             Text specialite = new Text("Spécialité: " + (user.getSpecialite() != null ? user.getSpecialite() : "N/A"));
-            Text certificat = new Text("Certificat: " + (user.getCertificat() != null ? user.getCertificat() : "N/A"));
-            infoBox.getChildren().addAll(specialite, certificat);
+            infoBox.getChildren().add(specialite);
         }
 
-        // Block/Unblock Button
+        content.getChildren().addAll(profileImage, infoBox);
+
+        // Buttons
+        HBox buttonBox = new HBox(10);
         Button blockButton = new Button(user.getRoles().contains("ROLE_BLOCKED") ? "Débloquer" : "Bloquer");
         blockButton.getStyleClass().add("block-button");
         blockButton.setOnAction(e -> toggleUserBlockStatus(user, blockButton));
 
-        HBox buttonBox = new HBox(blockButton);
-        buttonBox.setSpacing(10);
+        Button detailsButton = new Button("Afficher Plus de Détails");
+        detailsButton.getStyleClass().add("details-button");
+        detailsButton.setOnAction(e -> showUserDetails(user));
 
-        card.getChildren().addAll(profileImage, name, infoBox, buttonBox);
+        buttonBox.getChildren().addAll(blockButton, detailsButton);
+
+        card.getChildren().addAll(content, buttonBox);
         return card;
+    }
+
+    private void showUserDetails(User user) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Détails de l'Utilisateur");
+        dialog.setHeaderText(user.getPrenom() + " " + user.getNom());
+
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(20));
+
+        content.getChildren().addAll(
+                new Label("ID: " + user.getId()),
+                new Label("Email: " + user.getEmail()),
+                new Label("Prénom: " + user.getPrenom()),
+                new Label("Nom: " + user.getNom()),
+                new Label("Adresse: " + user.getAdresse()),
+                new Label("Sexe: " + user.getSexe()),
+                new Label("Âge: " + user.getAge()),
+                new Label("Rôles: " + String.join(", ", user.getRoles())),
+                new Label("Type: " + user.getUserType()),
+                new Label("Lock Until: " + (user.getLockUntil() != null ?
+                        user.getLockUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "N/A"))
+        );
+
+        if (user.getUserType().equals("MEDECIN")) {
+            content.getChildren().addAll(
+                    new Label("Spécialité: " + (user.getSpecialite() != null ? user.getSpecialite() : "N/A")),
+                    new Label("Certificat: " + (user.getCertificat() != null ? user.getCertificat() : "N/A"))
+            );
+        }
+
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.showAndWait();
     }
 
     private void toggleUserBlockStatus(User user, Button button) {
@@ -200,10 +262,11 @@ public class AdminDashboard {
             }
             authService.updateUser(user);
             showAlert("Succès", "Statut de l'utilisateur mis à jour.", Alert.AlertType.INFORMATION);
-            // Refresh the displayed users
-            allUsers = authService.getAllUsers(); // Reload users to reflect changes
+            // Refresh all tabs
+            allUsers = authService.getAllUsers();
             String selectedTab = tabPane.getSelectionModel().getSelectedItem().getText();
-            String userType = selectedTab.equals("Patients") ? "PATIENT" : "MEDECIN";
+            String userType = selectedTab.equals("Patients") ? "PATIENT" :
+                    selectedTab.equals("Médecins") ? "MEDECIN" : "BLOCKED";
             displayUsers(userType);
         } catch (Exception e) {
             showAlert("Erreur", "Erreur lors de la mise à jour du statut: " + e.getMessage(), Alert.AlertType.ERROR);

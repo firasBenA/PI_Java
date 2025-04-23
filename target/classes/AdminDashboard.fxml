@@ -21,7 +21,6 @@
         <Button text="Déconnexion" styleClass="logout-button" onAction="#handleLogout"/>
     </HBox>
 
-    <!-- Search and Tabs Section -->
     <VBox styleClass="content">
         <padding>
             <Insets top="10" right="20" bottom="10" left="20"/>
@@ -34,12 +33,17 @@
             <tabs>
                 <Tab fx:id="patientsTab" text="Patients" styleClass="tab">
                     <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-                        <VBox fx:id="patientUserCards" styleClass="user-cards"/>
+                        <FlowPane fx:id="patientUserCards" styleClass="user-cards" hgap="15" vgap="15"/>
                     </ScrollPane>
                 </Tab>
                 <Tab fx:id="medecinsTab" text="Médecins" styleClass="tab">
                     <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-                        <VBox fx:id="medecinUserCards" styleClass="user-cards"/>
+                        <FlowPane fx:id="medecinUserCards" styleClass="user-cards" hgap="15" vgap="15"/>
+                    </ScrollPane>
+                </Tab>
+                <Tab fx:id="blockedTab" text="Utilisateurs Bloqués" styleClass="tab">
+                    <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+                        <FlowPane fx:id="blockedUserCards" styleClass="user-cards" hgap="15" vgap="15"/>
                     </ScrollPane>
                 </Tab>
             </tabs>
