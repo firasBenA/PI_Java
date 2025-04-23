@@ -10,7 +10,7 @@ import tn.esprit.models.User;
 import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
 import tn.esprit.utils.SceneManager;
-
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,7 +39,7 @@ public class MedecinDashboardController {
     @FXML private Label adresseErrorLabel;
     @FXML private ComboBox<String> sexeComboBox;
     @FXML private Label sexeErrorLabel;
-    @FXML private ImageView certificatImageView;
+    @FXML private Hyperlink certificatLink;
     @FXML private Button changeCertificatBtn;
     @FXML private Label certificatErrorLabel;
     @FXML private Button modifierBtn;
@@ -49,7 +49,7 @@ public class MedecinDashboardController {
     private SceneManager sceneManager;
     private Medecin currentUser;
     private File selectedImageFile;
-    private File selectedCertificatFile;
+    private boolean isEditing = false;
 
     public void setAuthService(AuthService authService) {
         this.authService = authService;
@@ -71,7 +71,8 @@ public class MedecinDashboardController {
     @FXML
     public void initialize() {
         sexeComboBox.getItems().addAll("Homme", "Femme", "Autre");
-        // Event handlers are set in FXML via onAction attributes
+        // Fields are set to read-only in FXML via editable="false" and disable="true"
+        modifierBtn.setText("Modifier Profil");
     }
 
     private void loadUserData() {
@@ -99,37 +100,36 @@ public class MedecinDashboardController {
                     profileImage.setImage(image);
                 } else {
                     System.err.println("Image file not found: " + currentUser.getImageProfil());
-                    profileImage.setImage(null); // Or set a default image
+                    profileImage.setImage(null);
                 }
             } catch (Exception e) {
                 System.err.println("Erreur de chargement de l'image: " + e.getMessage());
                 e.printStackTrace();
-                profileImage.setImage(null); // Or set a default image
+                profileImage.setImage(null);
             }
         } else {
             System.out.println("No profile image for user: " + currentUser.getEmail());
-            profileImage.setImage(null); // Or set a default image
+            profileImage.setImage(null);
         }
 
-        // Load certificate image
+        // Load certificate path
         if (currentUser.getCertificat() != null && !currentUser.getCertificat().isEmpty()) {
             try {
                 File certFile = new File(currentUser.getCertificat());
-                if (certFile.exists() && certFile.getName().matches(".*\\.(png|jpg|jpeg|jfif)$")) {
-                    Image image = new Image(certFile.toURI().toString());
-                    certificatImageView.setImage(image);
+                if (certFile.exists()) {
+                    certificatLink.setText(certFile.getName());
                 } else {
-                    System.err.println("Certificate file not found or not an image: " + currentUser.getCertificat());
-                    // Keep default image set in FXML (@/images/default-certificat.jfif)
+                    System.err.println("Certificate file not found: " + currentUser.getCertificat());
+                    certificatLink.setText("Certificat introuvable");
                 }
             } catch (Exception e) {
                 System.err.println("Erreur de chargement du certificat: " + e.getMessage());
                 e.printStackTrace();
-                // Keep default image
+                certificatLink.setText("Erreur de certificat");
             }
         } else {
             System.out.println("No certificate for user: " + currentUser.getEmail());
-            // Keep default image
+            certificatLink.setText("Aucun certificat");
         }
     }
 
@@ -163,16 +163,14 @@ public class MedecinDashboardController {
     public void handleChangeCertificat() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.jfif")
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
         );
-        File file = fileChooser.showOpenDialog(certificatImageView.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(changeCertificatBtn.getScene().getWindow());
         if (file != null) {
             try {
-                selectedCertificatFile = file;
                 String certificatPath = saveFile(file, "certificats");
                 currentUser.setCertificat(certificatPath);
-                Image image = new Image(file.toURI().toString());
-                certificatImageView.setImage(image);
+                certificatLink.setText(file.getName());
                 authService.updateUser(currentUser);
                 showAlert("Succès", "Certificat mis à jour", Alert.AlertType.INFORMATION);
             } catch (AuthException e) {
@@ -183,6 +181,25 @@ public class MedecinDashboardController {
                 messageLabel.setStyle("-fx-text-fill: red;");
                 e.printStackTrace();
             }
+        }
+    }
+
+    @FXML
+    public void openCertificat() {
+        if (currentUser.getCertificat() != null && !currentUser.getCertificat().isEmpty()) {
+            try {
+                File certFile = new File(currentUser.getCertificat());
+                if (certFile.exists()) {
+                    Desktop.getDesktop().open(certFile);
+                } else {
+                    showAlert("Erreur", "Le fichier certificat n'existe pas.", Alert.AlertType.ERROR);
+                }
+            } catch (IOException e) {
+                showAlert("Erreur", "Impossible d'ouvrir le certificat: " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
+            }
+        } else {
+            showAlert("Information", "Aucun certificat n'est associé.", Alert.AlertType.INFORMATION);
         }
     }
 
@@ -200,64 +217,74 @@ public class MedecinDashboardController {
 
     @FXML
     public void handleModification() {
-        clearErrorLabels();
-        try {
-            // Validate inputs
-            if (nomField.getText().trim().isEmpty()) {
-                nomErrorLabel.setText("Le nom est requis");
-                return;
-            }
-            if (prenomField.getText().trim().isEmpty()) {
-                prenomErrorLabel.setText("Le prénom est requis");
-                return;
-            }
-            if (!emailField.getText().trim().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-                emailErrorLabel.setText("Email invalide");
-                return;
-            }
-            if (telephoneField.getText().trim().isEmpty()) {
-                telErrorLabel.setText("Le téléphone est requis");
-                return;
-            }
-            if (specialiteField.getText().trim().isEmpty()) {
-                specialiteErrorLabel.setText("La spécialité est requise");
-                return;
-            }
-            if (adresseField.getText().trim().isEmpty()) {
-                adresseErrorLabel.setText("L'adresse est requise");
-                return;
-            }
-            if (sexeComboBox.getValue() == null) {
-                sexeErrorLabel.setText("Le sexe est requis");
-                return;
-            }
+        if (!isEditing) {
+            // Enter edit mode
+            isEditing = true;
+            modifierBtn.setText("Enregistrer");
+            setFieldsEditable(true);
+            messageLabel.setText("Modifiez les champs, puis cliquez sur Enregistrer.");
+            messageLabel.setStyle("-fx-text-fill: blue;");
+        } else {
+            // Save changes
+            clearErrorLabels();
+            try {
+                // Validate inputs
+                if (nomField.getText().trim().isEmpty()) {
+                    nomErrorLabel.setText("Le nom est requis");
+                    return;
+                }
+                if (prenomField.getText().trim().isEmpty()) {
+                    prenomErrorLabel.setText("Le prénom est requis");
+                    return;
+                }
+                if (!emailField.getText().trim().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                    emailErrorLabel.setText("Email invalide");
+                    return;
+                }
+                if (telephoneField.getText().trim().isEmpty()) {
+                    telErrorLabel.setText("Le téléphone est requis");
+                    return;
+                }
+                if (specialiteField.getText().trim().isEmpty()) {
+                    specialiteErrorLabel.setText("La spécialité est requise");
+                    return;
+                }
+                if (adresseField.getText().trim().isEmpty()) {
+                    adresseErrorLabel.setText("L'adresse est requise");
+                    return;
+                }
+                if (sexeComboBox.getValue() == null) {
+                    sexeErrorLabel.setText("Le sexe est requis");
+                    return;
+                }
 
-            // Update user
-            currentUser.setNom(nomField.getText().trim());
-            currentUser.setPrenom(prenomField.getText().trim());
-            currentUser.setEmail(emailField.getText().trim());
-            currentUser.setTelephone(telephoneField.getText().trim());
-            currentUser.setSpecialite(specialiteField.getText().trim());
-            currentUser.setAdresse(adresseField.getText().trim());
-            currentUser.setSexe(sexeComboBox.getValue());
+                // Update user
+                currentUser.setNom(nomField.getText().trim());
+                currentUser.setPrenom(prenomField.getText().trim());
+                currentUser.setEmail(emailField.getText().trim());
+                currentUser.setTelephone(telephoneField.getText().trim());
+                currentUser.setSpecialite(specialiteField.getText().trim());
+                currentUser.setAdresse(adresseField.getText().trim());
+                currentUser.setSexe(sexeComboBox.getValue());
 
-            if (selectedCertificatFile != null) {
-                String certificatPath = saveFile(selectedCertificatFile, "certificats");
-                currentUser.setCertificat(certificatPath);
+                authService.updateUser(currentUser);
+                welcomeLabel.setText("Bienvenue, Dr. " + currentUser.getPrenom() + " " + currentUser.getNom());
+                specialiteLabel.setText(currentUser.getSpecialite());
+                messageLabel.setText("Profil mis à jour avec succès");
+                messageLabel.setStyle("-fx-text-fill: green;");
+
+                // Exit edit mode
+                isEditing = false;
+                modifierBtn.setText("Modifier Profil");
+                setFieldsEditable(false);
+            } catch (AuthException e) {
+                messageLabel.setText(e.getMessage());
+                messageLabel.setStyle("-fx-text-fill: red;");
+            } catch (Exception e) {
+                messageLabel.setText("Erreur lors de la mise à jour");
+                messageLabel.setStyle("-fx-text-fill: red;");
+                e.printStackTrace();
             }
-
-            authService.updateUser(currentUser);
-            welcomeLabel.setText("Bienvenue, Dr. " + currentUser.getPrenom() + " " + currentUser.getNom());
-            specialiteLabel.setText(currentUser.getSpecialite());
-            messageLabel.setText("Profil mis à jour avec succès");
-            messageLabel.setStyle("-fx-text-fill: green;");
-        } catch (AuthException e) {
-            messageLabel.setText(e.getMessage());
-            messageLabel.setStyle("-fx-text-fill: red;");
-        } catch (Exception e) {
-            messageLabel.setText("Erreur lors de la mise à jour");
-            messageLabel.setStyle("-fx-text-fill: red;");
-            e.printStackTrace();
         }
     }
 
@@ -284,6 +311,16 @@ public class MedecinDashboardController {
                 }
             }
         });
+    }
+
+    private void setFieldsEditable(boolean editable) {
+        nomField.setEditable(editable);
+        prenomField.setEditable(editable);
+        emailField.setEditable(editable);
+        telephoneField.setEditable(editable);
+        specialiteField.setEditable(editable);
+        adresseField.setEditable(editable);
+        sexeComboBox.setDisable(!editable);
     }
 
     private String saveFile(File file, String directory) throws IOException {

@@ -6,9 +6,9 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.shape.*?>
-
 <?import javafx.scene.effect.DropShadow?>
 <?import java.net.URL?>
+
 <VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="tn.esprit.controllers.MedecinDashboardController"
       spacing="20" style="-fx-background-color: #f8f9fa;" alignment="CENTER">
@@ -73,14 +73,14 @@
         <!-- Nom -->
         <Label text="Nom:" style="-fx-font-weight: bold;" GridPane.rowIndex="0"/>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="2">
-            <TextField fx:id="nomField"/>
+            <TextField fx:id="nomField" editable="false"/>
             <Label fx:id="nomErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
         </VBox>
 
         <!-- Prénom -->
         <Label text="Prénom:" style="-fx-font-weight: bold;" GridPane.rowIndex="1"/>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="2">
-            <TextField fx:id="prenomField"/>
+            <TextField fx:id="prenomField" editable="false"/>
             <Label fx:id="prenomErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
         </VBox>
 
@@ -94,21 +94,21 @@
         <!-- Téléphone -->
         <Label text="Téléphone:" style="-fx-font-weight: bold;" GridPane.rowIndex="3"/>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="3" spacing="2">
-            <TextField fx:id="telephoneField"/>
+            <TextField fx:id="telephoneField" editable="false"/>
             <Label fx:id="telErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
         </VBox>
 
         <!-- Spécialité -->
         <Label text="Spécialité:" style="-fx-font-weight: bold;" GridPane.rowIndex="4"/>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="4" spacing="2">
-            <TextField fx:id="specialiteField"/>
+            <TextField fx:id="specialiteField" editable="false"/>
             <Label fx:id="specialiteErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
         </VBox>
 
         <!-- Adresse -->
         <Label text="Adresse:" style="-fx-font-weight: bold;" GridPane.rowIndex="5"/>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="5" spacing="2">
-            <TextArea fx:id="adresseField" prefRowCount="3" wrapText="true"/>
+            <TextArea fx:id="adresseField" editable="false" prefRowCount="3" wrapText="true"/>
             <Label fx:id="adresseErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
         </VBox>
 
@@ -116,7 +116,7 @@
         <Label text="Sexe:" style="-fx-font-weight: bold;" GridPane.rowIndex="6"/>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="6" spacing="2">
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <ComboBox fx:id="sexeComboBox" prefWidth="150"/>
+                <ComboBox fx:id="sexeComboBox" prefWidth="150" disable="true"/>
             </HBox>
             <Label fx:id="sexeErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
         </VBox>
@@ -125,19 +125,16 @@
         <Label text="Certificat:" style="-fx-font-weight: bold;" GridPane.rowIndex="7"/>
         <VBox GridPane.columnIndex="1" GridPane.rowIndex="7" spacing="2">
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <ImageView fx:id="certificatImageView" fitWidth="150" fitHeight="100" preserveRatio="true">
-                    <image>
-                        <Image url="@/images/default-certificat.jfif" />
-                    </image>
-                </ImageView>
+                <Hyperlink fx:id="certificatLink" text="Aucun certificat" onAction="#openCertificat"/>
                 <Button fx:id="changeCertificatBtn" text="Modifier Certificat"
-                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;"
+                        onAction="#handleChangeCertificat"/>
             </HBox>
             <Label fx:id="certificatErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
         </VBox>
     </GridPane>
 
-    <!-- les buttons -->
+    <!-- Buttons -->
     <HBox spacing="15" alignment="CENTER">
         <Button fx:id="modifierBtn" text="Modifier Profil"
                 style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"
@@ -147,6 +144,4 @@
                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;"
                 onAction="#handleSuppression"/>
     </HBox>
-
-
 </VBox>
