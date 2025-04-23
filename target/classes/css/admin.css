@@ -110,7 +110,7 @@
     -fx-background-color: #ffffff;
     -fx-background-radius: 10;
     -fx-padding: 15;
-    -fx-pref-width: 300; /* Fixed width for consistent card size */
+    -fx-pref-width: 300;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
     -fx-transition: -fx-effect 0.2s ease;
 }
@@ -132,6 +132,11 @@
     -fx-border-width: 2;
     -fx-pref-width: 80;
     -fx-pref-height: 80;
+}
+
+.user-image:empty {
+    -fx-background-color: #e0e4e8;
+    -fx-border-radius: 50%;
 }
 
 .user-name {
@@ -165,81 +170,45 @@
 }
 
 /* Dialog Styles */
-.dialog-pane {
+.user-details-dialog {
     -fx-background-color: #ffffff;
-    -fx-padding: 20;
+    -fx-border-color: #e0e4e8;
+    -fx-border-width: 1;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
 }
 
-.dialog-pane .label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
-}
-
-.dialog-pane .header-panel {
+.user-details-dialog .header-panel {
     -fx-background-color: #3498db;
-    -fx-padding: 10;
+    -fx-padding: 15;
 }
 
-.dialog-pane .header-panel .label {
-    -fx-font-size: 16px;
+.user-details-dialog .header-panel .label {
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: #ffffff;
 }
 
-/* Dark Theme (Optional) */
-.root.dark-theme {
-    -fx-background-color: #2c3e50;
+.details-content {
+    -fx-padding: 20;
+    -fx-spacing: 15;
 }
 
-.root.dark-theme .header {
-    -fx-background-color: #34495e;
-    -fx-border-color: #2c3e50;
+.section-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 5 0;
 }
 
-.root.dark-theme .welcome-label {
-    -fx-text-fill: #ecf0f1;
+.details-grid {
+    -fx-background-color: #f9fafb;
+    -fx-padding: 10;
+    -fx-background-radius: 5;
 }
 
-.root.dark-theme .content {
-    -fx-background-color: transparent;
+.details-grid .label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #34495e;
 }
 
-.root.dark-theme .search-field {
-    -fx-background-color: #34495e;
-    -fx-border-color: #2c3e50;
-    -fx-text-fill: #ecf0f1;
-    -fx-prompt-text-fill: #95a5a6;
-}
-
-.root.dark-theme .tab-pane .tab-header-background {
-    -fx-background-color: #34495e;
-    -fx-border-color: #2c3e50;
-}
-
-.root.dark-theme .tab .tab-label {
-    -fx-text-fill: #ecf0f1;
-}
-
-.root.dark-theme .tab:selected .tab-label {
-    -fx-text-fill: #ffffff;
-}
-
-.root.dark-theme .user-card {
-    -fx-background-color: #34495e;
-}
-
-.root.dark-theme .user-name {
-    -fx-text-fill: #ecf0f1;
-}
-
-.root.dark-theme .user-card .text {
-    -fx-text-fill: #bdc3c7;
-}
-
-.root.dark-theme .dialog-pane {
-    -fx-background-color: #34495e;
-}
-
-.root.dark-theme .dialog-pane .label {
-    -fx-text-fill: #ecf0f1;
-}

@@ -12,6 +12,7 @@ import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
 import tn.esprit.utils.SceneManager;
 
+import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
 
 public class AdminDashboard {
     private static final Logger LOGGER = Logger.getLogger(AdminDashboard.class.getName());
-    private static final String DEFAULT_PROFILE_IMAGE = "/images/default_profile.png"; // Ensure this exists in resources
+    private static final String DEFAULT_PROFILE_IMAGE = "/images/default-profil.jpg";
 
     @FXML private VBox root;
     @FXML private Label welcomeLabel;
@@ -54,6 +55,9 @@ public class AdminDashboard {
     private void initialize() {
         try {
             allUsers = authService.getAllUsers();
+            // Debug: Verify default image
+            InputStream defaultImageStream = getClass().getResourceAsStream(DEFAULT_PROFILE_IMAGE);
+            LOGGER.info("Default image stream: " + (defaultImageStream != null ? "Found" : "Not found"));
             setupTabListener();
             setupSearchListener();
             displayUsers("PATIENT");
@@ -87,6 +91,7 @@ public class AdminDashboard {
         targetCards.getChildren().clear();
         List<User> filteredUsers = getFilteredUsers(userType);
 
+        LOGGER.info("Displaying " + filteredUsers.size() + " users for type: " + userType);
         for (User user : filteredUsers) {
             targetCards.getChildren().add(createUserCard(user));
         }
@@ -105,6 +110,7 @@ public class AdminDashboard {
                         user.getEmail().toLowerCase().contains(keyword.toLowerCase()))
                 .toList();
 
+        LOGGER.info("Filtered " + filteredUsers.size() + " users for type: " + userType + " with keyword: " + keyword);
         for (User user : filteredUsers) {
             targetCards.getChildren().add(createUserCard(user));
         }
@@ -144,28 +150,7 @@ public class AdminDashboard {
         profileImage.setFitWidth(80);
         profileImage.setFitHeight(80);
 
-        String imagePath = user.getImageProfil();
-        Image image = null;
-        if (imagePath != null && !imagePath.trim().isEmpty()) {
-            try {
-                if (imagePath.startsWith("/")) {
-                    image = new Image(getClass().getResourceAsStream(imagePath));
-                } else {
-                    image = new Image(imagePath);
-                }
-            } catch (Exception e) {
-                LOGGER.warning("Failed to load image for user ID: " + user.getId() + ", email: " + user.getEmail() +
-                        ", image_profil: " + imagePath + ". Error: " + e.getMessage());
-            }
-        }
-        if (image == null || image.isError()) {
-            try {
-                image = new Image(getClass().getResourceAsStream(DEFAULT_PROFILE_IMAGE));
-            } catch (Exception e) {
-                LOGGER.severe("Failed to load default profile image: " + DEFAULT_PROFILE_IMAGE + ". Error: " + e.getMessage());
-                image = new Image("file:src/main/resources/images/default_profile.png");
-            }
-        }
+        Image image = loadUserImage(user.getImageProfil());
         profileImage.setImage(image);
 
         // User Info
@@ -200,37 +185,132 @@ public class AdminDashboard {
         return card;
     }
 
+    private Image loadUserImage(String imagePath) {
+        Image image = null;
+        if (imagePath != null && !imagePath.trim().isEmpty()) {
+            try {
+                if (imagePath.startsWith("/")) {
+                    InputStream imageStream = getClass().getResourceAsStream(imagePath);
+                    if (imageStream != null) {
+                        image = new Image(imageStream);
+                    } else {
+                        LOGGER.warning("Image resource not found: " + imagePath);
+                    }
+                } else {
+                    image = new Image(imagePath);
+                }
+                if (image.isError()) {
+                    LOGGER.warning("Failed to load image: " + imagePath + ". Image error: " + image.getException());
+                    image = null;
+                }
+            } catch (Exception e) {
+                LOGGER.warning("Failed to load image: " + imagePath + ". Error: " + e.getMessage());
+            }
+        }
+
+        // Load default image if user image is invalid or missing
+        if (image == null || image.isError()) {
+            try {
+                InputStream defaultStream = getClass().getResourceAsStream(DEFAULT_PROFILE_IMAGE);
+                if (defaultStream != null) {
+                    image = new Image(defaultStream);
+                    if (image.isError()) {
+                        LOGGER.severe("Default image error: " + image.getException());
+                        image = null;
+                    }
+                } else {
+                    LOGGER.severe("Default profile image not found: " + DEFAULT_PROFILE_IMAGE);
+                    // Fallback to a base64-encoded placeholder (1x1 transparent pixel)
+                    image = new Image("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=");
+                }
+            } catch (Exception e) {
+                LOGGER.severe("Failed to load default profile image: " + DEFAULT_PROFILE_IMAGE + ". Error: " + e.getMessage());
+                image = new Image("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=");
+            }
+        }
+
+        return image;
+    }
+
     private void showUserDetails(User user) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Détails de l'Utilisateur");
         dialog.setHeaderText(user.getPrenom() + " " + user.getNom());
+        dialog.getDialogPane().getStyleClass().add("user-details-dialog");
 
-        VBox content = new VBox(10);
+        VBox content = new VBox(15);
         content.setPadding(new Insets(20));
+        content.getStyleClass().add("details-content");
 
-        content.getChildren().addAll(
-                new Label("ID: " + user.getId()),
-                new Label("Email: " + user.getEmail()),
-                new Label("Prénom: " + user.getPrenom()),
-                new Label("Nom: " + user.getNom()),
-                new Label("Adresse: " + user.getAdresse()),
-                new Label("Sexe: " + user.getSexe()),
-                new Label("Âge: " + user.getAge()),
-                new Label("Rôles: " + String.join(", ", user.getRoles())),
-                new Label("Type: " + user.getUserType()),
-                new Label("Lock Until: " + (user.getLockUntil() != null ?
-                        user.getLockUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "N/A"))
-        );
+        // Personal Information Section
+        Label personalHeader = new Label("Informations Personnelles");
+        personalHeader.getStyleClass().add("section-header");
 
+        GridPane personalGrid = new GridPane();
+        personalGrid.setHgap(10);
+        personalGrid.setVgap(8);
+        personalGrid.getStyleClass().add("details-grid");
+
+        int row = 0;
+        personalGrid.add(new Label(String.valueOf(user.getId())), 1, row++);
+        personalGrid.add(new Label("Prénom:"), 0, row);
+        personalGrid.add(new Label(user.getPrenom()), 1, row++);
+        personalGrid.add(new Label("Nom:"), 0, row);
+        personalGrid.add(new Label(user.getNom()), 1, row++);
+        personalGrid.add(new Label("Email:"), 0, row);
+        personalGrid.add(new Label(user.getEmail()), 1, row++);
+        personalGrid.add(new Label("Adresse:"), 0, row);
+        personalGrid.add(new Label(user.getAdresse()), 1, row++);
+        personalGrid.add(new Label("Sexe:"), 0, row);
+        personalGrid.add(new Label(user.getSexe()), 1, row++);
+        personalGrid.add(new Label("Âge:"), 0, row);
+        personalGrid.add(new Label(String.valueOf(user.getAge())), 1, row++);
+
+        // Account Information Section
+        Label accountHeader = new Label("Informations du Compte");
+        accountHeader.getStyleClass().add("section-header");
+
+        GridPane accountGrid = new GridPane();
+        accountGrid.setHgap(10);
+        accountGrid.setVgap(8);
+        accountGrid.getStyleClass().add("details-grid");
+
+        row = 0;
+        accountGrid.add(new Label("Type:"), 0, row);
+        accountGrid.add(new Label(user.getUserType()), 1, row++);
+        accountGrid.add(new Label("Rôles:"), 0, row);
+        accountGrid.add(new Label(String.join(", ", user.getRoles())), 1, row++);
+        accountGrid.add(new Label("Verrouillé jusqu'à:"), 0, row);
+        accountGrid.add(new Label(user.getLockUntil() != null ?
+                user.getLockUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "N/A"), 1, row++);
+
+        // Doctor-Specific Information (if applicable)
+        GridPane doctorGrid = null;
         if (user.getUserType().equals("MEDECIN")) {
-            content.getChildren().addAll(
-                    new Label("Spécialité: " + (user.getSpecialite() != null ? user.getSpecialite() : "N/A")),
-                    new Label("Certificat: " + (user.getCertificat() != null ? user.getCertificat() : "N/A"))
-            );
+            Label doctorHeader = new Label("Informations du Médecin");
+            doctorHeader.getStyleClass().add("section-header");
+
+            doctorGrid = new GridPane();
+            doctorGrid.setHgap(10);
+            doctorGrid.setVgap(8);
+            doctorGrid.getStyleClass().add("details-grid");
+
+            row = 0;
+            doctorGrid.add(new Label("Spécialité:"), 0, row);
+            doctorGrid.add(new Label(user.getSpecialite() != null ? user.getSpecialite() : "N/A"), 1, row++);
+            doctorGrid.add(new Label("Certificat:"), 0, row);
+            doctorGrid.add(new Label(user.getCertificat() != null ? user.getCertificat() : "N/A"), 1, row++);
+        }
+
+        // Assemble content
+        content.getChildren().addAll(personalHeader, personalGrid, accountHeader, accountGrid);
+        if (doctorGrid != null) {
+            content.getChildren().addAll(new Label(""), doctorGrid);
         }
 
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/admin.css").toExternalForm());
         dialog.showAndWait();
     }
 
