@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserRepositoryImpl implements UserRepository {
     private final Connection connection;
@@ -129,19 +130,34 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
-        String sql = "SELECT * FROM user";
+    public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
-            while (resultSet.next()) {
-                users.add(mapResultSetToUser(resultSet));
+        String query = "SELECT * FROM user WHERE roles LIKE '%ROLE_PATIENT%' OR roles LIKE '%ROLE_MEDECIN%' OR roles LIKE '%ROLE_BLOCKED%'";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            System.out.println("Executing query: " + query);
+            while (rs.next()) {
+                try {
+                    User user = mapResultSetToUser(rs);
+                    System.out.println("User loaded: " + user.getEmail());
+                    users.add(user);
+                } catch (SQLException e) {
+                    System.err.println("Error mapping user: " + e.getMessage());
+                    System.err.println("Skipping user with ID: " + rs.getInt("id") + ", email: " + rs.getString("email"));
+                }
             }
-            return users;
+            System.out.println("Total users loaded: " + users.size());
         } catch (SQLException e) {
-            throw new RuntimeException("Échec de la récupération des utilisateurs", e);
+            System.err.println("SQL Error: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to retrieve users: " + e.getMessage(), e);
         }
+        return users;
+    }
+
+    @Override
+    public List<User> findAll() {
+        return getAllUsers();
     }
 
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
@@ -169,7 +185,9 @@ public class UserRepositoryImpl implements UserRepository {
         if (rolesJson != null && !rolesJson.isEmpty()) {
             String cleaned = rolesJson.replaceAll("[\\[\\]\"]", "").trim();
             if (!cleaned.isEmpty()) {
-                roles = new ArrayList<>(Arrays.asList(cleaned.split(",")));
+                roles = Arrays.stream(cleaned.split(","))
+                        .map(role -> role.equals("BLOCKED") ? "ROLE_BLOCKED" : role) // Fix incorrect 'BLOCKED' role
+                        .collect(Collectors.toList());
             }
         }
 
@@ -179,7 +197,7 @@ public class UserRepositoryImpl implements UserRepository {
             throw new SQLException("Rôles invalides pour l'utilisateur : aucun rôle défini");
         }
         for (String role : roles) {
-            if (!Arrays.asList("ROLE_ADMIN", "ROLE_PATIENT", "ROLE_MEDECIN").contains(role)) {
+            if (!Arrays.asList("ROLE_ADMIN", "ROLE_PATIENT", "ROLE_MEDECIN", "ROLE_BLOCKED", "ORIGINAL_ROLE_ROLE_MEDECIN").contains(role)) {
                 System.err.println("Invalid role '" + role + "' for user ID: " + user.getId() + ", email: " + user.getEmail());
                 throw new SQLException("Rôle invalide pour l'utilisateur : " + role);
             }
@@ -209,6 +227,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         return user;
     }
+
     @Override
     public User findById(int id) {
         String sql = "SELECT * FROM user WHERE id = ?";

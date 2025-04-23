@@ -4,6 +4,7 @@ import tn.esprit.models.User;
 import tn.esprit.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -144,7 +145,7 @@ public class AuthService {
             throw new AuthException("Le téléphone est requis.");
         }
         if (isEmpty(user.getUserType()) || !Arrays.asList("ADMIN", "PATIENT", "MEDECIN").contains(user.getUserType())) {
-            throw new AuthException("Le type d'utilisateur doit être  PATIENT ou MEDECIN.");
+            throw new AuthException("Le type d'utilisateur doit être ADMIN, PATIENT ou MEDECIN.");
         }
 
         // Validate Medecin-specific fields
@@ -179,27 +180,44 @@ public class AuthService {
 
     public List<User> getAllUsers() throws AuthException {
         try {
-            return userRepository.findAll();
+            List<User> users = userRepository.getAllUsers();
+            List<User> validUsers = new ArrayList<>();
+            for (User user : users) {
+                try {
+                    // Validate mandatory fields
+                    if (isEmpty(user.getEmail()) || isEmpty(user.getNom()) || isEmpty(user.getPrenom()) ||
+                            isEmpty(user.getAdresse()) || isEmpty(user.getSexe()) || isEmpty(user.getTelephone())) {
+                        System.err.println("Skipping invalid user ID: " + user.getId() + ", email: " + user.getEmail());
+                        continue;
+                    }
+                    // Validate doctor-specific fields
+                    if ("MEDECIN".equals(user.getUserType()) && (isEmpty(user.getSpecialite()) || isEmpty(user.getCertificat()))) {
+                        System.err.println("Skipping doctor with missing specialite or certificat ID: " + user.getId() + ", email: " + user.getEmail());
+                        continue;
+                    }
+                    validUsers.add(user);
+                } catch (Exception e) {
+                    System.err.println("Error validating user ID: " + user.getId() + ", email: " + user.getEmail() + ": " + e.getMessage());
+                }
+            }
+            return validUsers;
         } catch (Exception e) {
             throw new AuthException("Erreur lors de la récupération des utilisateurs : " + e.getMessage());
         }
     }
 
-    public void toggleUserStatus(Integer userId) throws AuthException {
-        if (userId == null) {
-            throw new AuthException("L'ID de l'utilisateur est requis.");
-        }
+    public void toggleUserStatus(int userId) throws AuthException {
         User user = userRepository.findById(userId);
         if (user == null) {
             throw new AuthException("Utilisateur non trouvé.");
         }
+
         if (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now())) {
-            // Unlock user
+            // Unblock: Clear lock_until
             user.setLockUntil(null);
-            user.setFailedLoginAttempts(0);
         } else {
-            // Lock user for 30 minutes
-            user.setLockUntil(LocalDateTime.now().plusMinutes(30));
+            // Block: Set lock_until to 24 hours from now
+            user.setLockUntil(LocalDateTime.now().plusHours(24));
         }
         userRepository.save(user);
     }

@@ -1,42 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
+        <?import javafx.scene.control.*?>
+        <?import javafx.scene.layout.*?>
+        <?import javafx.geometry.Insets?>
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="tn.esprit.controllers.AdminDashboard"
-      spacing="20" style="-fx-padding: 20;" stylesheets="@/css/admin.css">
 
-    <!-- En-tête -->
-    <HBox spacing="15" alignment="CENTER_LEFT">
-        <Label text="Gestion des Utilisateurs" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3c4043;" />
-        <Region HBox.hgrow="ALWAYS" />
-        <TextField fx:id="searchField" promptText="Rechercher par nom, email..." styleClass="search-field" />
-        <Button fx:id="addUserBtn" text="+ Ajouter" />
+<?import java.net.URL?>
+<VBox fx:id="root" prefWidth="800" prefHeight="600" styleClass="root" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.AdminDashboard">
+
+    <stylesheets>
+        <URL value="@css/admin.css" />
+    </stylesheets>
+
+    <HBox styleClass="header">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+        <Label fx:id="welcomeLabel" styleClass="welcome-label" text="Bienvenue, Admin"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Déconnexion" styleClass="logout-button" onAction="#handleLogout"/>
     </HBox>
-    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
-        <Button text="Déconnexion" onAction="#handleLogout" styleClass="logout-button" />
-    </HBox>
-    <!-- Onglets -->
-    <TabPane fx:id="tabPane">
-        <tabs>
-            <Tab fx:id="patientsTab" text="Patients" />
-            <Tab fx:id="medecinsTab" text="Médecins" />
-        </tabs>
-    </TabPane>
 
+    <!-- Search and Tabs Section -->
+    <VBox styleClass="content">
+        <padding>
+            <Insets top="10" right="20" bottom="10" left="20"/>
+        </padding>
+        <!-- Search Field -->
+        <TextField fx:id="searchField" promptText="Rechercher par nom, prénom ou email..." styleClass="search-field"/>
 
-    <!-- Tableau des utilisateurs -->
-    <TableView fx:id="usersTable" styleClass="modern-table">
-        <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />
-            <TableColumn fx:id="nomColumn" text="Nom" prefWidth="150" />
-            <TableColumn fx:id="prenomColumn" text="Prénom" prefWidth="150" />
-            <TableColumn fx:id="emailColumn" text="Email" prefWidth="250" />
-            <TableColumn fx:id="roleColumn" text="Rôle" prefWidth="120" />
-            <TableColumn fx:id="statusColumn" text="Statut" prefWidth="100" />
-            <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="180" />
-        </columns>
-    </TableView>
+        <!-- Tab Pane -->
+        <TabPane fx:id="tabPane" styleClass="tab-pane">
+            <tabs>
+                <Tab fx:id="patientsTab" text="Patients" styleClass="tab">
+                    <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+                        <VBox fx:id="patientUserCards" styleClass="user-cards"/>
+                    </ScrollPane>
+                </Tab>
+                <Tab fx:id="medecinsTab" text="Médecins" styleClass="tab">
+                    <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+                        <VBox fx:id="medecinUserCards" styleClass="user-cards"/>
+                    </ScrollPane>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </VBox>
 </VBox>

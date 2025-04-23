@@ -6,8 +6,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import tn.esprit.controllers.*;
 import tn.esprit.models.User;
+import tn.esprit.repository.UserRepositoryImpl;
 import tn.esprit.services.AuthService;
 import javafx.scene.control.Alert;
+
+import java.io.IOException;
 
 
 public class SceneManager {
@@ -66,21 +69,19 @@ public class SceneManager {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/AdminDashboard.fxml"));
             Parent root = loader.load();
-
             AdminDashboard controller = loader.getController();
             controller.setCurrentUser(user);
-            controller.setAuthService(this.authService);
             controller.setSceneManager(this);
-
+            controller.setAuthService(new AuthService(new UserRepositoryImpl()));
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
-            primaryStage.setTitle("Tableau de Bord Administrateur");
+            primaryStage.setTitle("Tableau de Bord Admin");
             primaryStage.show();
-        } catch (Exception e) {
-            showAlert("Erreur", "Impossible de charger le tableau de bord admin: " + e.getMessage(), Alert.AlertType.ERROR);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     public void showMedecinDashboard(User user) {
         try {

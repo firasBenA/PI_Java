@@ -11,5 +11,7 @@ public interface  UserRepository {
     void delete(int userId);
     User findById(int userId);
 
+    List<User> getAllUsers();
+
     List<User> searchUsers(String keyword);
 }

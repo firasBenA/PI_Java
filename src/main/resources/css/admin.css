@@ -1,33 +1,162 @@
-.table-view {
-    -fx-background-color: white;
-    -fx-border-color: #e0e0e0;
+.root {
+    -fx-background-color: #f5f7fa;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-.table-view .column-header {
-    -fx-background-color: #4285f4;
-    -fx-text-fill: white;
+/* Header Styles */
+.header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e4e8;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 5, 0, 0, 2);
+    -fx-alignment: center-left;
+    -fx-padding: 20;
 }
 
-.table-row-cell:odd {
-    -fx-background-color: #f9f9f9;
-}
-
-.table-row-cell:selected {
-    -fx-background-color: #e8f0fe;
-}
-
-.button {
-    -fx-padding: 5 10 5 10;
-    -fx-cursor: hand;
-}
-.logout-button {
-    -fx-background-color: #f44336;
-    -fx-text-fill: white;
+.welcome-label {
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-padding: 8px 16px;
-    -fx-border-radius: 4px;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Logout Button */
+.logout-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-padding: 8 16;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-transition: -fx-background-color 0.2s ease;
 }
 
 .logout-button:hover {
-    -fx-background-color: #d32f2f;
+    -fx-background-color: #c0392b;
 }
+
+/* Content Section */
+.content {
+    -fx-padding: 20;
+    -fx-spacing: 10;
+}
+
+/* Search Field */
+.search-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 5;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #95a5a6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 5, 0, 0, 1);
+}
+
+.search-field:focused {
+    -fx-border-color: #3498db;
+    -fx-border-width: 2;
+}
+
+/* Tab Pane */
+.tab-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.tab {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+    -fx-pref-height: 40;
+}
+
+.tab:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: #ffffff;
+}
+
+.tab .tab-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2c3e50;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e4e8;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Tab Content */
+.tab-content {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* User Cards */
+.user-cards {
+    -fx-spacing: 15;
+    -fx-padding: 10;
+}
+
+.user-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 3);
+    -fx-transition: -fx-effect 0.2s ease;
+}
+
+.user-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0, 0, 5);
+}
+
+.user-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.user-card .image-view {
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-border-color: #e0e4e8;
+    -fx-border-width: 2;
+}
+
+/* User Info Text */
+.user-card .text {
+    -fx-font-size: 13px;
+    -fx-text-fill: #34495e;
+}
+
+/* Block/Unblock Button */
+.block-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-padding: 8 16;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-transition: -fx-background-color 0.2s ease;
+}
+
+.block-button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.block-button:pressed {
+    -fx-background-color: #1f6b9a;
+}
+
