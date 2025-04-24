@@ -247,4 +247,28 @@ public class AuthService {
         }
         userRepository.save(user);
     }
+
+
+    public void registerSocial(User user, String provider, String accessToken) throws AuthException {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new AuthException("Email non fourni par " + provider);
+        }
+        User existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser != null) {
+            // Link social account
+            existingUser.setSocialProvider(provider);
+            existingUser.setSocialAccessToken(accessToken);
+            userRepository.save(existingUser);
+            return;
+        }
+        // Set a random password for social users
+        user.hashPassword(generateRandomPassword());
+        user.setSocialProvider(provider);
+        user.setSocialAccessToken(accessToken);
+        userRepository.save(user);
+    }
+
+    private String generateRandomPassword() {
+        return java.util.UUID.randomUUID().toString().substring(0, 12);
+    }
 }

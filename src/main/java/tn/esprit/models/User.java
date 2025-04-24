@@ -29,6 +29,9 @@ public class User {
     private Integer failedLoginAttempts = 0;
     private LocalDateTime lockUntil;
 
+    private String socialProvider; // e.g., "google"
+    private String socialAccessToken;
+
     public User() {
         this.createdAt = LocalDateTime.now();
         this.userType = determineUserType();
@@ -104,11 +107,25 @@ public class User {
     public LocalDateTime getLockUntil() { return lockUntil; }
     public void setLockUntil(LocalDateTime lockUntil) { this.lockUntil = lockUntil; }
 
-    public void hashPassword(String plainPassword) {
-        this.password = BCrypt.hashpw(plainPassword, BCrypt.gensalt(13));
+    public void hashPassword(String rawPassword) {
+        this.password = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
     }
 
-    public boolean checkPassword(String candidate) {
-        return BCrypt.checkpw(candidate, this.password);
+    public boolean checkPassword(String password) {
+        if (this.password == null || this.password.isEmpty()) {
+            System.err.println("Password hash is null or empty for user: " + this.email);
+            return false;
+        }
+        try {
+            return BCrypt.checkpw(password, this.password);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Password verification failed for user " + this.email + ": " + e.getMessage());
+            return false;
+        }
     }
+
+    public String getSocialProvider() { return socialProvider; }
+    public void setSocialProvider(String socialProvider) { this.socialProvider = socialProvider; }
+    public String getSocialAccessToken() { return socialAccessToken; }
+    public void setSocialAccessToken(String socialAccessToken) { this.socialAccessToken = socialAccessToken; }
 }
