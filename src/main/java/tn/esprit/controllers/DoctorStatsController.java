@@ -3,17 +3,12 @@ package tn.esprit.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
+import javafx.scene.chart.*;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import tn.esprit.utils.MyDataBase;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,38 +27,39 @@ public class DoctorStatsController {
     @FXML private BarChart<String, Number> dayChart;
 
     private Connection connection;
-    private Map<String, String> medecinsMap = new HashMap<>(); // telephone -> nom complet
+    private Map<String, String> medecinsMap = new HashMap<>();
 
-    public void initialize(Connection connection) {
-        this.connection = connection;
-        loadSpecialites();
-        setupListeners();
+    @FXML
+    public void initialize() {
+        this.connection = MyDataBase.getInstance().getCnx();
+
+        if (connection != null) {
+            loadSpecialites();
+            setupListeners();
+        } else {
+            showAlert("Erreur de connexion", "Impossible de se connecter à la base de données");
+        }
     }
 
     private void loadSpecialites() {
         try {
-            String query = "SELECT DISTINCT specialite FROM user WHERE roles = 'MEDECIN' AND specialite IS NOT NULL AND specialite <> ''";
+            String query = "SELECT DISTINCT specialite FROM user WHERE roles LIKE '%MEDECIN%' AND specialite IS NOT NULL AND specialite <> ''";
+            ;
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
             ObservableList<String> specialites = FXCollections.observableArrayList();
             while (rs.next()) {
-                String spec = rs.getString("specialite");
-                if (spec != null && !spec.trim().isEmpty()) {
-                    specialites.add(spec);
-                }
+                specialites.add(rs.getString("specialite"));
             }
 
             specialiteCombo.setItems(specialites);
 
             if (specialites.isEmpty()) {
-                System.out.println("Aucune spécialité trouvée. Vérifiez que:");
-                System.out.println("1. La colonne 'roles' contient des valeurs 'MEDECIN'");
-                System.out.println("2. La colonne 'specialite' est remplie pour les médecins");
+                showAlert("Aucune spécialité", "Aucune spécialité trouvée dans la base de données");
             }
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des spécialités:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement des spécialités: " + e.getMessage());
         }
     }
 
@@ -98,7 +94,7 @@ public class DoctorStatsController {
 
     private void loadMedecinsBySpecialite(String specialite) {
         try {
-            String query = "SELECT telephone, prenom, nom FROM user WHERE roles = 'MEDECIN' AND specialite = ?";
+            String query = "SELECT telephone, prenom, nom FROM user WHERE roles LIKE '%MEDECIN%' AND specialite = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, specialite);
             ResultSet rs = stmt.executeQuery();
@@ -117,11 +113,10 @@ public class DoctorStatsController {
             medecinCombo.getSelectionModel().clearSelection();
 
             if (medecins.isEmpty()) {
-                System.out.println("Aucun médecin trouvé pour la spécialité: " + specialite);
+                showAlert("Aucun médecin", "Aucun médecin trouvé pour la spécialité: " + specialite);
             }
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des médecins:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement des médecins: " + e.getMessage());
         }
     }
 
@@ -149,16 +144,15 @@ public class DoctorStatsController {
                 statsTitleLabel.setText("Statistiques du médecin " + nomComplet);
             }
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement du nom du médecin:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement du médecin: " + e.getMessage());
         }
     }
 
     private void loadAppointmentStats(String doctorPhone) {
         try {
             String query = "SELECT "
-                    + "SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved, "
-                    + "SUM(CASE WHEN status = 'canceled' THEN 1 ELSE 0 END) as canceled, "
+                    + "SUM(CASE WHEN statut = 'Apprové' THEN 1 ELSE 0 END) as approved, "
+                    + "SUM(CASE WHEN statut = 'Refusé' THEN 1 ELSE 0 END) as canceled, "
                     + "COUNT(*) as total "
                     + "FROM rendez_vous WHERE medecin_id = ?";
 
@@ -177,8 +171,7 @@ public class DoctorStatsController {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des stats de rendez-vous:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement des stats de RDV: " + e.getMessage());
         }
     }
 
@@ -194,14 +187,13 @@ public class DoctorStatsController {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                String sexe = rs.getString("sexe").equalsIgnoreCase("homme") ? "Hommes" : "Femmes";
+                String sexe = "homme".equalsIgnoreCase(rs.getString("sexe")) ? "Hommes" : "Femmes";
                 pieData.add(new PieChart.Data(sexe, rs.getInt("count")));
             }
 
             genderChart.setData(pieData);
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des stats par sexe:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement des stats par sexe: " + e.getMessage());
         }
     }
 
@@ -236,8 +228,7 @@ public class DoctorStatsController {
             ageChart.getData().clear();
             ageChart.getData().add(series);
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des stats par âge:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement des stats par âge: " + e.getMessage());
         }
     }
 
@@ -261,8 +252,15 @@ public class DoctorStatsController {
             dayChart.getData().clear();
             dayChart.getData().add(series);
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des stats par jour:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement des stats par jour: " + e.getMessage());
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
