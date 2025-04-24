@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DoctorStatsController {
-    // Composants FXML
     @FXML private ComboBox<String> specialiteCombo;
     @FXML private ComboBox<String> medecinCombo;
     @FXML private VBox statsSection;
@@ -43,23 +42,32 @@ public class DoctorStatsController {
 
     private void loadSpecialites() {
         try {
-            String query = "SELECT DISTINCT specialite FROM user WHERE roles = 'MEDECIN' AND specialite IS NOT NULL";
+            String query = "SELECT DISTINCT specialite FROM user WHERE roles = 'MEDECIN' AND specialite IS NOT NULL AND specialite <> ''";
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
             ObservableList<String> specialites = FXCollections.observableArrayList();
             while (rs.next()) {
-                specialites.add(rs.getString("specialite"));
+                String spec = rs.getString("specialite");
+                if (spec != null && !spec.trim().isEmpty()) {
+                    specialites.add(spec);
+                }
             }
 
             specialiteCombo.setItems(specialites);
+
+            if (specialites.isEmpty()) {
+                System.out.println("Aucune spécialité trouvée. Vérifiez que:");
+                System.out.println("1. La colonne 'roles' contient des valeurs 'MEDECIN'");
+                System.out.println("2. La colonne 'specialite' est remplie pour les médecins");
+            }
         } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des spécialités:");
             e.printStackTrace();
         }
     }
 
     private void setupListeners() {
-        // Quand une spécialité est sélectionnée
         specialiteCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 loadMedecinsBySpecialite(newVal);
@@ -70,7 +78,6 @@ public class DoctorStatsController {
             }
         });
 
-        // Quand un médecin est sélectionné
         medecinCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 String doctorPhone = medecinsMap.entrySet().stream()
@@ -91,7 +98,7 @@ public class DoctorStatsController {
 
     private void loadMedecinsBySpecialite(String specialite) {
         try {
-            String query = "SELECT telephone, prenom, nom FROM user WHERE role = 'MEDECIN' AND specialite = ?";
+            String query = "SELECT telephone, prenom, nom FROM user WHERE roles = 'MEDECIN' AND specialite = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, specialite);
             ResultSet rs = stmt.executeQuery();
@@ -108,21 +115,21 @@ public class DoctorStatsController {
 
             medecinCombo.setItems(medecins);
             medecinCombo.getSelectionModel().clearSelection();
+
+            if (medecins.isEmpty()) {
+                System.out.println("Aucun médecin trouvé pour la spécialité: " + specialite);
+            }
         } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des médecins:");
             e.printStackTrace();
         }
     }
 
     private void showStatsForDoctor(String doctorPhone, String specialite) {
-        // Afficher les infos de base
         statsSection.setVisible(true);
         statsDetails.setVisible(true);
         specialiteLabel.setText("- " + specialite);
-
-        // Charger les données du médecin
         loadDoctorName(doctorPhone);
-
-        // Charger les statistiques
         loadAppointmentStats(doctorPhone);
         loadGenderStats(doctorPhone);
         loadAgeStats(doctorPhone);
@@ -142,27 +149,120 @@ public class DoctorStatsController {
                 statsTitleLabel.setText("Statistiques du médecin " + nomComplet);
             }
         } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement du nom du médecin:");
             e.printStackTrace();
         }
     }
 
     private void loadAppointmentStats(String doctorPhone) {
-        // Même implémentation que précédemment
-        // ...
+        try {
+            String query = "SELECT "
+                    + "SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved, "
+                    + "SUM(CASE WHEN status = 'canceled' THEN 1 ELSE 0 END) as canceled, "
+                    + "COUNT(*) as total "
+                    + "FROM rendez_vous WHERE medecin_id = ?";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, doctorPhone);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int total = rs.getInt("total");
+                if (total > 0) {
+                    double approvedPercent = (rs.getInt("approved") * 100.0) / total;
+                    double canceledPercent = (rs.getInt("canceled") * 100.0) / total;
+
+                    approvedLabel.setText(String.format("- Rendez-vous approuvés : %.2f%%", approvedPercent));
+                    canceledLabel.setText(String.format("- Rendez-vous annulés : %.2f%%", canceledPercent));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des stats de rendez-vous:");
+            e.printStackTrace();
+        }
     }
 
     private void loadGenderStats(String doctorPhone) {
-        // Même implémentation que précédemment
-        // ...
+        try {
+            ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+            String query = "SELECT p.sexe, COUNT(*) as count "
+                    + "FROM rendez_vous r JOIN user p ON r.patient_id = p.telephone "
+                    + "WHERE r.medecin_id = ? GROUP BY p.sexe";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, doctorPhone);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String sexe = rs.getString("sexe").equalsIgnoreCase("homme") ? "Hommes" : "Femmes";
+                pieData.add(new PieChart.Data(sexe, rs.getInt("count")));
+            }
+
+            genderChart.setData(pieData);
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des stats par sexe:");
+            e.printStackTrace();
+        }
     }
 
     private void loadAgeStats(String doctorPhone) {
-        // Même implémentation que précédemment
-        // ...
+        try {
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            String query = "SELECT "
+                    + "SUM(CASE WHEN p.age BETWEEN 0 AND 18 THEN 1 ELSE 0 END) as age0_18, "
+                    + "SUM(CASE WHEN p.age BETWEEN 19 AND 35 THEN 1 ELSE 0 END) as age19_35, "
+                    + "SUM(CASE WHEN p.age BETWEEN 36 AND 50 THEN 1 ELSE 0 END) as age36_50, "
+                    + "SUM(CASE WHEN p.age BETWEEN 51 AND 70 THEN 1 ELSE 0 END) as age51_70, "
+                    + "SUM(CASE WHEN p.age > 70 THEN 1 ELSE 0 END) as age71plus, "
+                    + "COUNT(*) as total "
+                    + "FROM rendez_vous r JOIN user p ON r.patient_id = p.telephone "
+                    + "WHERE r.medecin_id = ?";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, doctorPhone);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int total = rs.getInt("total");
+                if (total > 0) {
+                    series.getData().add(new XYChart.Data<>("0-18", (rs.getInt("age0_18") * 100.0 / total)));
+                    series.getData().add(new XYChart.Data<>("19-35", (rs.getInt("age19_35") * 100.0 / total)));
+                    series.getData().add(new XYChart.Data<>("36-50", (rs.getInt("age36_50") * 100.0 / total)));
+                    series.getData().add(new XYChart.Data<>("51-70", (rs.getInt("age51_70") * 100.0 / total)));
+                    series.getData().add(new XYChart.Data<>("71+", (rs.getInt("age71plus") * 100.0 / total)));
+                }
+            }
+
+            ageChart.getData().clear();
+            ageChart.getData().add(series);
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des stats par âge:");
+            e.printStackTrace();
+        }
     }
 
     private void loadDayStats(String doctorPhone) {
-        // Même implémentation que précédemment
-        // ...
+        try {
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            String query = "SELECT DAYNAME(date_rdv) as day, COUNT(*) as count "
+                    + "FROM rendez_vous WHERE medecin_id = ? "
+                    + "GROUP BY DAYNAME(date_rdv) "
+                    + "ORDER BY DAYOFWEEK(date_rdv)";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, doctorPhone);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String day = rs.getString("day");
+                series.getData().add(new XYChart.Data<>(day.substring(0, 3), rs.getInt("count")));
+            }
+
+            dayChart.getData().clear();
+            dayChart.getData().add(series);
+        } catch (SQLException e) {
+            System.err.println("Erreur lors du chargement des stats par jour:");
+            e.printStackTrace();
+        }
     }
 }
