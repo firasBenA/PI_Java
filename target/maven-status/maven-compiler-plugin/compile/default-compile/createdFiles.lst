@@ -15,5 +15,6 @@ tn\esprit\controllers\AjouterPrescriptionDepuisDiag.class
 tn\esprit\models\User.class
 tn\esprit\controllers\DiagnostiqueController.class
 tn\esprit\controllers\PrescriptionController.class
+tn\esprit\controllers\ChatbotController.class
 tn\esprit\controllers\GestionPrescription.class
 tn\esprit\controllers\MedecinPrescDiag.class
