@@ -150,10 +150,11 @@ public class DoctorStatsController {
 
     private void loadAppointmentStats(String doctorPhone) {
         try {
+            // Requête SQL corrigée avec des virgules manquantes
             String query = "SELECT "
-                    + "SUM(CASE WHEN statut = 'Apprové' THEN 1 ELSE 0 END) as approved, "
-                    + "SUM(CASE WHEN statut = 'Refusé' THEN 1 ELSE 0 END) as canceled, "
-                    + "COUNT(*) as total "
+                    + "SUM(CASE WHEN statut = 'Approuvé' THEN 1 ELSE 0 END) AS approved, "
+                    + "SUM(CASE WHEN statut = 'Refusé' THEN 1 ELSE 0 END) AS canceled, "
+                    + "COUNT(*) AS total "
                     + "FROM rendez_vous WHERE medecin_id = ?";
 
             PreparedStatement stmt = connection.prepareStatement(query);
@@ -163,11 +164,20 @@ public class DoctorStatsController {
             if (rs.next()) {
                 int total = rs.getInt("total");
                 if (total > 0) {
-                    double approvedPercent = (rs.getInt("approved") * 100.0) / total;
-                    double canceledPercent = (rs.getInt("canceled") * 100.0) / total;
+                    int approved = rs.getInt("approved");
+                    int canceled = rs.getInt("canceled");
 
+                    // Calcul des pourcentages
+                    double approvedPercent = (approved * 100.0) / total;
+                    double canceledPercent = (canceled * 100.0) / total;
+
+                    // Mise à jour des labels avec les pourcentages calculés
                     approvedLabel.setText(String.format("- Rendez-vous approuvés : %.2f%%", approvedPercent));
                     canceledLabel.setText(String.format("- Rendez-vous annulés : %.2f%%", canceledPercent));
+                } else {
+                    // Si aucun rendez-vous n'est trouvé
+                    approvedLabel.setText("- Rendez-vous approuvés : 0%");
+                    canceledLabel.setText("- Rendez-vous annulés : 0%");
                 }
             }
         } catch (SQLException e) {
@@ -235,7 +245,7 @@ public class DoctorStatsController {
     private void loadDayStats(String doctorPhone) {
         try {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            String query = "SELECT DAYNAME(date_rdv) as day, COUNT(*) as count "
+            String query = "SELECT DAYNAME(date) as day, COUNT(*) as count "
                     + "FROM rendez_vous WHERE medecin_id = ? "
                     + "GROUP BY DAYNAME(date_rdv) "
                     + "ORDER BY DAYOFWEEK(date_rdv)";
