@@ -43,7 +43,7 @@ public class DoctorStatsController {
 
     private void loadSpecialites() {
         try {
-            String query = "SELECT DISTINCT specialite FROM user WHERE role = 'MEDECIN' AND specialite IS NOT NULL";
+            String query = "SELECT DISTINCT specialite FROM user WHERE roles = 'MEDECIN' AND specialite IS NOT NULL";
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 

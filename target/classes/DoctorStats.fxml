@@ -51,7 +51,7 @@
                     <CategoryAxis label="Tranche d'âge"/>
                 </xAxis>
                 <yAxis>
-                    <NumberAxis label="% des patients"/>
+                    <NumberAxis label="patients"/>
                 </yAxis>
             </BarChart>
         </VBox>
