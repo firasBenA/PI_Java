@@ -61,7 +61,7 @@
                   <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Disponible" />
                </HBox>
                <HBox alignment="CENTER_LEFT" spacing="5">
-                  <Rectangle fill="#f4a261" height="20" stroke="#095d7e" strokeWidth="1" width="20" />
+                  <Rectangle fill="#ffbf66" height="20" stroke="#095d7e" strokeWidth="1" width="20" />
                   <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Occupé" />
                </HBox>
                <HBox alignment="CENTER_LEFT" spacing="5">

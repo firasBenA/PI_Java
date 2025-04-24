@@ -12,6 +12,7 @@ tn\esprit\controllers\ListeConsultationsController$1.class
 tn\esprit\controllers\GestionListeRdv.class
 tn\esprit\services\ServiceConsultation.class
 tn\esprit\utils\MyDataBase.class
+tn\esprit\controllers\DoctorStatsController.class
 tn\esprit\controllers\ListeConsultationsController$2.class
 tn\esprit\controllers\GestionRendezVous$1.class
 tn\esprit\models\Consultation.class
