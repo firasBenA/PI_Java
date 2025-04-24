@@ -240,34 +240,36 @@ public class DoctorStatsController {
     private void loadDayStats(Integer doctorId) {
         try {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
-            // Version pour MySQL/MariaDB:
             String query = "SELECT DAYNAME(date) as day, COUNT(*) as count "
                     + "FROM rendez_vous WHERE medecin_id = ? "
-                    + "GROUP BY DAYNAME(date), DAYOFWEEK(date) "
+                    + "GROUP BY DAYNAME(date), DAYOFWEEK(date_rdv) "
                     + "ORDER BY DAYOFWEEK(date)";
-
-            // Version alternative si DAYNAME ne fonctionne pas:
-            // String query = "SELECT DATE_FORMAT(date, '%W') as day, COUNT(*) as count...";
 
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
-            dayChart.getData().clear(); // Important: vider les données précédentes
+            dayChart.getData().clear(); // Nettoyer les données précédentes
 
+            // Debug: afficher les données récupérées
+            System.out.println("Données par jour:");
             while (rs.next()) {
                 String day = rs.getString("day");
-                // Formatage du nom du jour (3 premières lettres)
+                int count = rs.getInt("count");
+                System.out.println(day + ": " + count);
+
+                // Formatage du jour (3 premières lettres)
                 String jourAbrege = day.substring(0, Math.min(day.length(), 3));
-                series.getData().add(new XYChart.Data<>(jourAbrege, rs.getInt("count")));
+                series.getData().add(new XYChart.Data<>(jourAbrege, count));
             }
 
             dayChart.getData().add(series);
+
+            // Forcer le rafraîchissement du graphique
+            dayChart.layout();
         } catch (SQLException e) {
             System.err.println("Erreur lors du chargement des stats par jour:");
             e.printStackTrace();
-            // Ajoutez un message de debug pour voir la requête exacte
-            System.err.println("Requête échouée: " );
         }
     }
     private void showAlert(String title, String message) {
