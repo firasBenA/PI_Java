@@ -38,7 +38,7 @@
                 <CategoryAxis label="Tranche d'âge"/>
             </xAxis>
             <yAxis>
-                <NumberAxis label="% des rendez-vous"/>
+                <NumberAxis label=" rendez-vous"/>
             </yAxis>
         </BarChart>
     </VBox>

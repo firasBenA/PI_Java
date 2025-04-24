@@ -8,10 +8,24 @@
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" spacing="20" style="-fx-padding: 20;">
     <Label text="Tableau de Bord des Statistiques Médicales" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
+    <!-- Sélection de la spécialité -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Spécialité:"/>
+        <ComboBox fx:id="specialiteCombo" promptText="Choisir une spécialité" minWidth="200"/>
+    </HBox>
+
+    <!-- Sélection du médecin -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Médecin:"/>
+        <ComboBox fx:id="medecinCombo" promptText="Choisir un médecin" minWidth="200" disable="true"/>
+    </HBox>
+
+    <Separator/>
+
     <!-- Section Spécialité -->
-    <VBox spacing="5">
+    <VBox spacing="5" fx:id="statsSection" visible="false">
         <Label text="Spécialité" style="-fx-font-weight: bold;"/>
-        <Label fx:id="specialiteLabel" text="- psychothérapeute"/>
+        <Label fx:id="specialiteLabel" text="- "/>
         <Label text="- Médecin"/>
         <Label fx:id="nomMedecinLabel" text="  - "/>
     </VBox>
@@ -19,42 +33,42 @@
     <Separator/>
 
     <!-- Statistiques RDV -->
-    <VBox spacing="5">
+    <VBox spacing="5" fx:id="statsDetails" visible="false">
         <Label fx:id="statsTitleLabel" text="Statistiques du médecin" style="-fx-font-weight: bold;"/>
         <Label fx:id="approvedLabel" text="- Rendez-vous approuvés : 0%"/>
         <Label fx:id="canceledLabel" text="- Rendez-vous annulés : 0%"/>
-    </VBox>
 
-    <Separator/>
+        <Separator/>
 
-    <!-- Répartition par sexe et âge -->
-    <VBox spacing="10">
-        <Label text="Répartition par sexe" style="-fx-font-weight: bold;"/>
-        <PieChart fx:id="genderChart" legendVisible="true" maxWidth="200" maxHeight="200"/>
+        <!-- Répartition par sexe et âge -->
+        <VBox spacing="10">
+            <Label text="Répartition par sexe" style="-fx-font-weight: bold;"/>
+            <PieChart fx:id="genderChart" legendVisible="true" maxWidth="200" maxHeight="200"/>
 
-        <Label text="Répartition par âge" style="-fx-font-weight: bold;"/>
-        <BarChart fx:id="ageChart" legendVisible="false" maxWidth="400" maxHeight="300">
-            <xAxis>
-                <CategoryAxis label="Tranche d'âge"/>
-            </xAxis>
-            <yAxis>
-                <NumberAxis label=" rendez-vous"/>
-            </yAxis>
-        </BarChart>
-    </VBox>
+            <Label text="Répartition par âge" style="-fx-font-weight: bold;"/>
+            <BarChart fx:id="ageChart" legendVisible="false" maxWidth="400" maxHeight="300">
+                <xAxis>
+                    <CategoryAxis label="Tranche d'âge"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="% des patients"/>
+                </yAxis>
+            </BarChart>
+        </VBox>
 
-    <Separator/>
+        <Separator/>
 
-    <!-- Répartition par jours -->
-    <VBox spacing="10">
-        <Label text="Répartition par jours" style="-fx-font-weight: bold;"/>
-        <BarChart fx:id="dayChart" legendVisible="false" maxWidth="500" maxHeight="300">
-            <xAxis>
-                <CategoryAxis label="Jour"/>
-            </xAxis>
-            <yAxis>
-                <NumberAxis label="Nombre de rendez-vous"/>
-            </yAxis>
-        </BarChart>
+        <!-- Répartition par jours -->
+        <VBox spacing="10">
+            <Label text="Répartition par jours" style="-fx-font-weight: bold;"/>
+            <BarChart fx:id="dayChart" legendVisible="false" maxWidth="500" maxHeight="300">
+                <xAxis>
+                    <CategoryAxis label="Jour"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Nombre de rendez-vous"/>
+                </yAxis>
+            </BarChart>
+        </VBox>
     </VBox>
 </VBox>
