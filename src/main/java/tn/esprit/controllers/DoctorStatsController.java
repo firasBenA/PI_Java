@@ -242,36 +242,25 @@ public class DoctorStatsController {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             String query = "SELECT DAYNAME(date) as day, COUNT(*) as count "
                     + "FROM rendez_vous WHERE medecin_id = ? "
-                    + "GROUP BY DAYNAME(date), DAYOFWEEK(date_rdv) "
+                    + "GROUP BY DAYNAME(date) "
                     + "ORDER BY DAYOFWEEK(date)";
 
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
-            dayChart.getData().clear(); // Nettoyer les données précédentes
-
-            // Debug: afficher les données récupérées
-            System.out.println("Données par jour:");
             while (rs.next()) {
                 String day = rs.getString("day");
-                int count = rs.getInt("count");
-                System.out.println(day + ": " + count);
-
-                // Formatage du jour (3 premières lettres)
-                String jourAbrege = day.substring(0, Math.min(day.length(), 3));
-                series.getData().add(new XYChart.Data<>(jourAbrege, count));
+                series.getData().add(new XYChart.Data<>(day.substring(0, 3), rs.getInt("count")));
             }
 
+            dayChart.getData().clear();
             dayChart.getData().add(series);
-
-            // Forcer le rafraîchissement du graphique
-            dayChart.layout();
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des stats par jour:");
-            e.printStackTrace();
+            showAlert("Erreur SQL", "Erreur lors du chargement des stats par jour: " + e.getMessage());
         }
     }
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
