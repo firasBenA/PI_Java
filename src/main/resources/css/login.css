@@ -10,7 +10,7 @@
 
 .form-container {
     -fx-padding: 0 0 0 20px;
-    -fx-min-width: 320px;
+    -fx-min-width: 380px; /* Increased to support wider labels */
 }
 
 .input-label {
@@ -33,6 +33,27 @@
 .form-field:focused {
     -fx-border-color: #667eea;
     -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.2), 10, 0, 0, 0);
+}
+
+.password-container {
+    -fx-alignment: center-right;
+}
+
+.toggle-password {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0 5px;
+    -fx-cursor: hand;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 40px;
+    -fx-background-image: url("../images/eye-off.png");
+    -fx-background-size: 20px 20px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+.toggle-password.visible {
+    -fx-background-image: url("../images/eye-on.png");
 }
 
 .btn-primary {
@@ -68,6 +89,12 @@
 .error-text {
     -fx-text-fill: #e53e3e;
     -fx-font-size: 12px;
+}
+
+.error-message {
+    -fx-text-fill: #e53e3e;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
 
 .text-muted {

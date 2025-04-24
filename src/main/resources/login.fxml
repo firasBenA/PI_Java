@@ -28,7 +28,9 @@
         <VBox alignment="CENTER_LEFT" spacing="20.0" styleClass="form-container">
             <Text text="Se connecter" styleClass="title" />
 
-            <Label fx:id="errorLabel" styleClass="error-message" text="" wrapText="true" maxWidth="300" />
+            <Label fx:id="errorLabel" styleClass="error-message" text="" wrapText="true" maxWidth="350" />
+            <Label fx:id="countdownLabel" styleClass="error-message" wrapText="true" maxWidth="350" visible="false" />
+
 
             <GridPane hgap="10.0" vgap="10.0">
                 <columnConstraints>
@@ -49,7 +51,11 @@
 
                 <!-- Password -->
                 <Label text="Mot de passe:" styleClass="input-label" GridPane.rowIndex="2" />
-                <PasswordField fx:id="passwordField" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="Votre mot de passe" />
+                <HBox styleClass="password-container" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <PasswordField fx:id="passwordField" styleClass="form-field" promptText="Votre mot de passe" HBox.hgrow="ALWAYS" />
+                    <TextField fx:id="visiblePasswordField" styleClass="form-field" promptText="Votre mot de passe" visible="false" managed="false" HBox.hgrow="ALWAYS" />
+                    <Button fx:id="togglePasswordButton" styleClass="toggle-password" graphicTextGap="0" />
+                </HBox>
                 <Label fx:id="passwordError" styleClass="error-text" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             </GridPane>
 
@@ -66,7 +72,6 @@
                 <Hyperlink fx:id="registerButton" text="Créer un compte" styleClass="link" />
             </HBox>
 
-            <Label fx:id="countdownLabel" styleClass="lock-timer" visible="false" />
         </VBox>
     </HBox>
 </VBox>

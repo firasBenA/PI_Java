@@ -14,15 +14,19 @@ import tn.esprit.utils.SceneManager;
 public class LoginController {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
+    @FXML private TextField visiblePasswordField;
+    @FXML private Button togglePasswordButton;
     @FXML private Button loginButton;
     @FXML private Hyperlink registerButton;
     @FXML private Label errorLabel;
     @FXML private Hyperlink forgotPasswordLink;
     @FXML private Label emailError;
     @FXML private Label passwordError;
+    @FXML private Label countdownLabel;
 
     private AuthService authService;
     private SceneManager sceneManager;
+    private boolean isPasswordVisible;
 
     public void setAuthService(AuthService authService) {
         this.authService = authService;
@@ -37,9 +41,21 @@ public class LoginController {
         loginButton.setOnAction(this::handleLogin);
         registerButton.setOnAction(this::handleRegister);
         forgotPasswordLink.setOnAction(this::handleForgotPassword);
+        togglePasswordButton.setOnAction(this::togglePasswordVisibility);
         emailField.textProperty().addListener((obs, oldVal, newVal) -> validateEmail());
-        passwordField.textProperty().addListener((obs, oldVal, newVal) -> validatePassword());
+        passwordField.textProperty().addListener((obs, oldVal, newVal) -> {
+            validatePassword();
+            if (!isPasswordVisible) {
+                visiblePasswordField.setText(newVal);
+            }
+        });
+        visiblePasswordField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (isPasswordVisible) {
+                passwordField.setText(newVal);
+            }
+        });
         passwordField.setOnAction(this::handleLogin);
+        isPasswordVisible = false;
     }
 
     private void validateEmail() {
@@ -73,7 +89,7 @@ public class LoginController {
     private void handleLogin(ActionEvent event) {
         resetErrors();
         String email = emailField.getText().trim();
-        String password = passwordField.getText().trim();
+        String password = isPasswordVisible ? visiblePasswordField.getText().trim() : passwordField.getText().trim();
 
         try {
             if (!validateLoginFields()) {
@@ -87,26 +103,16 @@ public class LoginController {
 
             switch (user.getUserType()) {
                 case "ADMIN":
-                    if (!user.getRoles().contains("ROLE_ADMIN")) {
-                        throw new AuthException("Rôle invalide pour ADMIN : " + user.getRoles());
-                    }
                     sceneManager.showAdminDashboard(user);
                     break;
                 case "MEDECIN":
-                    if (!user.getRoles().contains("ROLE_MEDECIN")) {
-                        throw new AuthException("Rôle invalide pour MEDECIN : " + user.getRoles());
-                    }
                     sceneManager.showMedecinDashboard(user);
                     break;
                 case "PATIENT":
-                    if (!user.getRoles().contains("ROLE_PATIENT")) {
-                        throw new AuthException("Rôle invalide pour PATIENT : " + user.getRoles());
-                    }
                     sceneManager.showPatientDashboard(user);
                     break;
                 default:
-                    errorLabel.setText("Type d'utilisateur non supporté : " + user.getUserType() +
-                            ", rôles : " + user.getRoles());
+                    errorLabel.setText("Type d'utilisateur non supporté : " + user.getUserType());
                     System.err.println("Unsupported user_type: " + user.getUserType() +
                             ", roles: " + user.getRoles());
                     return;
@@ -122,10 +128,31 @@ public class LoginController {
         }
     }
 
+    private void togglePasswordVisibility(ActionEvent event) {
+        isPasswordVisible = !isPasswordVisible;
+        if (isPasswordVisible) {
+            visiblePasswordField.setText(passwordField.getText());
+            visiblePasswordField.setVisible(true);
+            visiblePasswordField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+            togglePasswordButton.getStyleClass().add("visible");
+        } else {
+            passwordField.setText(visiblePasswordField.getText());
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            visiblePasswordField.setVisible(false);
+            visiblePasswordField.setManaged(false);
+            togglePasswordButton.getStyleClass().remove("visible");
+        }
+    }
+
     private void resetErrors() {
         emailError.setText("");
         passwordError.setText("");
         errorLabel.setText("");
+        countdownLabel.setText("");
+        countdownLabel.setVisible(false);
     }
 
     private void handleRegister(ActionEvent event) {
@@ -137,15 +164,24 @@ public class LoginController {
     }
 
     private void handleAuthError(AuthException e) {
-        switch (e.getMessage()) {
-            case "Aucun compte trouvé avec cet email.":
-                emailError.setText(e.getMessage());
-                break;
-            case "Mot de passe incorrect.":
-                passwordError.setText(e.getMessage());
-                break;
-            default:
-                errorLabel.setText(e.getMessage());
+        String message = e.getMessage();
+        if (message.startsWith("Votre compte est bloqué par l'administrateur.") ||
+                message.startsWith("Compte verrouillé. Réessayez après")) {
+            countdownLabel.setText(message);
+            countdownLabel.setVisible(true);
+        } else {
+            switch (message) {
+                case "L'email est requis.":
+                case "Aucun compte trouvé avec cet email.":
+                    emailError.setText(message);
+                    break;
+                case "Le mot de passe est requis.":
+                case "Mot de passe incorrect.":
+                    passwordError.setText(message);
+                    break;
+                default:
+                    errorLabel.setText("Erreur de connexion : " + message);
+            }
         }
     }
 }

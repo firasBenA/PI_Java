@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 public class AdminDashboard {
     private static final Logger LOGGER = Logger.getLogger(AdminDashboard.class.getName());
-    private static final String DEFAULT_PROFILE_IMAGE = "/images/default-profil.jpg"; // Must exist in src/main/resources/images/
+    private static final String DEFAULT_PROFILE_IMAGE = "/images/default-profil.jpg";
     private static final String FALLBACK_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; // 1x1 transparent pixel
 
     @FXML private VBox root;

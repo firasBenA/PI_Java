@@ -4,6 +4,7 @@ import tn.esprit.models.User;
 import tn.esprit.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -99,6 +100,32 @@ public class AuthService {
             throw new AuthException("Aucun compte trouvé avec cet email.");
         }
 
+        // Check if user is blocked by admin
+        if (user.getRoles().contains("ROLE_BLOCKED")) {
+            String message = "Votre compte est bloqué par l'administrateur." +
+                    (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now()) ?
+                            " Réessayez après " + user.getLockUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "");
+            throw new AuthException(message);
+        }
+
+        // Check if account is locked due to failed attempts
+        if (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now())) {
+            throw new AuthException("Compte verrouillé. Réessayez après " +
+                    user.getLockUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        }
+
+        // Validate role matches userType
+        String expectedRole = switch (user.getUserType()) {
+            case "ADMIN" -> "ROLE_ADMIN";
+            case "MEDECIN" -> "ROLE_MEDECIN";
+            case "PATIENT" -> "ROLE_PATIENT";
+            default -> throw new AuthException("Type d'utilisateur non supporté : " + user.getUserType());
+        };
+        if (!user.getRoles().contains(expectedRole)) {
+            throw new AuthException("Rôle invalide pour " + user.getUserType() + " : " + user.getRoles());
+        }
+
+        // Verify password
         if (user.getPassword() == null || !user.checkPassword(password)) {
             int attempts = user.getFailedLoginAttempts() != null ? user.getFailedLoginAttempts() : 0;
             user.setFailedLoginAttempts(attempts + 1);
@@ -107,20 +134,19 @@ public class AuthService {
             if (user.getFailedLoginAttempts() >= 3) {
                 user.setLockUntil(LocalDateTime.now().plusMinutes(30));
                 userRepository.save(user);
-                throw new AuthException("Compte verrouillé. Réessayez dans 30 minutes.");
+                throw new AuthException("Compte verrouillé. Réessayez après " +
+                        user.getLockUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
             }
             throw new AuthException("Mot de passe incorrect.");
         }
 
-        if (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now())) {
-            throw new AuthException("Compte verrouillé. Réessayez dans 30 minutes.");
-        }
-
+        // Reset login attempts on successful login
         user.setFailedLoginAttempts(0);
         user.setLockUntil(null);
         userRepository.save(user);
         return user;
     }
+
 
     public void updateUser(User user) throws AuthException {
         if (user.getId() == null) {
