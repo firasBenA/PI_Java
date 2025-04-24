@@ -27,7 +27,7 @@ public class DoctorStatsController {
     @FXML private BarChart<String, Number> dayChart;
 
     private Connection connection;
-    private Map<String, String> medecinsMap = new HashMap<>();
+    private Map<Integer, String> medecinsMap = new HashMap<>(); // id -> nom complet
 
     @FXML
     public void initialize() {
@@ -44,7 +44,6 @@ public class DoctorStatsController {
     private void loadSpecialites() {
         try {
             String query = "SELECT DISTINCT specialite FROM user WHERE roles LIKE '%MEDECIN%' AND specialite IS NOT NULL AND specialite <> ''";
-            ;
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
@@ -76,14 +75,14 @@ public class DoctorStatsController {
 
         medecinCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                String doctorPhone = medecinsMap.entrySet().stream()
+                Integer doctorId = medecinsMap.entrySet().stream()
                         .filter(entry -> entry.getValue().equals(newVal))
                         .map(Map.Entry::getKey)
                         .findFirst()
                         .orElse(null);
 
-                if (doctorPhone != null) {
-                    showStatsForDoctor(doctorPhone, specialiteCombo.getValue());
+                if (doctorId != null) {
+                    showStatsForDoctor(doctorId, specialiteCombo.getValue());
                 }
             } else {
                 statsSection.setVisible(false);
@@ -94,7 +93,7 @@ public class DoctorStatsController {
 
     private void loadMedecinsBySpecialite(String specialite) {
         try {
-            String query = "SELECT telephone, prenom, nom FROM user WHERE roles LIKE '%MEDECIN%' AND specialite = ?";
+            String query = "SELECT id, prenom, nom FROM user WHERE roles LIKE '%MEDECIN%' AND specialite = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, specialite);
             ResultSet rs = stmt.executeQuery();
@@ -103,10 +102,10 @@ public class DoctorStatsController {
             medecinsMap.clear();
 
             while (rs.next()) {
-                String phone = rs.getString("telephone");
+                int id = rs.getInt("id");
                 String nomComplet = rs.getString("prenom") + " " + rs.getString("nom");
                 medecins.add(nomComplet);
-                medecinsMap.put(phone, nomComplet);
+                medecinsMap.put(id, nomComplet);
             }
 
             medecinCombo.setItems(medecins);
@@ -120,22 +119,22 @@ public class DoctorStatsController {
         }
     }
 
-    private void showStatsForDoctor(String doctorPhone, String specialite) {
+    private void showStatsForDoctor(Integer doctorId, String specialite) {
         statsSection.setVisible(true);
         statsDetails.setVisible(true);
         specialiteLabel.setText("- " + specialite);
-        loadDoctorName(doctorPhone);
-        loadAppointmentStats(doctorPhone);
-        loadGenderStats(doctorPhone);
-        loadAgeStats(doctorPhone);
-        loadDayStats(doctorPhone);
+        loadDoctorName(doctorId);
+        loadAppointmentStats(doctorId);
+        loadGenderStats(doctorId);
+        loadAgeStats(doctorId);
+        loadDayStats(doctorId);
     }
 
-    private void loadDoctorName(String doctorPhone) {
+    private void loadDoctorName(Integer doctorId) {
         try {
-            String query = "SELECT prenom, nom FROM user WHERE telephone = ?";
+            String query = "SELECT prenom, nom FROM user WHERE id = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, doctorPhone);
+            stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -148,9 +147,8 @@ public class DoctorStatsController {
         }
     }
 
-    private void loadAppointmentStats(String doctorPhone) {
+    private void loadAppointmentStats(Integer doctorId) {
         try {
-            // Requête SQL corrigée avec des virgules manquantes
             String query = "SELECT "
                     + "SUM(CASE WHEN statut = 'Approuvé' THEN 1 ELSE 0 END) AS approved, "
                     + "SUM(CASE WHEN statut = 'Refusé' THEN 1 ELSE 0 END) AS canceled, "
@@ -158,7 +156,7 @@ public class DoctorStatsController {
                     + "FROM rendez_vous WHERE medecin_id = ?";
 
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, doctorPhone);
+            stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -167,15 +165,12 @@ public class DoctorStatsController {
                     int approved = rs.getInt("approved");
                     int canceled = rs.getInt("canceled");
 
-                    // Calcul des pourcentages
                     double approvedPercent = (approved * 100.0) / total;
                     double canceledPercent = (canceled * 100.0) / total;
 
-                    // Mise à jour des labels avec les pourcentages calculés
                     approvedLabel.setText(String.format("- Rendez-vous approuvés : %.2f%%", approvedPercent));
                     canceledLabel.setText(String.format("- Rendez-vous annulés : %.2f%%", canceledPercent));
                 } else {
-                    // Si aucun rendez-vous n'est trouvé
                     approvedLabel.setText("- Rendez-vous approuvés : 0%");
                     canceledLabel.setText("- Rendez-vous annulés : 0%");
                 }
@@ -185,15 +180,15 @@ public class DoctorStatsController {
         }
     }
 
-    private void loadGenderStats(String doctorPhone) {
+    private void loadGenderStats(Integer doctorId) {
         try {
             ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
             String query = "SELECT p.sexe, COUNT(*) as count "
-                    + "FROM rendez_vous r JOIN user p ON r.patient_id = p.telephone "
+                    + "FROM rendez_vous r JOIN user p ON r.patient_id = p.id "
                     + "WHERE r.medecin_id = ? GROUP BY p.sexe";
 
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, doctorPhone);
+            stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -207,7 +202,7 @@ public class DoctorStatsController {
         }
     }
 
-    private void loadAgeStats(String doctorPhone) {
+    private void loadAgeStats(Integer doctorId) {
         try {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             String query = "SELECT "
@@ -217,11 +212,11 @@ public class DoctorStatsController {
                     + "SUM(CASE WHEN p.age BETWEEN 51 AND 70 THEN 1 ELSE 0 END) as age51_70, "
                     + "SUM(CASE WHEN p.age > 70 THEN 1 ELSE 0 END) as age71plus, "
                     + "COUNT(*) as total "
-                    + "FROM rendez_vous r JOIN user p ON r.patient_id = p.telephone "
+                    + "FROM rendez_vous r JOIN user p ON r.patient_id = p.id "
                     + "WHERE r.medecin_id = ?";
 
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, doctorPhone);
+            stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -242,16 +237,16 @@ public class DoctorStatsController {
         }
     }
 
-    private void loadDayStats(String doctorPhone) {
+    private void loadDayStats(Integer doctorId) {
         try {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             String query = "SELECT DAYNAME(date) as day, COUNT(*) as count "
                     + "FROM rendez_vous WHERE medecin_id = ? "
-                    + "GROUP BY DAYNAME(date_rdv) "
-                    + "ORDER BY DAYOFWEEK(date_rdv)";
+                    + "GROUP BY DAYNAME(date) "
+                    + "ORDER BY DAYOFWEEK(date)";
 
             PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, doctorPhone);
+            stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
