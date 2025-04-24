@@ -26,7 +26,7 @@ public class LoginController {
 
     private AuthService authService;
     private SceneManager sceneManager;
-    private boolean isPasswordVisible;
+    private boolean passwordVisible;
 
     public void setAuthService(AuthService authService) {
         this.authService = authService;
@@ -45,17 +45,17 @@ public class LoginController {
         emailField.textProperty().addListener((obs, oldVal, newVal) -> validateEmail());
         passwordField.textProperty().addListener((obs, oldVal, newVal) -> {
             validatePassword();
-            if (!isPasswordVisible) {
+            if (!passwordVisible) {
                 visiblePasswordField.setText(newVal);
             }
         });
         visiblePasswordField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (isPasswordVisible) {
+            if (passwordVisible) {
                 passwordField.setText(newVal);
             }
         });
         passwordField.setOnAction(this::handleLogin);
-        isPasswordVisible = false;
+        passwordVisible = false;
     }
 
     private void validateEmail() {
@@ -89,7 +89,7 @@ public class LoginController {
     private void handleLogin(ActionEvent event) {
         resetErrors();
         String email = emailField.getText().trim();
-        String password = isPasswordVisible ? visiblePasswordField.getText().trim() : passwordField.getText().trim();
+        String password = passwordVisible ? visiblePasswordField.getText().trim() : passwordField.getText().trim();
 
         try {
             if (!validateLoginFields()) {
@@ -129,8 +129,8 @@ public class LoginController {
     }
 
     private void togglePasswordVisibility(ActionEvent event) {
-        isPasswordVisible = !isPasswordVisible;
-        if (isPasswordVisible) {
+        passwordVisible = !passwordVisible;
+        if (passwordVisible) {
             visiblePasswordField.setText(passwordField.getText());
             visiblePasswordField.setVisible(true);
             visiblePasswordField.setManaged(true);
@@ -180,7 +180,7 @@ public class LoginController {
                     passwordError.setText(message);
                     break;
                 default:
-                    errorLabel.setText("Erreur de connexion : " + message);
+                    errorLabel.setText("Erreur : " + message);
             }
         }
     }

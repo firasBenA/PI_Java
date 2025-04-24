@@ -10,7 +10,7 @@
 
 .form-container {
     -fx-padding: 0 0 0 20px;
-    -fx-min-width: 380px; /* Increased to support wider labels */
+    -fx-min-width: 380px;
 }
 
 .input-label {
