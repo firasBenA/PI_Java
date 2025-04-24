@@ -240,27 +240,36 @@ public class DoctorStatsController {
     private void loadDayStats(Integer doctorId) {
         try {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
+            // Version pour MySQL/MariaDB:
             String query = "SELECT DAYNAME(date) as day, COUNT(*) as count "
                     + "FROM rendez_vous WHERE medecin_id = ? "
-                    + "GROUP BY DAYNAME(date) "
+                    + "GROUP BY DAYNAME(date), DAYOFWEEK(date) "
                     + "ORDER BY DAYOFWEEK(date)";
+
+            // Version alternative si DAYNAME ne fonctionne pas:
+            // String query = "SELECT DATE_FORMAT(date, '%W') as day, COUNT(*) as count...";
 
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setInt(1, doctorId);
             ResultSet rs = stmt.executeQuery();
 
+            dayChart.getData().clear(); // Important: vider les données précédentes
+
             while (rs.next()) {
                 String day = rs.getString("day");
-                series.getData().add(new XYChart.Data<>(day.substring(0, 3), rs.getInt("count")));
+                // Formatage du nom du jour (3 premières lettres)
+                String jourAbrege = day.substring(0, Math.min(day.length(), 3));
+                series.getData().add(new XYChart.Data<>(jourAbrege, rs.getInt("count")));
             }
 
-            dayChart.getData().clear();
             dayChart.getData().add(series);
         } catch (SQLException e) {
-            showAlert("Erreur SQL", "Erreur lors du chargement des stats par jour: " + e.getMessage());
+            System.err.println("Erreur lors du chargement des stats par jour:");
+            e.printStackTrace();
+            // Ajoutez un message de debug pour voir la requête exacte
+            System.err.println("Requête échouée: " );
         }
     }
-
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
