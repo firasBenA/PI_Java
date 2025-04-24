@@ -78,6 +78,10 @@
                     <NumberAxis label="Patients"/>
                 </yAxis>
             </BarChart>
+        </VBox>
+
+        <!-- Répartition par jours - Mise en valeur -->
+        <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #f8f9fa; -fx-background-radius: 5;">
             <Label text="Répartition par jours"
                    style="-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-size: 14px;"/>
             <BarChart fx:id="dayChart" legendVisible="false"
@@ -91,8 +95,5 @@
                 </yAxis>
             </BarChart>
         </VBox>
-
-        <!-- Répartition par jours - Mise en valeur -->
-
     </VBox>
 </VBox>
