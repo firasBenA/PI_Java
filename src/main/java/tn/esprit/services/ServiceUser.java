@@ -28,9 +28,7 @@ public class ServiceUser {
             if (rs.next()) {
                 user = new User();
                 user.setId(rs.getInt("id"));
-                user.setNom(rs.getString("nom"));
-                user.setPrenom(rs.getString("prenom"));
-                user.setTelephone(rs.getString("telephone"));
+
             }
 
         } catch (SQLException e) {
