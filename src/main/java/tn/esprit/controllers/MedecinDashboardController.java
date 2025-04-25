@@ -2,375 +2,349 @@ package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import tn.esprit.models.Article;
-import tn.esprit.models.Evenement;
-import tn.esprit.services.ServiceArticle;
-import tn.esprit.services.ServiceEvenement;
-
-import java.time.LocalDate;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import tn.esprit.models.Medecin;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthException;
+import tn.esprit.services.AuthService;
+import tn.esprit.utils.SceneManager;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class MedecinDashboardController {
+    @FXML private ImageView profileImage;
+    @FXML private Button changeImageBtn;
+    @FXML private Label welcomeLabel;
+    @FXML private Label specialiteLabel;
+    @FXML private Button deconnexionBtn;
+    @FXML private Label messageLabel;
+    @FXML private TextField nomField;
+    @FXML private Label nomErrorLabel;
+    @FXML private TextField prenomField;
+    @FXML private Label prenomErrorLabel;
+    @FXML private TextField emailField;
+    @FXML private Label emailErrorLabel;
+    @FXML private TextField telephoneField;
+    @FXML private Label telErrorLabel;
+    @FXML private TextField specialiteField;
+    @FXML private Label specialiteErrorLabel;
+    @FXML private TextArea adresseField;
+    @FXML private Label adresseErrorLabel;
+    @FXML private ComboBox<String> sexeComboBox;
+    @FXML private Label sexeErrorLabel;
+    @FXML private Hyperlink certificatLink;
+    @FXML private Button changeCertificatBtn;
+    @FXML private Label certificatErrorLabel;
+    @FXML private Button modifierBtn;
+    @FXML private Button supprimerBtn;
 
-    @FXML
-    private Button evenementButton;
-    @FXML
-    private Button articleButton;
-    @FXML
-    private ScrollPane contentArea;
-    @FXML
-    private VBox contentVBox;
+    private AuthService authService;
+    private SceneManager sceneManager;
+    private Medecin currentUser;
+    private File selectedImageFile;
+    private boolean isEditing = false;
 
-    private ServiceEvenement serviceEvenement;
-    private ServiceArticle serviceArticle;
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
 
-    private TableView<Evenement> eventsTable;
-    private TextField eventNomField;
-    private TextArea eventContenueField;
-    private TextField eventTypeField;
-    private TextField eventStatutField;
-    private TextField eventLieuxField;
-    private DatePicker eventDatePicker;
-    private Button addEventButton;
-    private Button updateEventButton;
-    private Button deleteEventButton;
-    private Button clearEventFormButton;
-    private Evenement selectedEvent;
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
 
-    private TableView<Article> articlesTable;
-    private TextField articleTitreField;
-    private TextArea articleContenueField;
-    private TextField articleImageField;
-    private Button addArticleButton;
-    private Button updateArticleButton;
-    private Button deleteArticleButton;
-    private Button clearArticleFormButton;
-    private Article selectedArticle;
+    public void setCurrentUser(User user) {
+        if (user instanceof Medecin) {
+            this.currentUser = (Medecin) user;
+            loadUserData();
+        } else {
+            showAlert("Erreur", "Utilisateur invalide pour le tableau de bord Médecin", Alert.AlertType.ERROR);
+        }
+    }
 
     @FXML
     public void initialize() {
-        serviceEvenement = new ServiceEvenement();
-        serviceArticle = new ServiceArticle();
-        showEvenements(); // Display events by default
+        sexeComboBox.getItems().addAll("Homme", "Femme", "Autre");
+        // Fields are set to read-only in FXML via editable="false" and disable="true"
+        modifierBtn.setText("Modifier Profil");
+    }
+
+    private void loadUserData() {
+        if (currentUser == null) {
+            return;
+        }
+
+        nomField.setText(currentUser.getNom() != null ? currentUser.getNom() : "");
+        prenomField.setText(currentUser.getPrenom() != null ? currentUser.getPrenom() : "");
+        emailField.setText(currentUser.getEmail() != null ? currentUser.getEmail() : "");
+        telephoneField.setText(currentUser.getTelephone() != null ? currentUser.getTelephone() : "");
+        specialiteField.setText(currentUser.getSpecialite() != null ? currentUser.getSpecialite() : "");
+        adresseField.setText(currentUser.getAdresse() != null ? currentUser.getAdresse() : "");
+        sexeComboBox.setValue(currentUser.getSexe());
+        welcomeLabel.setText("Bienvenue, Dr. " + (currentUser.getPrenom() != null ? currentUser.getPrenom() : "") +
+                " " + (currentUser.getNom() != null ? currentUser.getNom() : ""));
+        specialiteLabel.setText(currentUser.getSpecialite() != null ? currentUser.getSpecialite() : "Spécialité non définie");
+
+        // Load profile image
+        if (currentUser.getImageProfil() != null && !currentUser.getImageProfil().isEmpty()) {
+            try {
+                File imageFile = new File(currentUser.getImageProfil());
+                if (imageFile.exists()) {
+                    Image image = new Image(imageFile.toURI().toString());
+                    profileImage.setImage(image);
+                } else {
+                    System.err.println("Image file not found: " + currentUser.getImageProfil());
+                    profileImage.setImage(null);
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur de chargement de l'image: " + e.getMessage());
+                e.printStackTrace();
+                profileImage.setImage(null);
+            }
+        } else {
+            System.out.println("No profile image for user: " + currentUser.getEmail());
+            profileImage.setImage(null);
+        }
+
+        // Load certificate path
+        if (currentUser.getCertificat() != null && !currentUser.getCertificat().isEmpty()) {
+            try {
+                File certFile = new File(currentUser.getCertificat());
+                if (certFile.exists()) {
+                    certificatLink.setText(certFile.getName());
+                } else {
+                    System.err.println("Certificate file not found: " + currentUser.getCertificat());
+                    certificatLink.setText("Certificat introuvable");
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur de chargement du certificat: " + e.getMessage());
+                e.printStackTrace();
+                certificatLink.setText("Erreur de certificat");
+            }
+        } else {
+            System.out.println("No certificate for user: " + currentUser.getEmail());
+            certificatLink.setText("Aucun certificat");
+        }
     }
 
     @FXML
-    private void showEvenements() {
-        contentVBox.getChildren().clear();
-
-        // Title
-        Label titleLabel = new Label("Événements");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
-        // Table for Events
-        eventsTable = new TableView<>();
-        TableColumn<Evenement, String> eventNomColumn = new TableColumn<>("Nom");
-        eventNomColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        eventNomColumn.setPrefWidth(150);
-
-        TableColumn<Evenement, String> eventContenueColumn = new TableColumn<>("Contenu");
-        eventContenueColumn.setCellValueFactory(new PropertyValueFactory<>("contenue"));
-        eventContenueColumn.setPrefWidth(200);
-
-        TableColumn<Evenement, String> eventTypeColumn = new TableColumn<>("Type");
-        eventTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        eventTypeColumn.setPrefWidth(100);
-
-        TableColumn<Evenement, String> eventStatutColumn = new TableColumn<>("Statut");
-        eventStatutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
-        eventStatutColumn.setPrefWidth(100);
-
-        TableColumn<Evenement, String> eventLieuxColumn = new TableColumn<>("Lieu");
-        eventLieuxColumn.setCellValueFactory(new PropertyValueFactory<>("lieuxEvent"));
-        eventLieuxColumn.setPrefWidth(150);
-
-        TableColumn<Evenement, LocalDate> eventDateColumn = new TableColumn<>("Date");
-        eventDateColumn.setCellValueFactory(new PropertyValueFactory<>("dateEvent"));
-        eventDateColumn.setPrefWidth(100);
-
-        eventsTable.getColumns().addAll(eventNomColumn, eventContenueColumn, eventTypeColumn, eventStatutColumn, eventLieuxColumn, eventDateColumn);
-        refreshEventsTable();
-
-        // Form for Adding/Editing Events
-        VBox eventForm = new VBox(10);
-        eventForm.setStyle("-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-color: #dcdcdc; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;");
-
-        Label formTitle = new Label("Ajouter/Modifier un Événement");
-        formTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
-        HBox nomBox = new HBox(10);
-        nomBox.getChildren().addAll(new Label("Nom:"), eventNomField = new TextField());
-        eventNomField.setPromptText("Nom de l'événement");
-
-        HBox contenueBox = new HBox(10);
-        contenueBox.getChildren().addAll(new Label("Contenu:"), eventContenueField = new TextArea());
-        eventContenueField.setPromptText("Contenu");
-        eventContenueField.setPrefHeight(50);
-
-        HBox typeBox = new HBox(10);
-        typeBox.getChildren().addAll(new Label("Type:"), eventTypeField = new TextField());
-        eventTypeField.setPromptText("Type");
-
-        HBox statutBox = new HBox(10);
-        statutBox.getChildren().addAll(new Label("Statut:"), eventStatutField = new TextField());
-        eventStatutField.setPromptText("Statut");
-
-        HBox lieuxBox = new HBox(10);
-        lieuxBox.getChildren().addAll(new Label("Lieu:"), eventLieuxField = new TextField());
-        eventLieuxField.setPromptText("Lieu");
-
-        HBox dateBox = new HBox(10);
-        dateBox.getChildren().addAll(new Label("Date:"), eventDatePicker = new DatePicker());
-
-        HBox buttonBox = new HBox(10);
-        addEventButton = new Button("Ajouter");
-        addEventButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
-        addEventButton.setOnAction(e -> addEvent());
-
-        updateEventButton = new Button("Modifier");
-        updateEventButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
-        updateEventButton.setDisable(true);
-        updateEventButton.setOnAction(e -> updateEvent());
-
-        deleteEventButton = new Button("Supprimer");
-        deleteEventButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
-        deleteEventButton.setDisable(true);
-        deleteEventButton.setOnAction(e -> deleteEvent());
-
-        clearEventFormButton = new Button("Effacer");
-        clearEventFormButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
-        clearEventFormButton.setOnAction(e -> clearEventForm());
-
-        buttonBox.getChildren().addAll(addEventButton, updateEventButton, deleteEventButton, clearEventFormButton);
-        eventForm.getChildren().addAll(formTitle, nomBox, contenueBox, typeBox, statutBox, lieuxBox, dateBox, buttonBox);
-
-        // Handle event selection
-        eventsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                selectedEvent = newSelection;
-                eventNomField.setText(selectedEvent.getNom());
-                eventContenueField.setText(selectedEvent.getContenue());
-                eventTypeField.setText(selectedEvent.getType());
-                eventStatutField.setText(selectedEvent.getStatut());
-                eventLieuxField.setText(selectedEvent.getLieuxEvent());
-                eventDatePicker.setValue(selectedEvent.getDateEvent());
-                updateEventButton.setDisable(false);
-                deleteEventButton.setDisable(false);
+    public void handleChangeImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
+        );
+        File file = fileChooser.showOpenDialog(profileImage.getScene().getWindow());
+        if (file != null) {
+            try {
+                String imagePath = saveFile(file, "images");
+                currentUser.setImageProfil(imagePath);
+                Image image = new Image(file.toURI().toString());
+                profileImage.setImage(image);
+                authService.updateUser(currentUser);
+                showAlert("Succès", "Image de profil mise à jour", Alert.AlertType.INFORMATION);
+            } catch (AuthException e) {
+                messageLabel.setText(e.getMessage());
+                messageLabel.setStyle("-fx-text-fill: red;");
+            } catch (Exception e) {
+                messageLabel.setText("Erreur lors du changement d'image");
+                messageLabel.setStyle("-fx-text-fill: red;");
+                e.printStackTrace();
             }
-        });
-
-        contentVBox.getChildren().addAll(titleLabel, eventsTable, eventForm);
+        }
     }
 
     @FXML
-    private void showArticles() {
-        contentVBox.getChildren().clear();
+    public void handleChangeCertificat() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+        );
+        File file = fileChooser.showOpenDialog(changeCertificatBtn.getScene().getWindow());
+        if (file != null) {
+            try {
+                String certificatPath = saveFile(file, "certificats");
+                currentUser.setCertificat(certificatPath);
+                certificatLink.setText(file.getName());
+                authService.updateUser(currentUser);
+                showAlert("Succès", "Certificat mis à jour", Alert.AlertType.INFORMATION);
+            } catch (AuthException e) {
+                messageLabel.setText(e.getMessage());
+                messageLabel.setStyle("-fx-text-fill: red;");
+            } catch (Exception e) {
+                messageLabel.setText("Erreur lors du changement de certificat");
+                messageLabel.setStyle("-fx-text-fill: red;");
+                e.printStackTrace();
+            }
+        }
+    }
 
-        // Title
-        Label titleLabel = new Label("Articles");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+    @FXML
+    public void openCertificat() {
+        if (currentUser.getCertificat() != null && !currentUser.getCertificat().isEmpty()) {
+            try {
+                File certFile = new File(currentUser.getCertificat());
+                if (certFile.exists()) {
+                    Desktop.getDesktop().open(certFile);
+                } else {
+                    showAlert("Erreur", "Le fichier certificat n'existe pas.", Alert.AlertType.ERROR);
+                }
+            } catch (IOException e) {
+                showAlert("Erreur", "Impossible d'ouvrir le certificat: " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
+            }
+        } else {
+            showAlert("Information", "Aucun certificat n'est associé.", Alert.AlertType.INFORMATION);
+        }
+    }
 
-        // Table for Articles
-        articlesTable = new TableView<>();
-        TableColumn<Article, String> articleTitreColumn = new TableColumn<>("Titre");
-        articleTitreColumn.setCellValueFactory(new PropertyValueFactory<>("titre"));
-        articleTitreColumn.setPrefWidth(150);
+    @FXML
+    public void handleDeconnexion() {
+        try {
+            sceneManager.showLoginScene();
+            showAlert("Succès", "Déconnexion réussie", Alert.AlertType.INFORMATION);
+        } catch (Exception e) {
+            messageLabel.setText("Erreur lors de la déconnexion");
+            messageLabel.setStyle("-fx-text-fill: red;");
+            e.printStackTrace();
+        }
+    }
 
-        TableColumn<Article, String> articleContenueColumn = new TableColumn<>("Contenu");
-        articleContenueColumn.setCellValueFactory(new PropertyValueFactory<>("contenue"));
-        articleContenueColumn.setPrefWidth(300);
+    @FXML
+    public void handleModification() {
+        if (!isEditing) {
+            // Enter edit mode
+            isEditing = true;
+            modifierBtn.setText("Enregistrer");
+            setFieldsEditable(true);
+            messageLabel.setText("Modifiez les champs, puis cliquez sur Enregistrer.");
+            messageLabel.setStyle("-fx-text-fill: blue;");
+        } else {
+            // Save changes
+            clearErrorLabels();
+            try {
+                // Validate inputs
+                if (nomField.getText().trim().isEmpty()) {
+                    nomErrorLabel.setText("Le nom est requis");
+                    return;
+                }
+                if (prenomField.getText().trim().isEmpty()) {
+                    prenomErrorLabel.setText("Le prénom est requis");
+                    return;
+                }
+                if (!emailField.getText().trim().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                    emailErrorLabel.setText("Email invalide");
+                    return;
+                }
+                if (telephoneField.getText().trim().isEmpty()) {
+                    telErrorLabel.setText("Le téléphone est requis");
+                    return;
+                }
+                if (specialiteField.getText().trim().isEmpty()) {
+                    specialiteErrorLabel.setText("La spécialité est requise");
+                    return;
+                }
+                if (adresseField.getText().trim().isEmpty()) {
+                    adresseErrorLabel.setText("L'adresse est requise");
+                    return;
+                }
+                if (sexeComboBox.getValue() == null) {
+                    sexeErrorLabel.setText("Le sexe est requis");
+                    return;
+                }
 
-        TableColumn<Article, String> articleImageColumn = new TableColumn<>("Image");
-        articleImageColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
-        articleImageColumn.setPrefWidth(200);
+                // Update user
+                currentUser.setNom(nomField.getText().trim());
+                currentUser.setPrenom(prenomField.getText().trim());
+                currentUser.setEmail(emailField.getText().trim());
+                currentUser.setTelephone(telephoneField.getText().trim());
+                currentUser.setSpecialite(specialiteField.getText().trim());
+                currentUser.setAdresse(adresseField.getText().trim());
+                currentUser.setSexe(sexeComboBox.getValue());
 
-        articlesTable.getColumns().addAll(articleTitreColumn, articleContenueColumn, articleImageColumn);
-        refreshArticlesTable();
+                authService.updateUser(currentUser);
+                welcomeLabel.setText("Bienvenue, Dr. " + currentUser.getPrenom() + " " + currentUser.getNom());
+                specialiteLabel.setText(currentUser.getSpecialite());
+                messageLabel.setText("Profil mis à jour avec succès");
+                messageLabel.setStyle("-fx-text-fill: green;");
 
-        // Form for Adding/Editing Articles
-        VBox articleForm = new VBox(10);
-        articleForm.setStyle("-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-color: #dcdcdc; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;");
+                // Exit edit mode
+                isEditing = false;
+                modifierBtn.setText("Modifier Profil");
+                setFieldsEditable(false);
+            } catch (AuthException e) {
+                messageLabel.setText(e.getMessage());
+                messageLabel.setStyle("-fx-text-fill: red;");
+            } catch (Exception e) {
+                messageLabel.setText("Erreur lors de la mise à jour");
+                messageLabel.setStyle("-fx-text-fill: red;");
+                e.printStackTrace();
+            }
+        }
+    }
 
-        Label formTitle = new Label("Ajouter/Modifier un Article");
-        formTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+    @FXML
+    public void handleSuppression() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation de suppression");
+        alert.setHeaderText("Supprimer le compte");
+        alert.setContentText("Êtes-vous sûr de vouloir supprimer votre compte ?");
 
-        HBox titreBox = new HBox(10);
-        titreBox.getChildren().addAll(new Label("Titre:"), articleTitreField = new TextField());
-        articleTitreField.setPromptText("Titre de l'article");
-
-        HBox contenueBox = new HBox(10);
-        contenueBox.getChildren().addAll(new Label("Contenu:"), articleContenueField = new TextArea());
-        articleContenueField.setPromptText("Contenu");
-        articleContenueField.setPrefHeight(50);
-
-        HBox imageBox = new HBox(10);
-        imageBox.getChildren().addAll(new Label("Image:"), articleImageField = new TextField());
-        articleImageField.setPromptText("Chemin de l'image");
-
-        HBox buttonBox = new HBox(10);
-        addArticleButton = new Button("Ajouter");
-        addArticleButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
-        addArticleButton.setOnAction(e -> addArticle());
-
-        updateArticleButton = new Button("Modifier");
-        updateArticleButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
-        updateArticleButton.setDisable(true);
-        updateArticleButton.setOnAction(e -> updateArticle());
-
-        deleteArticleButton = new Button("Supprimer");
-        deleteArticleButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
-        deleteArticleButton.setDisable(true);
-        deleteArticleButton.setOnAction(e -> deleteArticle());
-
-        clearArticleFormButton = new Button("Effacer");
-        clearArticleFormButton.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white;");
-        clearArticleFormButton.setOnAction(e -> clearArticleForm());
-
-        buttonBox.getChildren().addAll(addArticleButton, updateArticleButton, deleteArticleButton, clearArticleFormButton);
-        articleForm.getChildren().addAll(formTitle, titreBox, contenueBox, imageBox, buttonBox);
-
-        // Handle article selection
-        articlesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                selectedArticle = newSelection;
-                articleTitreField.setText(selectedArticle.getTitre());
-                articleContenueField.setText(selectedArticle.getContenue());
-                articleImageField.setText(selectedArticle.getImage());
-                updateArticleButton.setDisable(false);
-                deleteArticleButton.setDisable(false);
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    authService.deleteUser(currentUser.getId());
+                    sceneManager.showLoginScene();
+                    showAlert("Succès", "Compte supprimé avec succès", Alert.AlertType.INFORMATION);
+                } catch (AuthException e) {
+                    messageLabel.setText(e.getMessage());
+                    messageLabel.setStyle("-fx-text-fill: red;");
+                } catch (Exception e) {
+                    messageLabel.setText("Erreur lors de la suppression");
+                    messageLabel.setStyle("-fx-text-fill: red;");
+                    e.printStackTrace();
+                }
             }
         });
-
-        contentVBox.getChildren().addAll(titleLabel, articlesTable, articleForm);
     }
 
-    // Events CRUD Operations
-    private void addEvent() {
-        if (validateEventForm()) {
-            Evenement event = new Evenement();
-            event.setNom(eventNomField.getText());
-            event.setContenue(eventContenueField.getText());
-            event.setType(eventTypeField.getText());
-            event.setStatut(eventStatutField.getText());
-            event.setLieuxEvent(eventLieuxField.getText());
-            event.setDateEvent(eventDatePicker.getValue());
-
-            serviceEvenement.add(event);
-            refreshEventsTable();
-            clearEventForm();
-        }
+    private void setFieldsEditable(boolean editable) {
+        nomField.setEditable(editable);
+        prenomField.setEditable(editable);
+        emailField.setEditable(editable);
+        telephoneField.setEditable(editable);
+        specialiteField.setEditable(editable);
+        adresseField.setEditable(editable);
+        sexeComboBox.setDisable(!editable);
     }
 
-    private void updateEvent() {
-        if (selectedEvent != null && validateEventForm()) {
-            selectedEvent.setNom(eventNomField.getText());
-            selectedEvent.setContenue(eventContenueField.getText());
-            selectedEvent.setType(eventTypeField.getText());
-            selectedEvent.setStatut(eventStatutField.getText());
-            selectedEvent.setLieuxEvent(eventLieuxField.getText());
-            selectedEvent.setDateEvent(eventDatePicker.getValue());
-
-            serviceEvenement.update(selectedEvent);
-            refreshEventsTable();
-            clearEventForm();
-        }
+    private String saveFile(File file, String directory) throws IOException {
+        Path targetDir = Paths.get("src/main/resources/" + directory);
+        Files.createDirectories(targetDir);
+        Path targetPath = targetDir.resolve(file.getName());
+        Files.copy(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+        return targetPath.toString();
     }
 
-    private void deleteEvent() {
-        if (selectedEvent != null) {
-            serviceEvenement.delete(selectedEvent);
-            refreshEventsTable();
-            clearEventForm();
-        }
+    private void clearErrorLabels() {
+        nomErrorLabel.setText("");
+        prenomErrorLabel.setText("");
+        emailErrorLabel.setText("");
+        telErrorLabel.setText("");
+        specialiteErrorLabel.setText("");
+        adresseErrorLabel.setText("");
+        sexeErrorLabel.setText("");
+        certificatErrorLabel.setText("");
+        messageLabel.setText("");
     }
 
-    private void clearEventForm() {
-        eventNomField.clear();
-        eventContenueField.clear();
-        eventTypeField.clear();
-        eventStatutField.clear();
-        eventLieuxField.clear();
-        eventDatePicker.setValue(null);
-        selectedEvent = null;
-        updateEventButton.setDisable(true);
-        deleteEventButton.setDisable(true);
-    }
-
-    private void refreshEventsTable() {
-        eventsTable.getItems().clear();
-        eventsTable.getItems().addAll(serviceEvenement.getAll());
-    }
-
-    private boolean validateEventForm() {
-        if (eventNomField.getText().isEmpty() || eventContenueField.getText().isEmpty() ||
-                eventTypeField.getText().isEmpty() || eventStatutField.getText().isEmpty() ||
-                eventLieuxField.getText().isEmpty() || eventDatePicker.getValue() == null) {
-            showAlert("Erreur", "Veuillez remplir tous les champs.");
-            return false;
-        }
-        return true;
-    }
-
-    // Articles CRUD Operations
-    private void addArticle() {
-        if (validateArticleForm()) {
-            Article article = new Article();
-            article.setTitre(articleTitreField.getText());
-            article.setContenue(articleContenueField.getText());
-            article.setImage(articleImageField.getText());
-
-            serviceArticle.add(article);
-            refreshArticlesTable();
-            clearArticleForm();
-        }
-    }
-
-    private void updateArticle() {
-        if (selectedArticle != null && validateArticleForm()) {
-            selectedArticle.setTitre(articleTitreField.getText());
-            selectedArticle.setContenue(articleContenueField.getText());
-            selectedArticle.setImage(articleImageField.getText());
-
-            serviceArticle.update(selectedArticle);
-            refreshArticlesTable();
-            clearArticleForm();
-        }
-    }
-
-    private void deleteArticle() {
-        if (selectedArticle != null) {
-            serviceArticle.delete(selectedArticle);
-            refreshArticlesTable();
-            clearArticleForm();
-        }
-    }
-
-    private void clearArticleForm() {
-        articleTitreField.clear();
-        articleContenueField.clear();
-        articleImageField.clear();
-        selectedArticle = null;
-        updateArticleButton.setDisable(true);
-        deleteArticleButton.setDisable(true);
-    }
-
-    private void refreshArticlesTable() {
-        articlesTable.getItems().clear();
-        articlesTable.getItems().addAll(serviceArticle.getAll());
-    }
-
-    private boolean validateArticleForm() {
-        if (articleTitreField.getText().isEmpty() || articleContenueField.getText().isEmpty()) {
-            showAlert("Erreur", "Veuillez remplir les champs obligatoires (Titre et Contenu).");
-            return false;
-        }
-        return true;
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

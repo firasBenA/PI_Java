@@ -40,7 +40,7 @@ public class PatientDashboardEAController {
     public void initialize() {
         serviceEvenement = new ServiceEvenement();
         serviceArticle = new ServiceArticle();
-        currentUser = new User(1, "patient1"); // Replace with actual authentication
+        currentUser = new User(); // Replace with actual authentication
         showEvenements(); // Display events by default
     }
 

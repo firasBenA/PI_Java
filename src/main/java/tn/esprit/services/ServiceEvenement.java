@@ -104,7 +104,7 @@ public class ServiceEvenement implements IService<Evenement> {
             pstm.setInt(1, user.getId());
             pstm.setInt(2, evenement.getId());
             pstm.executeUpdate();
-            System.out.println("User " + user.getUsername() + " participated in event " + evenement.getNom());
+            System.out.println("User " + user.getPrenom() + " participated in event " + evenement.getNom());
         } catch (SQLException e) {
             System.out.println("Error while adding participation: " + e.getMessage());
         }

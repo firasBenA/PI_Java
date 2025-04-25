@@ -16,7 +16,7 @@
         <padding>
             <Insets top="20" right="20" bottom="20" left="20"/>
         </padding>
-        <Label fx:id="welcomeLabel" styleClass="welcome-label" text="Bienvenue, Admin"/>
+        <Label fx:id="welcomeLabel" styleClass="welcome-label" text="Bienvenue, "/>
         <Region HBox.hgrow="ALWAYS"/>
         <Button text="Déconnexion" styleClass="logout-button" onAction="#handleLogout"/>
     </HBox>

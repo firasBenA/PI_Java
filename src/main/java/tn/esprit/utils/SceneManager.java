@@ -12,7 +12,6 @@ import javafx.scene.control.Alert;
 
 import java.io.IOException;
 
-
 public class SceneManager {
     private final Stage primaryStage;
     private final AuthService authService;
@@ -20,6 +19,22 @@ public class SceneManager {
     public SceneManager(Stage primaryStage, AuthService authService) {
         this.primaryStage = primaryStage;
         this.authService = authService;
+    }
+
+    // Nouvelle méthode pour afficher la page principale (Main.fxml)
+    public void showMainScene() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Ajouter Réclamation");
+            primaryStage.show();
+        } catch (Exception e) {
+            showAlert("Erreur", "Impossible de charger la page principale.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        }
     }
 
     public void showLoginScene() {
@@ -81,7 +96,6 @@ public class SceneManager {
             e.printStackTrace();
         }
     }
-
 
     public void showMedecinDashboard(User user) {
         try {
