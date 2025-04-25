@@ -34,7 +34,6 @@ public class StatistiquesController {
         int enAttente = stats.getEnAttenteCount();
         int traite = stats.getTraiteCount();
 
-        // Update PieChart
         double enAttentePercent = total > 0 ? (enAttente * 100.0 / total) : 0;
         double traitePercent = total > 0 ? (traite * 100.0 / total) : 0;
 
