@@ -45,7 +45,7 @@ public class StatistiquesController {
         pieChart.setData(pieChartData);
         pieChart.setTitle("Répartition par État");
 
-        
+        // Update BarChart
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Nombre de Réclamations");
         series.getData().add(new XYChart.Data<>("Tous", total));
