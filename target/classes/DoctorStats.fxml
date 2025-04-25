@@ -88,29 +88,11 @@
                       style="-fx-background-color: transparent;"
                       maxWidth="500" maxHeight="300">
                 <xAxis>
-                    <CategoryAxis label="Jour de la semaine">
-                        <style>
-                            -fx-tick-label-fill: #2c3e50;
-                            -fx-font-size: 12px;
-                        </style>
-                    </CategoryAxis>
+                    <CategoryAxis label="Jour de la semaine"/>
                 </xAxis>
                 <yAxis>
-                    <NumberAxis label="Nombre de rendez-vous">
-                        <style>
-                            -fx-tick-label-fill: #2c3e50;
-                            -fx-font-size: 12px;
-                        </style>
-                    </NumberAxis>
+                    <NumberAxis label="Nombre de rendez-vous"/>
                 </yAxis>
-                <style>
-                    .chart-series-bar {
-                    -fx-bar-fill: #3498db;
-                    }
-                    .chart-plot-background {
-                    -fx-background-color: transparent;
-                    }
-                </style>
             </BarChart>
         </VBox>
     </VBox>
