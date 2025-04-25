@@ -96,7 +96,7 @@ public class ServiceConsultation {
     }
 
     public String getPatientEmailById(int patientId) throws SQLException {
-        String query = "SELECT email FROM user WHERE id = ? AND roles LIKE '%patient%'";
+        String query = "SELECT email FROM user WHERE id = ? AND roles LIKE '%PATIENT%'";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, patientId);
             ResultSet rs = stmt.executeQuery();
