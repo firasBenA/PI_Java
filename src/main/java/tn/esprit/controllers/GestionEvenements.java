@@ -2,15 +2,10 @@ package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import tn.esprit.models.Article;
 import tn.esprit.models.Evenement;
 import tn.esprit.models.User;
@@ -19,7 +14,7 @@ import tn.esprit.services.ServiceEvenement;
 
 import java.util.List;
 
-public class PatientDashboardEAController {
+public class GestionEvenements {
 
     @FXML
     private Button evenementButton;

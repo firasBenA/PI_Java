@@ -34,6 +34,12 @@ public class MainController {
     public void goGestionReclamation() {
         loadUI("ListeReclamation"); // Assuming you have this FXML already
     }
+    public void goGestionEvenements() {
+        loadUI("Evenements"); // Assuming you have this FXML already
+    }
+    public void goGestionArticles() {
+        loadUI("Articles"); // Assuming you have this FXML already
+    }
     public void goGestionReponse() {
         loadUI("GestionReponse"); // Assuming you have this FXML already
     }
