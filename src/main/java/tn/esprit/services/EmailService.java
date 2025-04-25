@@ -7,8 +7,8 @@ import java.util.Properties;
 
 public class EmailService {
 
-    private final String username = "esprit.recover.plus@gmail.com";
-    private final String password = "jxsdekiolyggrpjj";
+    private final String username = "f522a319a791f5"; // Remplacez par votre username Mailtrap
+    private final String password = "a63037e7c67847"; // Remplacez par votre password Mailtrap
 
     public void sendApprovalEmail(String recipient, String date, double price) throws MessagingException {
         String subject = "Confirmation de votre rendez-vous";
@@ -30,8 +30,11 @@ public class EmailService {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.host", "sandbox.smtp.mailtrap.io");
+        props.put("mail.smtp.port", "2525");
+        props.put("mail.smtp.connectiontimeout", "10000"); // 10 secondes
+        props.put("mail.smtp.timeout", "10000"); // 10 secondes
+        props.put("mail.debug", "true"); // Activer le débogage
 
         // Créer une session avec authentification
         Session session = Session.getInstance(props, new Authenticator() {
