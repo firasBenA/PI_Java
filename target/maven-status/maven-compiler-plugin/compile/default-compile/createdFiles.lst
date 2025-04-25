@@ -15,13 +15,16 @@ tn\esprit\controllers\AjouterPrescriptionDepuisDiag.class
 tn\esprit\controllers\ListeReclamation.class
 tn\esprit\models\Prescription.class
 tn\esprit\controllers\GestionReclamation$1.class
+tn\esprit\controllers\StatistiquesController.class
 tn\esprit\utils\MyDataBase.class
 tn\esprit\services\ServicePrescription.class
 tn\esprit\controllers\PatientDashboardController$1.class
+tn\esprit\services\ServiceStatistiques.class
 tn\esprit\controllers\GestionPrescription.class
 tn\esprit\controllers\MedecinPrescDiag.class
 tn\esprit\controllers\PatientDashboardController.class
 tn\esprit\models\Reclamation.class
+tn\esprit\models\Statistiques.class
 tn\esprit\controllers\MedecinPrescDiag$2.class
 tn\esprit\services\ServiceDiagnostique.class
 tn\esprit\services\ServiceReclamation.class

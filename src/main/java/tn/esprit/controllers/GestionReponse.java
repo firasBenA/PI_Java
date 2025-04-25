@@ -17,6 +17,7 @@ import tn.esprit.utils.MyDataBase;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
@@ -125,7 +126,7 @@ public class GestionReponse {
             System.out.println("Loading stylesheet for confirmation dialog...");
             java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
             if (cssUrl == null) {
-                System.out.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
+                System.out.println("Warning: CSS file not found at /tn/esprit/styles/styles.css. Proceeding without styling.");
             } else {
                 System.out.println("CSS file found: " + cssUrl.toExternalForm());
                 dialogPane.getStylesheets().add(cssUrl.toExternalForm());
@@ -174,23 +175,19 @@ public class GestionReponse {
     @FXML
     public void downloadExcel(ActionEvent actionEvent) {
         try {
-            // Fetch all reclamations based on current filter
             String selectedEtat = filterEtatComboBox.getValue();
             List<Reclamation> reclamationList = (selectedEtat == null || selectedEtat.equals("Tous"))
                     ? serviceReclamation.getAll()
                     : serviceReclamation.getByEtat(selectedEtat);
 
-            // Create Excel workbook and sheet
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Reclamations and Responses");
 
-            // Create header row
             Row headerRow = sheet.createRow(0);
             String[] headers = {"Reclamation ID", "Sujet", "Description", "Date", "État", "Response Contenu", "Response Date"};
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
-                // Optional: Style header
                 CellStyle headerStyle = workbook.createCellStyle();
                 Font font = workbook.createFont();
                 font.setBold(true);
@@ -198,12 +195,10 @@ public class GestionReponse {
                 cell.setCellStyle(headerStyle);
             }
 
-            // Populate data rows
             int rowNum = 1;
             for (Reclamation reclamation : reclamationList) {
                 List<Reponse> responses = serviceReponse.getByReclamationId(reclamation.getId());
                 if (responses.isEmpty()) {
-                    // Reclamation without responses
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(0).setCellValue(reclamation.getId());
                     row.createCell(1).setCellValue(reclamation.getSujet());
@@ -211,7 +206,6 @@ public class GestionReponse {
                     row.createCell(3).setCellValue(reclamation.getDateDebut().toString());
                     row.createCell(4).setCellValue(reclamation.getEtat());
                 } else {
-                    // Reclamation with one or more responses
                     for (Reponse response : responses) {
                         Row row = sheet.createRow(rowNum++);
                         row.createCell(0).setCellValue(reclamation.getId());
@@ -225,12 +219,10 @@ public class GestionReponse {
                 }
             }
 
-            // Auto-size columns
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
             }
 
-            // Open file chooser to save the Excel file
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save Excel File");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
@@ -246,7 +238,6 @@ public class GestionReponse {
                 System.out.println("Exportation annulée.");
             }
 
-            // Close workbook
             workbook.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -264,7 +255,7 @@ public class GestionReponse {
         System.out.println("Loading stylesheet for alert...");
         java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
         if (cssUrl == null) {
-            System.out.println("Error: CSS file not found at /tn/esprit/styles/styles.css");
+            System.out.println("Warning: CSS file not found at /tn/esprit/styles/styles.css. Proceeding without styling.");
         } else {
             System.out.println("CSS file found: " + cssUrl.toExternalForm());
             dialogPane.getStylesheets().add(cssUrl.toExternalForm());

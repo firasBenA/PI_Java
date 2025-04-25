@@ -10,7 +10,7 @@
             fx:controller="tn.esprit.controllers.GestionReponse"
             prefHeight="600.0" prefWidth="800.0"
             styleClass="root-pane"
-            stylesheets="@/styles.css">
+            stylesheets="styles.css">
 
     <!-- Main container with padding -->
     <VBox spacing="15" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
@@ -42,6 +42,11 @@
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0"/>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" prefWidth="250.0"/>
                     </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                        <RowConstraints vgrow="SOMETIMES"/>
+                    </rowConstraints>
 
                     <Text text="Réclamation ID :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label"/>
                     <TextField fx:id="TFReclamationId" promptText="ID (Auto rempli)" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="text-field"/>

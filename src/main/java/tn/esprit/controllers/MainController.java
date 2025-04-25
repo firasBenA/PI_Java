@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Node;
+import tn.esprit.models.Statistiques;
+
 import java.io.IOException;
 
 public class MainController {
@@ -22,38 +24,56 @@ public class MainController {
     }
 
     public void goDiagnostique() {
-        loadUI("GestionDiagnostique"); // Assuming you have this FXML already
+        loadUI("GestionDiagnostique");
     }
+
     public void goPrescription() {
-        loadUI("GestionPrescription"); // Assuming you have this FXML already
+        loadUI("GestionPrescription");
     }
 
     public void goGestionMedecin() {
-        loadUI("MedecinPrescDiag"); // Assuming you have this FXML already
+        loadUI("MedecinPrescDiag");
     }
+
     public void goGestionReclamation() {
-        loadUI("ListeReclamation"); // Assuming you have this FXML already
+        loadUI("ListeReclamation");
     }
+
     public void goGestionReponse() {
-        loadUI("GestionReponse"); // Assuming you have this FXML already
+        loadUI("GestionReponse");
     }
+
     public void goGestionPatient() {
-        loadUI("PatientDashboard"); // Assuming you have this FXML already
+        loadUI("PatientDashboard");
     }
+
+    public void goStatistiques() {
+        loadUI("Statistiques");
+    }
+
     public void handleLogout() {
         System.out.println("Déconnexion...");
     }
 
-
     private void loadUI(String fxml) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/" + fxml + ".fxml"));
+            // Construct the full path to the FXML file dynamically
+            String fxmlPath = "/" + fxml + ".fxml";
+            System.out.println("Loading FXML from path: " + fxmlPath);
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            if (fxmlLocation == null) {
+                throw new IOException("Cannot find FXML file at " + fxmlPath);
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Node node = loader.load();
             if (contentArea != null) {
                 contentArea.getChildren().setAll(node);
+            } else {
+                System.out.println("Error: contentArea is null. Cannot load UI.");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.println("Failed to load FXML: " + fxml + ".fxml - " + e.getMessage());
         }
     }
 

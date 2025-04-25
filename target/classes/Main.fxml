@@ -3,36 +3,29 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<BorderPane fx:id="mainPane" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.controllers.MainController" prefHeight="840" prefWidth="1250">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.controllers.MainController"
+            prefHeight="600.0" prefWidth="800.0">
 
-    <!-- Left Sidebar -->
+    <!-- Left Sidebar for Navigation -->
     <left>
-        <VBox spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 20; -fx-pref-width: 200;">
-            <children>
-                <!-- Logo -->
-                <Label text="🏥 MedApp" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
-
-                <!-- Navigation Buttons -->
-                <Button text="Accueil" onAction="#goHome" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Diagnostique" onAction="#goDiagnostique" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Medecin" onAction="#goGestionMedecin" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Patient Dashboard" onAction="#goGestionPatient" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Reclamation" onAction="#goGestionReclamation" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Reponse" onAction="#goGestionReponse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-
-                <!-- Spacer -->
-                <VBox fx:id="spacer" VBox.vgrow="ALWAYS" />
-
-                <!-- Logout -->
-                <Button text="Déconnexion" onAction="#handleLogout"
-                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
-            </children>
+        <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #f4f4f4;">
+            <Button text="Home" onAction="#goHome" style="-fx-pref-width: 150;" />
+            <Button text="Diagnostique" onAction="#goDiagnostique" style="-fx-pref-width: 150;" />
+            <Button text="Prescription" onAction="#goPrescription" style="-fx-pref-width: 150;" />
+            <Button text="Gestion Médecin" onAction="#goGestionMedecin" style="-fx-pref-width: 150;" />
+            <Button text="Gestion Réclamation" onAction="#goGestionReclamation" style="-fx-pref-width: 150;" />
+            <Button text="Gestion Réponse" onAction="#goGestionReponse" style="-fx-pref-width: 150;" />
+            <Button text="Gestion Patient" onAction="#goGestionPatient" style="-fx-pref-width: 150;" />
+            <Button text="Statistiques" onAction="#goStatistiques" style="-fx-pref-width: 150;" />
+            <Button text="Déconnexion" onAction="#handleLogout" style="-fx-pref-width: 150;" />
         </VBox>
     </left>
 
-    <!-- Main content area -->
+    <!-- Center Content Area -->
     <center>
-        <StackPane fx:id="contentArea" style="-fx-background-color: #f4f4f4;" />
+        <StackPane fx:id="contentArea" BorderPane.alignment="CENTER" />
     </center>
+
 </BorderPane>
