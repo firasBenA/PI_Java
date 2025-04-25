@@ -6,9 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Pidev3A53" />
+        <module name="PI_JAVA" />
         <module name="PI_Java" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Pidev3A53" target="19" />
+    </bytecodeTargetLevel>
   </component>
 </project>

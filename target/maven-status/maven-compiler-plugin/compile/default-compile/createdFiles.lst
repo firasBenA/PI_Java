@@ -4,7 +4,6 @@ tn\esprit\controllers\EvenementController.class
 tn\esprit\utils\MyDataBase.class
 tn\esprit\models\User.class
 tn\esprit\models\Evenement.class
-tn\esprit\services\ServiceUser.class
 tn\esprit\test\TestMain.class
 tn\esprit\services\ServiceEvenement.class
 tn\esprit\interfaces\IService.class
