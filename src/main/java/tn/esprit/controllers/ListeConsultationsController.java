@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import tn.esprit.models.Consultation;
 import tn.esprit.services.ServiceConsultation;
+import tn.esprit.controllers.EmailService;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ public class ListeConsultationsController implements Initializable {
     private ListView<Consultation> consultationsListView;
 
     private final ServiceConsultation serviceConsultation = new ServiceConsultation();
+    private final EmailService emailService = new EmailService();
     private final int medecinId = 4;
 
     @Override
@@ -37,7 +39,7 @@ public class ListeConsultationsController implements Initializable {
     }
 
     private void configurerListView() {
-        consultationsListView.setCellFactory(param -> new javafx.scene.control.ListCell<Consultation>() {
+        consultationsListView.setCellFactory(param -> new ListCell<Consultation>() {
             private final Button btnApprouver = new Button("Approuver");
             private final Button btnRefuser = new Button("Refuser");
             private final Button btnModifier = new Button("Modifier");
@@ -54,10 +56,7 @@ public class ListeConsultationsController implements Initializable {
                 btnApprouver.setOnAction(event -> {
                     Consultation consultation = getItem();
                     if (consultation != null) {
-                        serviceConsultation.updateStatutRendezVous(consultation.getRendez_vous_id(), "approuvé");
-                        consultation.setStatut("approuvé");
-                        updateItem(consultation, false);
-                        showAlert("Succès", "Consultation approuvée avec succès");
+                        showApprovalDialog(consultation);
                     }
                 });
 
@@ -67,7 +66,13 @@ public class ListeConsultationsController implements Initializable {
                         serviceConsultation.updateStatutRendezVous(consultation.getRendez_vous_id(), "refusé");
                         consultation.setStatut("refusé");
                         updateItem(consultation, false);
-                        showAlert("Information", "Consultation refusée");
+                        try {
+                            String patientEmail = serviceConsultation.getPatientEmailById(consultation.getPatient_id());
+                            emailService.sendRejectionEmail(patientEmail);
+                            showAlert("Succès", "Consultation refusée et email envoyé au patient");
+                        } catch (Exception e) {
+                            showAlert("Erreur", "Échec de l'envoi de l'email : " + e.getMessage());
+                        }
                     }
                 });
 
@@ -125,16 +130,81 @@ public class ListeConsultationsController implements Initializable {
         });
     }
 
-    private void modifierDateConsultation(Consultation consultation) {
-        // Créer une boîte de dialogue pour modifier la date
-        Dialog<LocalDate> dialog = new Dialog<>();
-        dialog.setTitle("Modifier la date de consultation");
-        dialog.setHeaderText("Nouvelle date pour la consultation");
+    private void showApprovalDialog(Consultation consultation) {
+        Dialog<ApprovalData> dialog = new Dialog<>();
+        dialog.setTitle("Approuver la consultation");
+        dialog.setHeaderText("Entrez la date et le prix de la consultation");
 
         // Ajouter les boutons
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        // Créer le DatePicker
+        // Créer les champs
+        DatePicker datePicker = new DatePicker(consultation.getDate());
+        datePicker.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(date.isBefore(LocalDate.now()));
+            }
+        });
+
+        TextField priceField = new TextField();
+        priceField.setPromptText("Prix (TND)");
+        priceField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*(\\.\\d*)?")) {
+                priceField.setText(oldValue);
+            }
+        });
+
+        dialog.getDialogPane().setContent(new HBox(10,
+                new Label("Date:"), datePicker,
+                new Label("Prix:"), priceField
+        ));
+
+        // Convertir le résultat
+        dialog.setResultConverter(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                try {
+                    LocalDate date = datePicker.getValue();
+                    double price = Double.parseDouble(priceField.getText());
+                    return new ApprovalData(date, price);
+                } catch (NumberFormatException e) {
+                    showAlert("Erreur", "Veuillez entrer un prix valide (nombre décimal).");
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        Optional<ApprovalData> result = dialog.showAndWait();
+        result.ifPresent(data -> {
+            // Mettre à jour la consultation
+            serviceConsultation.updateConsultationDateAndPrice(consultation.getId(), data.date, data.price);
+            consultation.setDate(data.date);
+            consultation.setPrix(data.price);
+            consultation.setStatut("approuvé");
+
+            // Envoyer l'email
+            try {
+                String patientEmail = serviceConsultation.getPatientEmailById(consultation.getPatient_id());
+                emailService.sendApprovalEmail(patientEmail, data.date.toString(), data.price);
+                showAlert("Succès", "Consultation approuvée et email envoyé au patient");
+            } catch (Exception e) {
+                showAlert("Erreur", "Échec de l'envoi de l'email : " + e.getMessage());
+            }
+
+            // Rafraîchir l'affichage
+            consultationsListView.refresh();
+        });
+    }
+
+    private void modifierDateConsultation(Consultation consultation) {
+        Dialog<LocalDate> dialog = new Dialog<>();
+        dialog.setTitle("Modifier la date de consultation");
+        dialog.setHeaderText("Nouvelle date pour la consultation");
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
         DatePicker datePicker = new DatePicker(consultation.getDate());
         datePicker.setDayCellFactory(picker -> new DateCell() {
             @Override
@@ -146,7 +216,6 @@ public class ListeConsultationsController implements Initializable {
 
         dialog.getDialogPane().setContent(new HBox(10, new Label("Date:"), datePicker));
 
-        // Convertir le résultat en LocalDate
         dialog.setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
                 return datePicker.getValue();
@@ -156,15 +225,9 @@ public class ListeConsultationsController implements Initializable {
 
         Optional<LocalDate> result = dialog.showAndWait();
         result.ifPresent(newDate -> {
-            // Mettre à jour la date dans la base de données
             serviceConsultation.updateConsultationDate(consultation.getId(), newDate);
-
-            // Mettre à jour l'objet consultation
             consultation.setDate(newDate);
-
-            // Rafraîchir l'affichage
             consultationsListView.refresh();
-
             showAlert("Succès", "Date de consultation modifiée avec succès");
         });
     }
@@ -175,5 +238,16 @@ public class ListeConsultationsController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // Classe interne pour stocker les données du popup
+    private static class ApprovalData {
+        LocalDate date;
+        double price;
+
+        ApprovalData(LocalDate date, double price) {
+            this.date = date;
+            this.price = price;
+        }
     }
 }

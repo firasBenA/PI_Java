@@ -27,6 +27,9 @@ public class MainController {
     public void goPrescription() {
         loadUI("GestionPrescription"); // Assuming you have this FXML already
     }
+    public void goGestionRdv() {
+        loadUI("listrdv");
+    }
 
     public void goGestionMedecin() {
         loadUI("MedecinPrescDiag"); // Assuming you have this FXML already
