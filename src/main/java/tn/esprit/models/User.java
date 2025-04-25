@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
+
     private Integer id;
     private String email;
     private List<String> roles = new ArrayList<>();
