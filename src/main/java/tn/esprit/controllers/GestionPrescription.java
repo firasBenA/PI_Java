@@ -2,22 +2,13 @@ package tn.esprit.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 import tn.esprit.interfaces.IService;
-import tn.esprit.models.Diagnostique;
-import tn.esprit.models.Personne;
 import tn.esprit.models.Prescription;
-import tn.esprit.services.ServiceDiagnostique;
-import tn.esprit.services.ServicePersonne;
 import tn.esprit.services.ServicePrescription;
 
-import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 

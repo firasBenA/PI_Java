@@ -3,6 +3,33 @@
     -fx-padding: 20px;
 }
 
+/* Button hover effects */
+Button {
+    -fx-transition: all 0.3s ease;
+}
+Button:hover {
+    -fx-opacity: 0.9;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ComboBox and TextField focus effects */
+ComboBox:focused, TextField:focused {
+    -fx-border-color: #3498db;
+    -fx-border-width: 2;
+}
+
+/* ListView and TextArea subtle hover */
+ListView:hover, TextArea:hover {
+    -fx-background-color: #f0f2f5;
+}
+
+/* Ensure ScrollPane is clean */
+ScrollPane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
 .title {
     -fx-font-size: 24px;
     -fx-font-weight: bold;

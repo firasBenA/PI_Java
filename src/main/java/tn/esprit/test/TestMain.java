@@ -12,7 +12,7 @@ public class TestMain extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/chatbot.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/Main.fxml")));
         primaryStage.setTitle("Ajouter Réclamation");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
