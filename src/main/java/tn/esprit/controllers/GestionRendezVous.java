@@ -30,18 +30,19 @@ public class GestionRendezVous implements Initializable {
     @FXML private Label medecinError;
     @FXML private Label causeError;
 
-    private Connection connection;
-    private final ServiceAddRdv serviceAddRdv = new ServiceAddRdv();
+    private final ServiceAddRdv serviceRendezVous = new ServiceAddRdv();
     private Map<LocalDate, Integer> rdvCountByDate = new HashMap<>();
     private int currentMedecinId = -1;
+    private final int patientId = 1; // Replace with actual logged-in patient ID
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialisation des types de rendez-vous
-        type_rdv.setItems(FXCollections.observableArrayList("consultation", "suivi", "urgence"));
-
-        // Connexion à la base de données
-        connectDB();
+        // Initialisation des types de rendez-vous avec les valeurs de l'enum
+        type_rdv.setItems(FXCollections.observableArrayList(
+                RendeVous.TypeRendezVous.CONSULTATION.name(),
+                RendeVous.TypeRendezVous.SUIVI.name(),
+                RendeVous.TypeRendezVous.URGENCE.name()
+        ));
 
         // Chargement des médecins
         loadMedecins();
@@ -107,7 +108,8 @@ public class GestionRendezVous implements Initializable {
 
         try {
             String medecinQuery = "SELECT id FROM user WHERE nom = ? AND prenom = ?";
-            try (PreparedStatement psMedecin = connection.prepareStatement(medecinQuery)) {
+            try (Connection connection = serviceRendezVous.getConnection();
+                 PreparedStatement psMedecin = connection.prepareStatement(medecinQuery)) {
                 psMedecin.setString(1, nom);
                 psMedecin.setString(2, prenom);
                 ResultSet rs = psMedecin.executeQuery();
@@ -131,7 +133,8 @@ public class GestionRendezVous implements Initializable {
 
         String query = "SELECT date, COUNT(*) as count FROM rendez_vous WHERE medecin_id = ? GROUP BY date";
 
-        try (PreparedStatement pst = connection.prepareStatement(query)) {
+        try (Connection connection = serviceRendezVous.getConnection();
+             PreparedStatement pst = connection.prepareStatement(query)) {
             pst.setInt(1, currentMedecinId);
             ResultSet rs = pst.executeQuery();
 
@@ -149,21 +152,12 @@ public class GestionRendezVous implements Initializable {
         }
     }
 
-    private void connectDB() {
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
-            System.out.println("Connexion réussie !");
-        } catch (SQLException e) {
-            System.err.println("Erreur de connexion à la base de données : " + e.getMessage());
-            showAlert("Erreur", "Impossible de se connecter à la base de données");
-        }
-    }
-
     private void loadMedecins() {
         ObservableList<String> medecinsList = FXCollections.observableArrayList();
         String query = "SELECT nom, prenom FROM user WHERE roles LIKE '%MEDECIN%'";
 
-        try (Statement stmt = connection.createStatement();
+        try (Connection connection = serviceRendezVous.getConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
@@ -188,26 +182,38 @@ public class GestionRendezVous implements Initializable {
                     return;
                 }
 
+                // Vérifier la limite de rendez-vous (3 par jour)
+                LocalDate selectedDate = date.getValue();
+                int rdvCount = rdvCountByDate.getOrDefault(selectedDate, 0);
+                if (rdvCount >= 3) {
+                    showAlert("Erreur", "Le médecin a déjà 3 rendez-vous ce jour. Veuillez choisir une autre date.");
+                    return;
+                }
+
                 // Création et sauvegarde du rendez-vous
                 RendeVous rdv = new RendeVous();
-                rdv.setDate(date.getValue());
+                rdv.setDate(selectedDate);
                 rdv.setType(type_rdv.getValue());
                 rdv.setCause(cause.getText());
                 rdv.setIdMedecin(currentMedecinId);
-                rdv.setIdPatient(1); // À remplacer par l'ID du patient connecté
-                rdv.setStatut("en_attente"); // Statut par défaut
+                rdv.setIdPatient(patientId);
+                rdv.setStatut(RendeVous.StatutRendezVous.EN_ATTENTE.name());
 
-                // Utilisation de ServiceAddRdv pour ajouter le rendez-vous
-                serviceAddRdv.add(rdv);
+                // Utilisation de ServiceRendezVous pour ajouter le rendez-vous
+                serviceRendezVous.add(rdv);
 
                 showAlert("Succès", "Rendez-vous enregistré avec succès");
+                showDesktopNotification("Rendez-vous Ajouté",
+                        "Votre rendez-vous a été ajouté.\nDate: " + selectedDate +
+                                "\nType: " + type_rdv.getValue() +
+                                "\nCause: " + cause.getText());
                 clearFields();
 
                 // Mettre à jour le calendrier après l'ajout
                 loadRendezVousForMedecin();
             } catch (Exception e) {
                 System.err.println("Erreur lors de l'ajout du rendez-vous : " + e.getMessage());
-                showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");
+                showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous : " + e.getMessage());
             }
         }
     }
@@ -253,7 +259,9 @@ public class GestionRendezVous implements Initializable {
     private void clearFields() {
         date.setValue(null);
         type_rdv.getSelectionModel().clearSelection();
+        medecin.getSelectionModel().clearSelection();
         cause.clear();
+        currentMedecinId = -1;
     }
 
     private void showAlert(String title, String message) {
@@ -264,11 +272,20 @@ public class GestionRendezVous implements Initializable {
         alert.showAndWait();
     }
 
+    private void showDesktopNotification(String title, String content) {
+        Alert notification = new Alert(Alert.AlertType.INFORMATION);
+        notification.setTitle(title);
+        notification.setHeaderText(null);
+        notification.setContentText(content);
+        notification.showAndWait();
+    }
+
     public void setRendezVousToEdit(RendeVous rdv) {
         try {
             // Récupérer le nom du médecin
             String medecinQuery = "SELECT prenom, nom FROM user WHERE id = ?";
-            try (PreparedStatement ps = connection.prepareStatement(medecinQuery)) {
+            try (Connection connection = serviceRendezVous.getConnection();
+                 PreparedStatement ps = connection.prepareStatement(medecinQuery)) {
                 ps.setInt(1, rdv.getIdMedecin());
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
@@ -285,6 +302,7 @@ public class GestionRendezVous implements Initializable {
 
         } catch (SQLException e) {
             System.err.println("Erreur lors du chargement du médecin : " + e.getMessage());
+            showAlert("Erreur", "Problème lors du chargement du rendez-vous à modifier");
         }
     }
 }

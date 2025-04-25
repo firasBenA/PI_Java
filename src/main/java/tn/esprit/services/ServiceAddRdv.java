@@ -1,5 +1,8 @@
 package tn.esprit.services;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Consultation;
 import tn.esprit.models.RendeVous;
@@ -58,7 +61,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
             consultation.setDate(rdv.getDate());
             consultation.setPrix(0); // Prix par défaut
             consultation.setType_consultation(rdv.getType());
-            consultation.setUser_id(1); // À remplacer par l'ID de l'utilisateur connecté
+            consultation.setUser_id(rdv.getIdPatient()); // Utiliser patient_id comme user_id
 
             String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?,?,?,?,?,?,?)";
 
@@ -80,6 +83,18 @@ public class ServiceAddRdv implements IService<RendeVous> {
             // Valider la transaction
             cnx.commit();
             System.out.println("Rendez-vous et consultation créés avec succès. ID RDV: " + rdv.getId());
+
+            // 3. Envoyer une notification FCM au patient
+            String patientFcmToken = getUserFcmToken(rdv.getIdPatient());
+            if (patientFcmToken != null) {
+                sendRdvAddedNotification(patientFcmToken, rdv.getDate().toString(), rdv.getType());
+            }
+
+            // 4. Envoyer une notification FCM au médecin
+            String doctorFcmToken = getUserFcmToken(rdv.getIdMedecin());
+            if (doctorFcmToken != null) {
+                sendNewConsultationNotification(doctorFcmToken, rdv.getDate().toString(), rdv.getType());
+            }
 
         } catch (SQLException e) {
             try {
@@ -217,5 +232,60 @@ public class ServiceAddRdv implements IService<RendeVous> {
         rdv.setType(rs.getString("type_rdv"));
         rdv.setCause(rs.getString("cause"));
         return rdv;
+    }
+
+    private String getUserFcmToken(int userId) throws SQLException {
+        String query = "SELECT fcm_token FROM user WHERE id = ?";
+        try (PreparedStatement stmt = cnx.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String token = rs.getString("fcm_token");
+                if (token == null || token.isEmpty()) {
+                    System.err.println("FCM token not found for user ID: " + userId);
+                    return null;
+                }
+                return token;
+            }
+            throw new SQLException("User not found with ID: " + userId);
+        }
+    }
+
+    private void sendRdvAddedNotification(String fcmToken, String date, String typeConsultation) {
+        try {
+            Notification notification = Notification.builder()
+                    .setTitle("Rendez-vous ajouté avec succès")
+                    .setBody(String.format("Votre rendez-vous a été ajouté.\nDate: %s\nType: %s", date, typeConsultation))
+                    .build();
+
+            Message message = Message.builder()
+                    .setNotification(notification)
+                    .setToken(fcmToken)
+                    .build();
+
+            String response = FirebaseMessaging.getInstance().send(message);
+            System.out.println("Successfully sent RDV added notification: " + response);
+        } catch (Exception e) {
+            System.err.println("Failed to send RDV added notification: " + e.getMessage());
+        }
+    }
+
+    private void sendNewConsultationNotification(String fcmToken, String date, String typeConsultation) {
+        try {
+            Notification notification = Notification.builder()
+                    .setTitle("Nouvelle Consultation à Examiner")
+                    .setBody(String.format("Une nouvelle consultation a été ajoutée.\nDate: %s\nType: %s", date, typeConsultation))
+                    .build();
+
+            Message message = Message.builder()
+                    .setNotification(notification)
+                    .setToken(fcmToken)
+                    .build();
+
+            String response = FirebaseMessaging.getInstance().send(message);
+            System.out.println("Successfully sent new consultation notification: " + response);
+        } catch (Exception e) {
+            System.err.println("Failed to send new consultation notification: " + e.getMessage());
+        }
     }
 }
