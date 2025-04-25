@@ -1,4 +1,4 @@
-/* Root pane background with wave pattern */
+
 .root-pane {
     -fx-background-color: linear-gradient(to bottom, #f1f9ff, #ccecee);
     -fx-padding: 20px;

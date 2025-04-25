@@ -57,7 +57,7 @@ public class MainController {
 
     private void loadUI(String fxml) {
         try {
-            //
+            // Construct the full path to the FXML file dynamically
             String fxmlPath = "/" + fxml + ".fxml";
             System.out.println("Loading FXML from path: " + fxmlPath);
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
