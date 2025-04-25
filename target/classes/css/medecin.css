@@ -1,0 +1,94 @@
+.root {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-background-color: #f5f7fa;
+}
+
+/* Style des boutons */
+.button {
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
+/* Bouton spécial pour l'image */
+.image-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 5 10 5 10;
+    -fx-font-size: 12px;
+}
+
+/* Style des champs de texte */
+.text-field, .text-area {
+    -fx-background-radius: 4;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+    -fx-padding: 5;
+}
+
+.text-area .content {
+    -fx-background-color: white;
+    -fx-background-radius: 4;
+}
+
+/* Style de l'image de profil */
+#profileImage {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
+
+.confirmation-dialog {
+    -fx-background-color: white;
+    -fx-padding: 20px;
+    -fx-spacing: 20px;
+}
+
+.confirmation-dialog .button-bar {
+    -fx-padding: 10px 0 0 0;
+}
+
+.confirmation-dialog .button {
+    -fx-padding: 8 15;
+    -fx-background-radius: 5px;
+    -fx-font-weight: bold;
+}
+
+.confirmation-dialog .button:default {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+.confirmation-dialog .button:cancel {
+    -fx-background-color: #95a5a6;
+    -fx-text-fill: white;
+}
+
+/* Style pour les messages d'erreur des champs */
+.error-label {
+    -fx-text-fill: #e74c3c; /* Rouge */
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Style pour le messageLabel */
+.status-message {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+
+.status-message.success {
+    -fx-text-fill: #27ae60; /* Vert */
+    -fx-background-color: #e8f8f5; /* Fond vert très clair */
+}
+
+.status-message.error {
+    -fx-text-fill: #e74c3c; /* Rouge */
+    -fx-background-color: #fadbd8; /* Fond rouge très clair */
+}
