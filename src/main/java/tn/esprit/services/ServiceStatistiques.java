@@ -30,7 +30,7 @@ public class ServiceStatistiques {
         } catch (SQLException e) {
             System.out.println("Erreur lors du comptage total : " + e.getMessage());
         }
-//
+
         String enAttenteQuery = "SELECT COUNT(*) FROM reclamation WHERE etat = ?";
         try (PreparedStatement pstm = cnx.prepareStatement(enAttenteQuery)) {
             pstm.setString(1, "En Attente");
