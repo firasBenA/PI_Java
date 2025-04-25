@@ -1,0 +1,41 @@
+.custom-date-picker .day-cell {
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+}
+
+/* Jours normaux */
+.custom-date-picker .day-cell {
+    -fx-background-color: #e2fcd6; /* Vert clair */
+}
+
+/* Survol */
+.custom-date-picker .day-cell:hover {
+    -fx-background-color: #ccecee; /* Bleu très clair */
+}
+
+/* Jour sélectionné */
+.custom-date-picker .day-cell:selected {
+    -fx-background-color: #14967f; /* Bleu-vert */
+    -fx-text-fill: white;
+}
+
+/* Jours désactivés (passés) */
+.custom-date-picker .day-cell:disabled {
+    -fx-background-color: #eeeeee;
+    -fx-text-fill: #cccccc;
+}
+
+/* Style pour les jours avec 0-1 consultation */
+.day-cell.low-availability {
+    -fx-background-color: #e2fcd6; /* Vert clair */
+}
+
+/* Style pour les jours avec 2 consultations */
+.day-cell.medium-availability {
+    -fx-background-color: #ffebcc; /* Orange */
+}
+
+/* Style pour les jours avec 3+ consultations */
+.day-cell.high-availability {
+    -fx-background-color: #ffcccc; /* Rouge */
+}
