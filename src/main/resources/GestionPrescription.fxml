@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="720.0" prefWidth="1080.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionPrescription">
+    <children>
+
+        <!-- Title -->
+        <Label layoutX="400" layoutY="40" text="📝 Gestion des Prescriptions" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
+        <!-- Prescription Form Section -->
+        <VBox layoutX="80" layoutY="100" spacing="20" style="-fx-background-color: #f4f4f4; -fx-padding: 20; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: #ddd;">
+            <children>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Titre :" style="-fx-font-size: 16px;" />
+                    <TextField fx:id="titre" promptText="Entrez le titre" style="-fx-border-radius: 5px; -fx-padding: 5;"/>
+                </HBox>
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Contenu :" style="-fx-font-size: 16px;" />
+                    <TextField fx:id="contenue" promptText="Entrez le contenu" style="-fx-border-radius: 5px; -fx-padding: 5;"/>
+                </HBox>
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Date de Prescription :" style="-fx-font-size: 16px;" />
+                    <DatePicker fx:id="datePrescription" promptText="Sélectionnez la date" style="-fx-border-radius: 5px; -fx-padding: 5;"/>
+                </HBox>
+
+                <Label fx:id="lbPrescription" wrapText="true" style="-fx-text-fill: #27ae60; -fx-font-weight: bold;"/>
+
+
+                <Button text="➕ Ajouter Prescription" onAction="#ajouterPrescription"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8;"/>
+            </children>
+        </VBox>
+
+        <!-- Prescription Table Section -->
+        <VBox layoutX="80" layoutY="400" spacing="20" style="-fx-background-color: #fafafa; -fx-padding: 20; -fx-border-radius: 10; -fx-border-color: #ddd;">
+            <children>
+                <Label text="📋 Liste des Prescriptions" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                <!-- Table View for displaying prescriptions -->
+                <TableView fx:id="prescriptionTable" prefWidth="960" prefHeight="300" style="-fx-border-color: #ccc; -fx-background-color: white; -fx-border-radius: 8;">
+                    <columns>
+                        <TableColumn fx:id="idCol" text="ID" prefWidth="100"/>
+                        <TableColumn fx:id="titreCol" text="Titre" prefWidth="200"/>
+                        <TableColumn fx:id="contenueCol" text="Contenu" prefWidth="300"/>
+                        <TableColumn fx:id="dateCol" text="Date" prefWidth="200"/>
+                        <TableColumn fx:id="actionsCol" text="Actions" prefWidth="160"/>
+                    </columns>
+                </TableView>
+            </children>
+        </VBox>
+
+    </children>
+</AnchorPane>
