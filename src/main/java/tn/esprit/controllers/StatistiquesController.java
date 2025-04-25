@@ -34,6 +34,7 @@ public class StatistiquesController {
         int enAttente = stats.getEnAttenteCount();
         int traite = stats.getTraiteCount();
 
+        // Update PieChart
         double enAttentePercent = total > 0 ? (enAttente * 100.0 / total) : 0;
         double traitePercent = total > 0 ? (traite * 100.0 / total) : 0;
 
@@ -44,7 +45,7 @@ public class StatistiquesController {
         pieChart.setData(pieChartData);
         pieChart.setTitle("Répartition par État");
 
-        // Update BarChart
+        
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Nombre de Réclamations");
         series.getData().add(new XYChart.Data<>("Tous", total));
