@@ -1,62 +1,89 @@
 package tn.esprit.controllers;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.control.cell.PropertyValueFactory;
 import tn.esprit.models.Evenement;
 import tn.esprit.services.ServiceEvenement;
 
-import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 public class EvenementController {
 
     @FXML
-    private TextField nomField, typeField, statutField, lieuxField;
+    private TextField nomField;
     @FXML
     private TextArea contenueField;
     @FXML
+    private TextField typeField;
+    @FXML
+    private TextField statutField;
+    @FXML
+    private TextField lieuxField;
+    @FXML
     private DatePicker dateField;
     @FXML
+    private Label errorLabel;
+    @FXML
     private TableView<Evenement> evenementTable;
+    @FXML
+    private TableColumn<Evenement, Integer> idColumn;
+    @FXML
+    private TableColumn<Evenement, String> nomColumn;
+    @FXML
+    private TableColumn<Evenement, String> contenueColumn;
+    @FXML
+    private TableColumn<Evenement, String> typeColumn;
+    @FXML
+    private TableColumn<Evenement, String> statutColumn;
+    @FXML
+    private TableColumn<Evenement, String> lieuxColumn;
+    @FXML
+    private TableColumn<Evenement, LocalDate> dateColumn;
 
-    private ServiceEvenement serviceEvenement = new ServiceEvenement();
-    private ObservableList<Evenement> evenementList = FXCollections.observableArrayList();
+    private ServiceEvenement serviceEvenement;
+    private Evenement selectedEvenement;
 
     @FXML
     public void initialize() {
-        // Load evenements from the database
-        try {
-            evenementList.clear(); // Clear any existing data
-            evenementList.addAll(serviceEvenement.getAll()); // Fetch data from the database
-            evenementTable.setItems(evenementList); // Set the data in the TableView
-            System.out.println("Loaded " + evenementList.size() + " evenements from the database.");
-        } catch (Exception e) {
-            showAlert("Error", "Failed to load evenements: " + e.getMessage());
-        }
+        serviceEvenement = new ServiceEvenement();
 
-        // Select an evenement to populate fields
+        // Set up table columns
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nomColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
+        contenueColumn.setCellValueFactory(new PropertyValueFactory<>("contenue"));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        statutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
+        lieuxColumn.setCellValueFactory(new PropertyValueFactory<>("lieuxEvent"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateEvent"));
+
+        // Load events into the table
+        loadEvenements();
+
+        // Add listener to table selection
         evenementTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                nomField.setText(newSelection.getNom());
-                contenueField.setText(newSelection.getContenue());
-                typeField.setText(newSelection.getType());
-                statutField.setText(newSelection.getStatut());
-                lieuxField.setText(newSelection.getLieuxEvent());
-                dateField.setValue(newSelection.getDateEvent());
+                selectedEvenement = newSelection;
+                nomField.setText(selectedEvenement.getNom());
+                contenueField.setText(selectedEvenement.getContenue());
+                typeField.setText(selectedEvenement.getType());
+                statutField.setText(selectedEvenement.getStatut());
+                lieuxField.setText(selectedEvenement.getLieuxEvent());
+                dateField.setValue(selectedEvenement.getDateEvent());
             }
         });
     }
 
+    private void loadEvenements() {
+        List<Evenement> evenements = serviceEvenement.getAll();
+        evenementTable.getItems().clear();
+        evenementTable.getItems().addAll(evenements);
+    }
+
     @FXML
-    public void addEvenement() {
-        // Input validation
-        if (!validateEvenementInputs()) {
+    private void addEvenement() {
+        if (!validateInputs()) {
             return;
         }
 
@@ -68,27 +95,20 @@ public class EvenementController {
         evenement.setLieuxEvent(lieuxField.getText());
         evenement.setDateEvent(dateField.getValue());
 
-        try {
-            serviceEvenement.add(evenement);
-            evenementList.clear();
-            evenementList.addAll(serviceEvenement.getAll());
-            clearFields();
-            showAlert("Success", "Evenement added successfully!");
-        } catch (Exception e) {
-            showAlert("Error", "Failed to add evenement: " + e.getMessage());
-        }
+        serviceEvenement.add(evenement);
+        loadEvenements();
+        clearFields();
+        showSuccess("Événement ajouté avec succès !");
     }
 
     @FXML
-    public void updateEvenement() {
-        Evenement selectedEvenement = evenementTable.getSelectionModel().getSelectedItem();
+    private void updateEvenement() {
         if (selectedEvenement == null) {
-            showAlert("Error", "Please select an evenement to update.");
+            showError("Veuillez sélectionner un événement à modifier.");
             return;
         }
 
-        // Input validation
-        if (!validateEvenementInputs()) {
+        if (!validateInputs()) {
             return;
         }
 
@@ -99,74 +119,26 @@ public class EvenementController {
         selectedEvenement.setLieuxEvent(lieuxField.getText());
         selectedEvenement.setDateEvent(dateField.getValue());
 
-        try {
-            serviceEvenement.update(selectedEvenement);
-            evenementList.clear();
-            evenementList.addAll(serviceEvenement.getAll());
-            clearFields();
-            showAlert("Success", "Evenement updated successfully!");
-        } catch (Exception e) {
-            showAlert("Error", "Failed to update evenement: " + e.getMessage());
-        }
+        serviceEvenement.update(selectedEvenement);
+        loadEvenements();
+        clearFields();
+        showSuccess("Événement modifié avec succès !");
     }
 
     @FXML
-    public void deleteEvenement() {
-        Evenement selectedEvenement = evenementTable.getSelectionModel().getSelectedItem();
+    private void deleteEvenement() {
         if (selectedEvenement == null) {
-            showAlert("Error", "Please select an evenement to delete.");
+            showError("Veuillez sélectionner un événement à supprimer.");
             return;
         }
 
-        try {
-            serviceEvenement.delete(selectedEvenement);
-            evenementList.remove(selectedEvenement);
-            clearFields();
-            showAlert("Success", "Evenement deleted successfully!");
-        } catch (Exception e) {
-            showAlert("Error", "Failed to delete evenement: " + e.getMessage());
-        }
+        serviceEvenement.delete(selectedEvenement);
+        loadEvenements();
+        clearFields();
+        showSuccess("Événement supprimé avec succès !");
     }
 
     @FXML
-    public void switchToArticle() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/ArticleController.fxml"));
-        Stage stage = (Stage) nomField.getScene().getWindow();
-        stage.setScene(new Scene(root));
-    }
-
-    private boolean validateEvenementInputs() {
-        if (nomField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Nom cannot be empty.");
-            return false;
-        }
-        if (contenueField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Contenue cannot be empty.");
-            return false;
-        }
-        if (typeField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Type cannot be empty.");
-            return false;
-        }
-        if (statutField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Statut cannot be empty.");
-            return false;
-        }
-        if (lieuxField.getText().trim().isEmpty()) {
-            showAlert("Validation Error", "Lieux Event cannot be empty.");
-            return false;
-        }
-        if (dateField.getValue() == null) {
-            showAlert("Validation Error", "Date Event cannot be empty.");
-            return false;
-        }
-        if (dateField.getValue().isBefore(LocalDate.now())) {
-            showAlert("Validation Error", "Date Event cannot be in the past.");
-            return false;
-        }
-        return true;
-    }
-
     private void clearFields() {
         nomField.clear();
         contenueField.clear();
@@ -174,12 +146,45 @@ public class EvenementController {
         statutField.clear();
         lieuxField.clear();
         dateField.setValue(null);
+        selectedEvenement = null;
+        errorLabel.setText("");
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private boolean validateInputs() {
+        if (nomField.getText().isEmpty()) {
+            showError("Le nom ne peut pas être vide.");
+            return false;
+        }
+        if (contenueField.getText().isEmpty()) {
+            showError("Le contenu ne peut pas être vide.");
+            return false;
+        }
+        if (typeField.getText().isEmpty()) {
+            showError("Le type ne peut pas être vide.");
+            return false;
+        }
+        if (statutField.getText().isEmpty()) {
+            showError("Le statut ne peut pas être vide.");
+            return false;
+        }
+        if (lieuxField.getText().isEmpty()) {
+            showError("Le lieu ne peut pas être vide.");
+            return false;
+        }
+        if (dateField.getValue() == null) {
+            showError("La date ne peut pas être vide.");
+            return false;
+        }
+        return true;
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
+        errorLabel.setStyle("-fx-text-fill: red;");
+    }
+
+    private void showSuccess(String message) {
+        errorLabel.setText(message);
+        errorLabel.setStyle("-fx-text-fill: green;");
     }
 }

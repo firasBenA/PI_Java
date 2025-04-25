@@ -11,7 +11,7 @@ public class MainFX extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/ArticleController.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/PatientDashboard.fxml"));
         primaryStage.setTitle("Recover Plus");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

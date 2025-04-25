@@ -1,53 +1,70 @@
 package tn.esprit.controllers;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.control.cell.PropertyValueFactory;
 import tn.esprit.models.Article;
 import tn.esprit.services.ServiceArticle;
 
-import java.io.IOException;
+import java.util.List;
 
 public class ArticleController {
 
     @FXML
-    private TextField titreField, imageField;
+    private TextField titreField;
     @FXML
     private TextArea contenueField;
     @FXML
+    private TextField imageField;
+    @FXML
+    private Label errorLabel;
+    @FXML
     private TableView<Article> articleTable;
+    @FXML
+    private TableColumn<Article, Integer> idColumn;
+    @FXML
+    private TableColumn<Article, String> titreColumn;
+    @FXML
+    private TableColumn<Article, String> contenueColumn;
+    @FXML
+    private TableColumn<Article, String> imageColumn;
 
-    private ServiceArticle serviceArticle = new ServiceArticle();
-    private ObservableList<Article> articleList = FXCollections.observableArrayList();
+    private ServiceArticle serviceArticle;
+    private Article selectedArticle;
 
     @FXML
     public void initialize() {
-        try {
-            articleList.clear();
-            articleList.addAll(serviceArticle.getAll());
-            articleTable.setItems(articleList);
-            System.out.println("Loaded " + articleList.size() + " articles from the database.");
-        } catch (Exception e) {
-            showError("Échec du chargement : " + e.getMessage());
-        }
+        serviceArticle = new ServiceArticle();
 
+        // Set up table columns
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        titreColumn.setCellValueFactory(new PropertyValueFactory<>("titre"));
+        contenueColumn.setCellValueFactory(new PropertyValueFactory<>("contenue"));
+        imageColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
+
+        // Load articles into the table
+        loadArticles();
+
+        // Add listener to table selection
         articleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                titreField.setText(newSelection.getTitre());
-                contenueField.setText(newSelection.getContenue());
-                imageField.setText(newSelection.getImage());
+                selectedArticle = newSelection;
+                titreField.setText(selectedArticle.getTitre());
+                contenueField.setText(selectedArticle.getContenue());
+                imageField.setText(selectedArticle.getImage());
             }
         });
     }
 
+    private void loadArticles() {
+        List<Article> articles = serviceArticle.getAll();
+        articleTable.getItems().clear();
+        articleTable.getItems().addAll(articles);
+    }
+
     @FXML
-    public void addArticle() {
-        if (!validateArticleInputs()) {
+    private void addArticle() {
+        if (!validateInputs()) {
             return;
         }
 
@@ -56,26 +73,20 @@ public class ArticleController {
         article.setContenue(contenueField.getText());
         article.setImage(imageField.getText());
 
-        try {
-            serviceArticle.add(article);
-            articleList.clear();
-            articleList.addAll(serviceArticle.getAll());
-            clearFields();
-            showAlert("Succès", "Article ajouté avec succès.");
-        } catch (Exception e) {
-            showError("Erreur d'ajout : " + e.getMessage());
-        }
+        serviceArticle.add(article);
+        loadArticles();
+        clearFields();
+        showSuccess("Article ajouté avec succès !");
     }
 
     @FXML
-    public void updateArticle() {
-        Article selectedArticle = articleTable.getSelectionModel().getSelectedItem();
+    private void updateArticle() {
         if (selectedArticle == null) {
             showError("Veuillez sélectionner un article à modifier.");
             return;
         }
 
-        if (!validateArticleInputs()) {
+        if (!validateInputs()) {
             return;
         }
 
@@ -83,80 +94,57 @@ public class ArticleController {
         selectedArticle.setContenue(contenueField.getText());
         selectedArticle.setImage(imageField.getText());
 
-        try {
-            serviceArticle.update(selectedArticle);
-            articleList.clear();
-            articleList.addAll(serviceArticle.getAll());
-            clearFields();
-            showAlert("Succès", "Article modifié avec succès.");
-        } catch (Exception e) {
-            showError("Erreur de modification : " + e.getMessage());
-        }
+        serviceArticle.update(selectedArticle);
+        loadArticles();
+        clearFields();
+        showSuccess("Article modifié avec succès !");
     }
 
     @FXML
-    public void deleteArticle() {
-        Article selectedArticle = articleTable.getSelectionModel().getSelectedItem();
+    private void deleteArticle() {
         if (selectedArticle == null) {
             showError("Veuillez sélectionner un article à supprimer.");
             return;
         }
 
-        try {
-            serviceArticle.delete(selectedArticle);
-            articleList.remove(selectedArticle);
-            clearFields();
-            showAlert("Succès", "Article supprimé avec succès.");
-        } catch (Exception e) {
-            showError("Erreur de suppression : " + e.getMessage());
-        }
+        serviceArticle.delete(selectedArticle);
+        loadArticles();
+        clearFields();
+        showSuccess("Article supprimé avec succès !");
     }
 
     @FXML
-    public void switchToEvenement() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/EvenementController.fxml"));
-        Stage stage = (Stage) titreField.getScene().getWindow();
-        stage.setScene(new Scene(root));
+    private void clearFields() {
+        titreField.clear();
+        contenueField.clear();
+        imageField.clear();
+        selectedArticle = null;
+        errorLabel.setText("");
     }
 
-    private boolean validateArticleInputs() {
-        if (titreField.getText().trim().isEmpty()) {
-            showError("Le titre est obligatoire.");
+    private boolean validateInputs() {
+        if (titreField.getText().isEmpty()) {
+            showError("Le titre ne peut pas être vide.");
             return false;
         }
-        if (contenueField.getText().trim().isEmpty()) {
-            showError("Le contenu est obligatoire.");
+        if (contenueField.getText().isEmpty()) {
+            showError("Le contenu ne peut pas être vide.");
             return false;
         }
-        if (imageField.getText().trim().isEmpty()) {
-            showError("L'image est obligatoire.");
+        if (imageField.getText().isEmpty()) {
+            showError("Le chemin de l'image ne peut pas être vide.");
             return false;
         }
         return true;
     }
 
-    private void clearFields() {
-        titreField.clear();
-        contenueField.clear();
-        imageField.clear();
-    }
-
-    // Overloaded showAlert methods
-    private void showAlert(String message) {
-        showAlert("Information", message);
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
     private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Erreur");
-        alert.setContentText(message);
-        alert.showAndWait();
+        errorLabel.setText(message);
+        errorLabel.setStyle("-fx-text-fill: red;");
+    }
+
+    private void showSuccess(String message) {
+        errorLabel.setText(message);
+        errorLabel.setStyle("-fx-text-fill: green;");
     }
 }
