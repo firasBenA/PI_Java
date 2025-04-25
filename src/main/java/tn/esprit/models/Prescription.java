@@ -1,18 +1,18 @@
 package tn.esprit.models;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.sql.Date;
 
 public class Prescription {
 
     private int id ,dossier_medical_id, diagnostique_id,medecin_id,patient_id ;
     private String titre ,contenue ;
-    private LocalDateTime date_prescription;
+    private Date date_prescription;
 
     public Prescription() {
     }
 
-    public Prescription(int id, int dossier_medical_id, int diagnostique_id, int medecin_id, int patient_id, String titre, String contenue, LocalDateTime date_prescription) {
+    public Prescription(int id, int dossier_medical_id, int diagnostique_id, int medecin_id, int patient_id, String titre, String contenue, Date date_prescription) {
         this.id = id;
         this.dossier_medical_id = dossier_medical_id;
         this.diagnostique_id = diagnostique_id;
@@ -23,7 +23,7 @@ public class Prescription {
         this.date_prescription = date_prescription;
     }
 
-    public Prescription( int dossier_medical_id, int diagnostique_id, int medecin_id, int patient_id, String titre, String contenue, LocalDateTime date_prescription) {
+    public Prescription( int dossier_medical_id, int diagnostique_id, int medecin_id, int patient_id, String titre, String contenue, Date date_prescription) {
         this.dossier_medical_id = dossier_medical_id;
         this.diagnostique_id = diagnostique_id;
         this.medecin_id = medecin_id;
@@ -89,11 +89,11 @@ public class Prescription {
         this.contenue = contenue;
     }
 
-    public LocalDateTime getDate_prescription() {
+    public Date getDate_prescription() {
         return date_prescription;
     }
 
-    public void setDate_prescription(LocalDateTime date_prescription) {
+    public void setDate_prescription(Date date_prescription) {
         this.date_prescription = date_prescription;
     }
 
@@ -105,9 +105,5 @@ public class Prescription {
                 ", contenue='" + contenue + '\'' +
                 ", date_prescription=" + date_prescription +
                 '}';
-    }
-
-    public Diagnostique getDiagnostique() {
-        return null;
     }
 }

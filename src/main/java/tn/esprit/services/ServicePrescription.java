@@ -1,10 +1,10 @@
 package tn.esprit.services;
 
 import tn.esprit.interfaces.IService;
-import tn.esprit.models.Personne;
 import tn.esprit.models.Prescription;
 import tn.esprit.utils.MyDataBase;
 
+import java.io.File;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,41 +18,25 @@ public class ServicePrescription implements IService<Prescription> {
     public ServicePrescription(){cnx = MyDataBase.getInstance().getCnx();}
     @Override
     public void add(Prescription prescription) {
-        // Check if diagnostique exists before saving the prescription
-        if (prescription.getDiagnostique() == null || prescription.getDiagnostique().getId() <= 0) {
-            throw new IllegalArgumentException("Prescription must have a valid diagnostique");
-        }
+    String qry ="INSERT INTO `prescription`(`dossier_medical_id`, `diagnostique_id`, `medecin_id`, `patient_id`, `titre`, `contenue`, `date_prescription`)" +
+            " VALUES (?,?,?,?,?,?,?)";
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(qry);
+            pstm.setInt(1,1);
+            pstm.setInt(2,19);
+            pstm.setInt(3,3);
+            pstm.setInt(4,1);
+            pstm.setString(5,prescription.getTitre());
+            pstm.setString(6,prescription.getContenue());
+            pstm.setDate(7, java.sql.Date.valueOf(LocalDate.now()));
 
-        // Verify diagnostique exists in the database
-        String checkDiagnostiqueQuery = "SELECT * FROM `diagnostique` WHERE `id` = ?";
-        try (PreparedStatement stmt = cnx.prepareStatement(checkDiagnostiqueQuery)) {
-            stmt.setInt(1, prescription.getDiagnostique().getId());
-            ResultSet rs = stmt.executeQuery();
 
-            if (!rs.next()) {
-                throw new IllegalArgumentException("No diagnostique found with ID: " + prescription.getDiagnostique().getId());
-            }
-
-            // Proceed to insert the prescription if diagnostique is valid
-            String qry = "INSERT INTO `prescription`(`dossier_medical_id`, `diagnostique_id`, `medecin_id`, `patient_id`, `titre`, `contenue`, `date_prescription`)" +
-                    " VALUES (?,?,?,?,?,?,?)";
-            try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
-                pstm.setInt(1, 1);  // Adjust as per your data
-                pstm.setInt(2, prescription.getDiagnostique().getId()); // Use the diagnostique ID here
-                pstm.setInt(3, 3);  // Adjust as per your data
-                pstm.setInt(4, 1);  // Adjust as per your data
-                pstm.setString(5, prescription.getTitre());
-                pstm.setString(6, prescription.getContenue());
-                pstm.setDate(7, java.sql.Date.valueOf(LocalDate.now()));
-
-                pstm.executeUpdate();
-            }
+            pstm.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("Error while adding prescription: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
-
 
     @Override
     public List<Prescription> getAll() {
@@ -68,10 +52,16 @@ public class ServicePrescription implements IService<Prescription> {
                 p.setId(rs.getInt(1));
                 p.setTitre(rs.getString("titre"));
                 p.setContenue(rs.getString("contenue"));
+                p.setDiagnostique_id(rs.getInt("diagnostique_id"));
+                p.setDossier_medical_id(rs.getInt("dossier_medical_id"));
+                p.setMedecin_id(rs.getInt("medecin_id"));
+                p.setPatient_id(rs.getInt("patient_id"));
+
                 ///date convertion
                 java.sql.Date sqlDate = rs.getDate("date_prescription");
-                LocalDateTime dateTime = sqlDate.toLocalDate().atStartOfDay();
-                p.setDate_prescription(dateTime);
+                Date utilDate = new Date(sqlDate.getTime());
+                p.setDate_prescription(utilDate);
+
                 //////
 
                 prescriptions.add(p);
@@ -99,7 +89,7 @@ public class ServicePrescription implements IService<Prescription> {
             pstm.setInt(4, prescription.getPatient_id());
             pstm.setString(5, prescription.getTitre());
             pstm.setString(6, prescription.getContenue());
-            pstm.setTimestamp(7, Timestamp.valueOf(prescription.getDate_prescription()));
+            pstm.setDate(7, prescription.getDate_prescription());
             pstm.setInt(8, prescription.getId());
 
             pstm.executeUpdate();
@@ -108,18 +98,15 @@ public class ServicePrescription implements IService<Prescription> {
         }
     }
 
-
     @Override
     public void delete(Prescription prescription) {
         String qry = "DELETE FROM `prescription` WHERE `id` = ?";
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(qry);
-            pstm.setInt(1, prescription.getId());
+        try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
+            pstm.setInt(1, prescription.getId());  // Use prescription.getId() instead of id
             pstm.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error while deleting prescription: " + e.getMessage());
         }
     }
-
 
 }

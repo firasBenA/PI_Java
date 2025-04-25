@@ -1,0 +1,15 @@
+tn\esprit\test\MainFX.class
+tn\esprit\controllers\ArticleController.class
+tn\esprit\controllers\EvenementController.class
+tn\esprit\utils\MyDataBase.class
+tn\esprit\models\User.class
+tn\esprit\controllers\MedecinDashboardController.class
+tn\esprit\models\Evenement.class
+tn\esprit\controllers\EventDetailsController.class
+tn\esprit\services\ServiceUser.class
+tn\esprit\test\TestMain.class
+tn\esprit\services\ServiceEvenement.class
+tn\esprit\controllers\PatientDashboardEAController.class
+tn\esprit\interfaces\IService.class
+tn\esprit\services\ServiceArticle.class
+tn\esprit\models\Article.class

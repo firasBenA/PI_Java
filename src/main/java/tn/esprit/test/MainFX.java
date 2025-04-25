@@ -5,11 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import tn.esprit.repository.UserRepository;
-import tn.esprit.repository.UserRepositoryImpl;
-import tn.esprit.services.AuthService;
-import tn.esprit.utils.MyDataBase;
-import tn.esprit.utils.SceneManager;
 
 import java.io.IOException;
 
@@ -21,22 +16,17 @@ public class MainFX extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialize database connection
-        MyDataBase.getInstance();
 
-        // Initialize services with database repository
-        UserRepository userRepository = new UserRepositoryImpl();
-        AuthService authService = new AuthService(userRepository);
+        FXMLLoader loader =new FXMLLoader(getClass().getResource("/DoctorStats.fxml"));
+        try {
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("---- Gestion RDV -----");
+            primaryStage.show();
 
-        // Set up scene manager
-        SceneManager sceneManager = new SceneManager(primaryStage, authService);
-
-        // Show login scene first
-        sceneManager.showLoginScene();
-
-        primaryStage.setTitle("Medical Application");
-        primaryStage.show();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
-
-
 }
