@@ -9,7 +9,7 @@ tn\esprit\controllers\EventDetailsController.class
 tn\esprit\services\ServiceUser.class
 tn\esprit\test\TestMain.class
 tn\esprit\services\ServiceEvenement.class
-tn\esprit\controllers\PatientDashboardController.class
+tn\esprit\controllers\PatientDashboardEAController.class
 tn\esprit\interfaces\IService.class
 tn\esprit\services\ServiceArticle.class
 tn\esprit\models\Article.class

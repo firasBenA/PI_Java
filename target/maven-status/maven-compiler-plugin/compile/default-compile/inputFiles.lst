@@ -4,6 +4,7 @@ C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\EventDetails
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\models\User.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\MedecinDashboardController.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\services\ServiceArticle.java
+C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\PatientDashboardEAController.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\ArticleController.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\EvenementController.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\test\TestMain.java
@@ -11,5 +12,4 @@ C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\services\ServiceUser.jav
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\test\MainFX.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\utils\MyDataBase.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\services\ServiceEvenement.java
-C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\controllers\PatientDashboardController.java
 C:\Users\USER\Documents\PI_Java\src\main\java\tn\esprit\interfaces\IService.java

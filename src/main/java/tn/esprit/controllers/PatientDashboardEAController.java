@@ -19,7 +19,7 @@ import tn.esprit.services.ServiceEvenement;
 
 import java.util.List;
 
-public class PatientDashboardController {
+public class PatientDashboardEAController {
 
     @FXML
     private Button evenementButton;
