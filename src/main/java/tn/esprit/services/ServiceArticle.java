@@ -94,7 +94,7 @@ public class ServiceArticle implements IService<Article> {
             pstm.setInt(1, user.getId());
             pstm.setInt(2, article.getId());
             pstm.executeUpdate();
-            System.out.println("User " + user.getUsername() + " liked article " + article.getTitre());
+            System.out.println("User " + user.getPrenom() + " liked article " + article.getTitre());
         } catch (SQLException e) {
             System.out.println("Error while adding like: " + e.getMessage());
         }
