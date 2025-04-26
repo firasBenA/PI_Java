@@ -65,7 +65,6 @@ public class GestionReponse {
 
     @FXML
     public void initialize() {
-        // Initialize ComboBox with filter options
         filterEtatComboBox.setItems(FXCollections.observableArrayList("Tous", "En Attente", "Traité"));
         filterEtatComboBox.setValue("Tous");
         filterEtatComboBox.setOnAction(event -> {
