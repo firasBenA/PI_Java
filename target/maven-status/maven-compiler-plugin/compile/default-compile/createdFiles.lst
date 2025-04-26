@@ -8,7 +8,6 @@ tn\esprit\controllers\MainController.class
 tn\esprit\test\TestMain.class
 tn\esprit\controllers\RatingController.class
 tn\esprit\controllers\HomeController.class
-tn\esprit\controllers\GestionReponse$1.class
 tn\esprit\controllers\ModifierPrescriptionController.class
 tn\esprit\interfaces\IService.class
 tn\esprit\models\Reponse.class
