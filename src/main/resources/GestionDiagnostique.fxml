@@ -1,109 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import java.lang.String?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.controllers.GestionDiagnostique"
-            prefHeight="780.0" prefWidth="1080.0"
-            style="-fx-background-color: #f4f6f9; -fx-font-family: 'Segoe UI';">
-
-    <children>
-        <ScrollPane fitToWidth="true" pannable="true"
-                    style="-fx-background-color: transparent; -fx-border-color: transparent;">
-            <content>
-                <VBox spacing="30" alignment="TOP_CENTER" padding="30 50 50 50">
+<ScrollPane fitToWidth="true" pannable="true" style="-fx-background-color: transparent; -fx-border-color: transparent;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionDiagnostique">
+    <content>
+                    <VBox alignment="TOP_CENTER" prefHeight="1500" prefWidth="980" spacing="30" style="-fx-padding: 30 50 50 50;">
                     <!-- Title -->
-                    <Label text="🩺 Système de Diagnostic Médical"
-                           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" />
+                    <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" text="🩺 Système de Diagnostic Médical" />
 
                     <!-- Symptoms and Selected Symptoms -->
-                    <HBox spacing="30" alignment="CENTER">
+                    <HBox alignment="CENTER" spacing="30">
                         <!-- Symptoms -->
-                        <VBox spacing="15" prefWidth="460"
-                              style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
+                        <VBox prefWidth="460" spacing="15" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
                             <children>
-                                <Label text="🦠 Liste des symptômes"
-                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" />
-                                <ListView fx:id="symptomsListView" prefHeight="250"
-                                          style="-fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;" />
-                                <Button fx:id="selectSymptomButton" text="Ajouter le symptôme ➕"
-                                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;" />
+                                <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" text="Liste des symptômes" />
+                                <ListView fx:id="symptomsListView" prefHeight="250" style="-fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;" />
+                                <Button fx:id="selectSymptomButton" prefHeight="40.0" prefWidth="381.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;" text="Ajouter le symptôme ➕" />
                             </children>
                         </VBox>
 
                         <!-- Selected Symptoms -->
-                        <VBox spacing="15" prefWidth="460"
-                              style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
+                        <VBox prefWidth="460" spacing="15" style="-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
                             <children>
-                                <Label text="📋 Symptômes sélectionnés"
-                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" />
-                                <TextArea fx:id="selectedSymptomsArea" prefHeight="250" editable="false" wrapText="true"
-                                          promptText="Les symptômes sélectionnés apparaîtront ici"
-                                          style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 14px;" />
+                                <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" text="Symptômes sélectionnés" />
+                                <TextArea fx:id="selectedSymptomsArea" editable="false" prefHeight="318.0" prefWidth="385.0" promptText="Les symptômes sélectionnés apparaîtront ici" style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 14px;" wrapText="true" />
                             </children>
                         </VBox>
                     </HBox>
 
-                    <!-- Diagnostic Form -->
-                    <VBox spacing="20" maxWidth="740"
-                          style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
-                        <children>
-                            <HBox spacing="30" alignment="CENTER">
-                                <VBox spacing="8">
-                                    <Label text="👨‍⚕️ Médecin responsable"
-                                           style="-fx-font-size: 14px; -fx-text-fill: #1a2b3c;" />
-                                    <ComboBox fx:id="doctorComboBox" prefWidth="300"
-                                              style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8;" />
-                                </VBox>
-                                <VBox spacing="8">
-                                    <Label text="📍 Zone du corps"
-                                           style="-fx-font-size: 14px; -fx-text-fill: #1a2b3c;" />
-                                    <TextField fx:id="zoneCorps" promptText="Ex : Tête, Bras, Jambes..." prefWidth="300"
-                                               style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-font-size: 14px;" />
-                                </VBox>
-                            </HBox>
-
-                            <Button text="Lancer le diagnostic 🧠" onAction="#handleDiagnose"
-                                    style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 20; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"
-                                    maxWidth="300" />
-                        </children>
-                    </VBox>
-
                     <!-- Diagnosis Result -->
-                    <VBox spacing="15" maxWidth="800"
-                          style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
+                    <VBox maxWidth="960.0" prefHeight="284.0" prefWidth="960.0" spacing="15" style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
                         <children>
-                            <Label text="🧾 Résultat du diagnostic"
-                                   style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" />
-                            <Label fx:id="resultLabel" wrapText="true" prefHeight="120"
-                                   style="-fx-background-color: #f7f9fc; -fx-padding: 15; -fx-font-size: 16px; -fx-text-fill: #34495e; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;" />
+                            <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" text="Résultat du diagnostic" />
+                            <Label fx:id="resultLabel" prefHeight="120" prefWidth="820" style="-fx-background-color: #f7f9fc; -fx-padding: 15; -fx-font-size: 16px; -fx-text-fill: #34495e; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;" wrapText="true" />
+
+                            <Button maxWidth="817.0" onAction="#handleDiagnose" prefHeight="49.0" prefWidth="817.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 20; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;" text="Lancer le diagnostic" />
                         </children>
                     </VBox>
+         <HBox alignment="CENTER" spacing="20.0">
+            <children>
+      
+                          <!-- Diagnostic Form -->
+                          <VBox maxHeight="-Infinity" maxWidth="461.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="480.0" spacing="20" style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
+                              <children>
+                                  <HBox prefHeight="55.0" prefWidth="387.0" spacing="30">
+                                      <VBox alignment="CENTER_LEFT" spacing="8">
+                                          <Label style="-fx-font-size: 14px; -fx-text-fill: #1a2b3c;" text="Médecin responsable" />
+                                          <ComboBox fx:id="doctorComboBox" prefHeight="27.0" prefWidth="431.0" style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8;" />
+                                      </VBox>
+                                  </HBox>
+                              </children>
+                          </VBox>
+               <VBox maxWidth="912.0" prefHeight="120.0" prefWidth="480.0" spacing="20" style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
+                  <children>
+                     <HBox spacing="30">
+                        <children>
+                           <VBox alignment="CENTER_LEFT" spacing="8">
+                              <children>
+                                 <Label style="-fx-font-size: 14px; -fx-text-fill: #1a2b3c;" text="Zone du corps" />
+                                 <TextField fx:id="zoneCorps" prefHeight="32.0" prefWidth="488.0" promptText="Ex : Tête, Bras, Jambes..." style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-font-size: 14px;" />
+                              </children>
+                           </VBox>
+                        </children>
+                     </HBox>
+                  </children>
+               </VBox>
+            </children>
+         </HBox>
+                        <Button maxWidth="960.0" onAction="#handleSaveDiagnostique" prefHeight="49.0" prefWidth="960.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 20; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;" text="Enregistrer" />
 
                     <!-- Chatbot -->
-                    <VBox spacing="15" maxWidth="960"
-                          style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
+                    <VBox maxWidth="960" spacing="15" style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 8, 0.2, 0, 2);">
                         <children>
-                            <Label text="💬 Assistant Médical"
-                                   style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" />
-                            <ListView fx:id="chatListView" prefHeight="200"
-                                      style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-font-size: 14px;" />
-                            <HBox spacing="10" alignment="CENTER">
-                                <TextField fx:id="userInputField" prefWidth="800"
-                                           promptText="Posez une question ou décrivez un symptôme..."
-                                           style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 14px; -fx-padding: 10;" />
-                                <Button fx:id="sendButton" text="Envoyer ➤" onAction="#sendMessage"
-                                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;" />
+                            <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a2b3c;" text="💬 Assistant Médical" />
+                            <ListView fx:id="chatListView" prefHeight="200" style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-font-size: 14px;" />
+                            <HBox alignment="CENTER" spacing="10">
+                                <TextField fx:id="userInputField" prefWidth="800" promptText="Posez une question ou décrivez un symptôme..." style="-fx-background-color: #f7f9fc; -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 14px; -fx-padding: 10;" />
+                                <Button fx:id="sendButton" onAction="#sendMessage" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;" text="Envoyer ➤" />
                             </HBox>
                         </children>
                     </VBox>
                 </VBox>
-            </content>
-        </ScrollPane>
-    </children>
-</AnchorPane>
+        </content>
+    </ScrollPane>

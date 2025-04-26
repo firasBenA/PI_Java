@@ -14,12 +14,15 @@ import javafx.stage.Stage;
 import okhttp3.*;
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Diagnostique;
+import tn.esprit.models.User;
 import tn.esprit.services.ServiceDiagnostique;
+import tn.esprit.services.ServiceUser;
 
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GestionDiagnostique {
@@ -56,50 +59,10 @@ public class GestionDiagnostique {
     private final ObservableList<String> messages = FXCollections.observableArrayList();
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final String apiKey = "AIzaSyCAIyy3hwHeeRevuaAfipBrVSYHIcyuVAk";
+    private final String apiKey = "";
     private static final int MAX_RETRIES = 3;
     private static final long BASE_RETRY_DELAY_MS = 5000;
 
-    @FXML
-    public void ajouterDiagnostique(ActionEvent actionEvent) {
-        Diagnostique d = new Diagnostique();
-        d.setDossierMedicalId(1);
-        d.setPatientId(1);
-        d.setMedecinId(3);
-        d.setDateDiagnostique(Date.valueOf(dateDiagnostique.getValue()));
-        d.setNom("Allergy");
-        d.setDescription("test java");
-        d.setZoneCorps(zoneCorps.getText());
-        d.setDateSymptomes(Date.valueOf(dateDiagnostique.getValue()));
-        d.setStatus(0);
-
-        String selected = String.join(",", selectedSymptoms);
-        d.setSelectedSymptoms(selected);
-
-        diag.add(d);
-    }
-
-    @FXML
-    public void modifierDiagnostique(ActionEvent actionEvent) {
-        int id = Integer.parseInt(idDiagnostique.getText()); // Get the ID from the UI
-
-        Diagnostique d = new Diagnostique();
-        d.setId(id); // Set the ID to update the correct record
-        d.setDossierMedicalId(1);
-        d.setPatientId(1);
-        d.setMedecinId(3);
-        d.setDateDiagnostique(Date.valueOf(dateDiagnostique.getValue()));
-        d.setNom(nom.getText()); // Use input field
-        d.setDescription("Mise à jour depuis JavaFX");
-        d.setZoneCorps(zoneCorps.getText());
-        d.setDateSymptomes(Date.valueOf(dateDiagnostique.getValue()));
-        d.setStatus(1); // Status updated (example)
-
-        String selected = String.join(",", selectedSymptoms);
-        d.setSelectedSymptoms(selected);
-
-        diag.update(d); // Calls the update method
-    }
     //////
 
     public void initialize() {
@@ -169,77 +132,99 @@ public class GestionDiagnostique {
 
     @FXML
     private void handleDiagnose() {
-        String selectedDoctor = doctorComboBox.getValue();
-        String selectedZoneCorps = zoneCorps.getText();
-
+        // Assuming 'selectedSymptoms' is already defined
         if (selectedSymptoms.isEmpty()) {
             resultLabel.setText("❌ Veuillez sélectionner au moins un symptôme.");
             return;
         }
 
-        if (selectedDoctor == null || selectedDoctor.trim().isEmpty()) {
-            resultLabel.setText("❌ Veuillez sélectionner un médecin.");
-            return;
-        }
-
-        if (selectedZoneCorps == null || selectedZoneCorps.trim().isEmpty()) {
-            resultLabel.setText("❌ Veuillez spécifier une zone du corps.");
-            return;
-        }
-
-        if (selectedSymptomsArea.getText().length() > 1000) {
-            resultLabel.setText("❌ Trop de texte sélectionné pour les symptômes.");
-            return;
-        }
-
-        Tooltip errorTooltip = new Tooltip("Sélection requise !");
-        Tooltip.install(doctorComboBox, errorTooltip);
-
+        // Assuming ServiceDiagnostique.diagnose() gives the disease
         Map<String, String> result = ServiceDiagnostique.diagnose(selectedSymptoms);
-
         String disease = result.getOrDefault("disease", "Inconnu");
-        String description = result.getOrDefault("description", "Pas de description");
 
-        resultLabel.setText("Maladie: " + disease + "\nDescription: " + description);
+        // Retrieve the list of doctors based on the disease
+        List<User> matchingDoctors = ServiceUser.findMedecinsBySpecialite(disease);
 
-        int doctorId = doctorIdMap.get(selectedDoctor);
-        Date currentDate = new Date(System.currentTimeMillis());
-
-        Diagnostique diag = new Diagnostique();
-        diag.setNom(disease);
-        diag.setDescription(description);
-        diag.setSelectedSymptoms(selectedSymptoms.toString());
-        diag.setMedecinId(doctorId);
-        diag.setPatientId(1);
-        diag.setDossierMedicalId(1);
-        diag.setZoneCorps(selectedZoneCorps);
-        diag.setDateSymptomes(Date.valueOf(LocalDate.now()));
-        diag.setStatus(0);
-
-        ServiceDiagnostique.saveDiagnosis(diag);
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Diagnostic effectué");
-        alert.setHeaderText(null);
-        alert.setContentText("Le diagnostic a été effectué avec succès !");
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                // Now, navigate to the home screen
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
-                    Parent root = loader.load();
-                    Stage stage = (Stage) resultLabel.getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    resultLabel.setText("❌ Une erreur est survenue lors du changement de page.");
-                }
+        // Check if doctors are found, and add them to the ComboBox
+        if (!matchingDoctors.isEmpty()) {
+            ObservableList<String> doctorNames = FXCollections.observableArrayList();
+            for (User doctor : matchingDoctors) {
+                doctorNames.add(doctor.getNom());
             }
-        });
+            doctorComboBox.setItems(doctorNames);
+            resultLabel.setText("Maladie: " + disease);
+        } else {
+            resultLabel.setText(resultLabel.getText() + "\n\nAucun médecin trouvé avec cette spécialité : " + disease);
+        }
     }
 
+        /*int doctorId = doctorIdMap.get(selectedDoctor);
+        Date currentDate = new Date(System.currentTimeMillis());
+        */
+        @FXML
+        private void handleSaveDiagnostique(ActionEvent event) {
+            try {
+                String disease = resultLabel.getText();
+                String description = "Diagnostic généré par le système.";
+                String selectedSymptoms = selectedSymptomsArea.getText();
+                String selectedZoneCorps = zoneCorps.getText();
+                String selectedDoctorName = doctorComboBox.getValue();
+                int doctorId = ServiceUser.findDoctorIdByName(selectedDoctorName);
 
+                System.out.println(selectedDoctorName);
+                System.out.println(doctorId);
+                System.out.println(selectedSymptoms);
+                System.out.println(disease);
+
+                if (doctorId == -1 || selectedSymptoms.isEmpty() || disease.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Données manquantes");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Veuillez remplir toutes les informations nécessaires avant de sauvegarder.");
+                    alert.show();
+                    return;
+                }
+
+                Diagnostique diag = new Diagnostique();
+                diag.setNom(disease);
+                diag.setDescription(description);
+                diag.setSelectedSymptoms(selectedSymptoms);
+                diag.setMedecinId(doctorId);
+                diag.setPatientId(1);
+                diag.setDossierMedicalId(1);
+                diag.setZoneCorps(selectedZoneCorps);
+                diag.setDateSymptomes(Date.valueOf(LocalDate.now()));
+                diag.setStatus(0);
+
+                ServiceDiagnostique.saveDiagnosis(diag);
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Diagnostic effectué");
+                alert.setHeaderText(null);
+                alert.setContentText("Le diagnostic a été effectué avec succès !");
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        try {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
+                            Parent root = loader.load();
+                            Stage stage = (Stage) resultLabel.getScene().getWindow();
+                            stage.setScene(new Scene(root));
+                            stage.show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            resultLabel.setText("❌ Une erreur est survenue lors du changement de page.");
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur");
+                alert.setHeaderText(null);
+                alert.setContentText("Une erreur est survenue lors de l'enregistrement du diagnostic.");
+                alert.show();
+            }
+        }
 
     //////
 
