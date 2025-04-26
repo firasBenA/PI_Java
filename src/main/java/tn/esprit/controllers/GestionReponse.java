@@ -124,7 +124,7 @@ public class GestionReponse {
             cardPane.getChildren().add(card);
         }
     }
-//
+
     private VBox createReclamationCard(Reclamation reclamation) {
         VBox card = new VBox(10);
         card.getStyleClass().add("card");
