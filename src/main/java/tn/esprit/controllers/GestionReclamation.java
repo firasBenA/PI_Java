@@ -42,7 +42,6 @@ public class GestionReclamation {
         data = FXCollections.observableArrayList(sr.getAll());
         listViewReclamations.setItems(data);
 
-        // Afficher chaque réclamation sous forme de texte simple
         listViewReclamations.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Reclamation item, boolean empty) {
