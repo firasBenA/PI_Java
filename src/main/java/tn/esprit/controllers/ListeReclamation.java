@@ -248,7 +248,7 @@ public class ListeReclamation {
         dialogContent.getChildren().addAll(dialogTitle, descriptionText, buttonContainer);
 
         Scene dialogScene = new Scene(dialogContent, 500, 350);
-        java.net.URL cssUrl = getClass().getResource("/tn/esprit/styles/styles.css");
+        java.net.URL cssUrl = getClass().getResource("/styles.css");
         if (cssUrl != null) {
             dialogScene.getStylesheets().add(cssUrl.toExternalForm());
         } else {
