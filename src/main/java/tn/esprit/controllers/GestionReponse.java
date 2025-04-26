@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import tn.esprit.models.Reclamation;
 import tn.esprit.models.Reponse;
+import tn.esprit.services.MailService;
 import tn.esprit.services.ServiceReclamation;
 import tn.esprit.services.ServiceReponse;
 import tn.esprit.utils.MyDataBase;
@@ -54,6 +55,7 @@ public class GestionReponse {
     @FXML
     private Label pageLabel;
 
+    private final MailService mailService = new MailService();
     private final ServiceReclamation serviceReclamation = new ServiceReclamation();
     private final ServiceReponse serviceReponse = new ServiceReponse();
     private ObservableList<Reclamation> observableReclamations;
@@ -62,6 +64,7 @@ public class GestionReponse {
     private int currentPage = 1;
     private final int itemsPerPage = 3;
     private static final int DESCRIPTION_DISPLAY_LIMIT = 110;
+    private static final String STATIC_RECIPIENT_EMAIL = "mechket.mlayeh@gmail.com"; // Static email for testing
 
     @FXML
     public void initialize() {
@@ -280,7 +283,7 @@ public class GestionReponse {
                 dialogPane.getStylesheets().add(cssUrl.toExternalForm());
                 dialogPane.getStyleClass().add("sweet-alert");
             }
-
+            
             Optional<ButtonType> result = confirmationAlert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 Connection cnx = MyDataBase.getInstance().getCnx();
@@ -290,6 +293,15 @@ public class GestionReponse {
                     selectedReclamation.setEtat("Traité");
                     serviceReclamation.update(selectedReclamation);
                     cnx.commit();
+                    // Send email notification
+                    mailService.sendEmail(
+                            STATIC_RECIPIENT_EMAIL,
+                            selectedReclamation.getSujet(),
+                            selectedReclamation.getSujet(),
+                            contenu,
+                            date.toString()
+                    );
+
                     showAlert("Succès", "Réponse ajoutée avec la date : " + date.toString() + " ! La réclamation est maintenant marquée comme Traité.");
                     clearFields();
                     loadReclamations();
