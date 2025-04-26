@@ -283,7 +283,7 @@ public class GestionReponse {
                 dialogPane.getStylesheets().add(cssUrl.toExternalForm());
                 dialogPane.getStyleClass().add("sweet-alert");
             }
-            
+
             Optional<ButtonType> result = confirmationAlert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 Connection cnx = MyDataBase.getInstance().getCnx();
