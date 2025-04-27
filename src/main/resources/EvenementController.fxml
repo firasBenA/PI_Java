@@ -4,14 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionEvenements" style="-fx-background-color: #f0f0f0;">
-    <!-- Sidebar on the left -->
-    <left>
-        <VBox style="-fx-background-color: #2c3e50; -fx-padding: 10;" spacing="10" alignment="CENTER">
-            <Label text="Tableau de Bord Patient" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 10;"/>
-            <Button fx:id="evenementButton" text="Événements" onAction="#showEvenements" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px;" prefWidth="150"/>
-            <Button fx:id="articleButton" text="Articles" onAction="#showArticles" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px;" prefWidth="150"/>
-        </VBox>
-    </left>
+
 
     <!-- Main content area on the right -->
     <center>

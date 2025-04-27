@@ -1,30 +1,28 @@
 package tn.esprit.controllers;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.json.JSONObject;
-import tn.esprit.models.Article;
+import javafx.scene.layout.*;
+import javafx.scene.web.WebView;
 import tn.esprit.models.Evenement;
+import tn.esprit.models.Article;
 import tn.esprit.services.ServiceArticle;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 
 public class EventDetailsController {
 
@@ -45,8 +43,6 @@ public class EventDetailsController {
     @FXML
     private Label dateLabel;
     @FXML
-    private ImageView qrCodeImage;
-    @FXML
     private VBox relatedArticlesSection;
     @FXML
     private Button showRelatedArticlesButton;
@@ -55,43 +51,114 @@ public class EventDetailsController {
     @FXML
     private HBox relatedArticlesBox;
     @FXML
-    private ImageView mapImage;
+    private ImageView qrCodeImageView;
+    @FXML
+    private StackPane mapPlaceholder;
+    @FXML
+    private HBox weatherBox;
+    @FXML
+    private ImageView weatherIcon;
     @FXML
     private Label weatherLabel;
 
     private ServiceArticle serviceArticle;
     private Evenement event;
+    private String WEATHER_API_KEY;
+    private String ORS_API_KEY;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
-    // Replace with your API keys
-    private static final String GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
-    private static final String OPENWEATHERMAP_API_KEY = "YOUR_OPENWEATHERMAP_API_KEY";
-    private final OkHttpClient client = new OkHttpClient();
+    @FXML
+    public void initialize() {
+        System.out.println("EventDetailsController initialized");
+        System.out.println("titleLabel: " + titleLabel);
+        System.out.println("mapPlaceholder: " + mapPlaceholder);
+        if (relatedArticlesScrollPane != null) {
+            relatedArticlesScrollPane.setVisible(false);
+        }
+        loadApiKeys();
+    }
+
+    private void loadApiKeys() {
+        try {
+            Properties props = new Properties();
+            props.load(getClass().getResourceAsStream("/config.properties"));
+            WEATHER_API_KEY = props.getProperty("weather.api.key");
+            ORS_API_KEY = props.getProperty("ors.api.key");
+            System.out.println("Loaded API keys: Weather=" + (WEATHER_API_KEY != null) + ", ORS=" + (ORS_API_KEY != null));
+        } catch (Exception e) {
+            System.err.println("Error loading API keys: " + e.getMessage());
+            WEATHER_API_KEY = "";
+            ORS_API_KEY = "";
+        }
+    }
 
     public void setEvent(Evenement event) {
+        System.out.println("Setting event: " + (event != null ? event.getNom() : "null"));
         this.event = event;
         serviceArticle = new ServiceArticle();
         populateDetails();
         generateQRCode();
+        fetchWeatherData();
         loadMap();
-        loadWeather();
     }
 
     private void populateDetails() {
-        titleLabel.setText("Détails de l'Événement: " + event.getNom());
-        nomLabel.setText("Nom: " + event.getNom());
-        contenueLabel.setText("Contenu: " + event.getContenue());
-        typeLabel.setText("Type: " + event.getType());
-        statutLabel.setText("Statut: " + event.getStatut());
-        lieuxLabel.setText("Lieu: " + event.getLieuxEvent());
-        dateLabel.setText("Date: " + event.getDateEvent().toString());
+        if (event != null) {
+            Platform.runLater(() -> {
+                titleLabel.setText("Détails de l'Événement: " + event.getNom());
+                nomLabel.setText("Nom: " + event.getNom());
+                contenueLabel.setText("Contenu: " + event.getContenue());
+                typeLabel.setText("Type: " + event.getType());
+                statutLabel.setText("Statut: " + event.getStatut());
+                lieuxLabel.setText("Lieu: " + event.getLieuxEvent());
+                dateLabel.setText("Date: " + event.getDateEvent().toString());
+            });
+        }
+    }
+
+    private void fetchWeatherData() {
+        if (event == null || event.getLieuxEvent() == null || event.getLieuxEvent().isEmpty()) {
+            Platform.runLater(() -> weatherLabel.setText("Lieu non spécifié"));
+            return;
+        }
+        if (WEATHER_API_KEY == null || WEATHER_API_KEY.isEmpty()) {
+            Platform.runLater(() -> weatherLabel.setText("Clé API météo manquante"));
+            return;
+        }
+
+        String location = event.getLieuxEvent();
+        String url = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s", URLEncoder.encode(location, StandardCharsets.UTF_8), WEATHER_API_KEY);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response.statusCode() == 200) {
+                        JSONObject json = new JSONObject(response.body());
+                        String description = json.getJSONArray("weather").getJSONObject(0).getString("description");
+                        double temp = json.getJSONObject("main").getDouble("temp");
+                        String iconCode = json.getJSONArray("weather").getJSONObject(0).getString("icon");
+                        String iconUrl = String.format("http://openweathermap.org/img/wn/%s@2x.png", iconCode);
+
+                        Platform.runLater(() -> {
+                            weatherLabel.setText(String.format("%s, %.1f°C", description, temp));
+                            weatherIcon.setImage(new Image(iconUrl));
+                        });
+                    } else {
+                        Platform.runLater(() -> weatherLabel.setText("Erreur lors de la récupération de la météo"));
+                    }
+                })
+                .exceptionally(throwable -> {
+                    Platform.runLater(() -> weatherLabel.setText("Erreur: " + throwable.getMessage()));
+                    return null;
+                });
     }
 
     @FXML
     private void showRelatedArticles() {
-        // Clear previous content
         relatedArticlesBox.getChildren().clear();
-
-        // Fetch related articles
         List<Article> relatedArticles = serviceArticle.getRelatedArticles(event);
         if (relatedArticles.isEmpty()) {
             Label noArticlesLabel = new Label("Aucun article associé.");
@@ -115,79 +182,85 @@ public class EventDetailsController {
                 relatedArticlesBox.getChildren().add(articleCard);
             }
         }
-
-        // Show the articles and hide the button
         relatedArticlesScrollPane.setVisible(true);
         showRelatedArticlesButton.setVisible(false);
     }
 
     private void generateQRCode() {
-        try {
-            String eventUrl = "https://yourapp.com/event/" + event.getId();
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(eventUrl, BarcodeFormat.QR_CODE, 150, 150);
-
-            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(pngOutputStream.toByteArray());
-
-            Image qrImage = new Image(inputStream);
-            qrCodeImage.setImage(qrImage);
-        } catch (WriterException | IOException e) {
-            System.err.println("Error generating QR code: " + e.getMessage());
-            qrCodeImage.setImage(new Image("https://via.placeholder.com/150?text=QR+Code+Erreur"));
+        // Placeholder for QR Code generation
+        if (qrCodeImageView != null) {
+            qrCodeImageView.setImage(null); // Placeholder
         }
+    }
+
+    private double[] geocodeLocation(String location) {
+        if (ORS_API_KEY == null || ORS_API_KEY.isEmpty()) {
+            System.err.println("Clé API ORS manquante");
+            return null;
+        }
+        try {
+            String url = String.format("https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s&size=1", ORS_API_KEY, URLEncoder.encode(location, StandardCharsets.UTF_8));
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Accept", "application/json")
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JSONObject json = new JSONObject(response.body());
+                JSONArray features = json.getJSONArray("features");
+                if (!features.isEmpty()) {
+                    JSONObject geometry = features.getJSONObject(0).getJSONObject("geometry");
+                    JSONArray coordinates = geometry.getJSONArray("coordinates");
+                    double lon = coordinates.getDouble(0);
+                    double lat = coordinates.getDouble(1);
+                    return new double[]{lat, lon};
+                }
+            }
+            System.err.println("Geocoding failed: " + response.body());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void loadMap() {
-        try {
-            String location = event.getLieuxEvent().replace(" ", "+");
-            String mapUrl = String.format(
-                    "https://maps.googleapis.com/maps/api/staticmap?center=%s&zoom=14&size=300x200&maptype=roadmap&key=%s",
-                    location, GOOGLE_MAPS_API_KEY
-            );
-
-            Request request = new Request.Builder().url(mapUrl).build();
-            try (Response response = client.newCall(request).execute()) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ByteArrayInputStream inputStream = new ByteArrayInputStream(response.body().bytes());
-                    Image map = new Image(inputStream);
-                    mapImage.setImage(map);
-                } else {
-                    throw new IOException("Failed to fetch map image");
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error loading map: " + e.getMessage());
-            mapImage.setImage(new Image("https://via.placeholder.com/300x200?text=Carte+Erreur"));
+        if (event == null || event.getLieuxEvent() == null || event.getLieuxEvent().isEmpty()) {
+            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Lieu non spécifié")));
+            return;
         }
-    }
 
-    private void loadWeather() {
+        double[] coordinates = geocodeLocation(event.getLieuxEvent());
+        if (coordinates == null) {
+            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Impossible de géocoder le lieu")));
+            return;
+        }
+
         try {
-            String location = event.getLieuxEvent().replace(" ", "+");
-            String weatherUrl = String.format(
-                    "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=fr",
-                    location, OPENWEATHERMAP_API_KEY
-            );
-
-            Request request = new Request.Builder().url(weatherUrl).build();
-            try (Response response = client.newCall(request).execute()) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String jsonData = response.body().string();
-                    JSONObject jsonObject = new JSONObject(jsonData);
-                    String description = jsonObject.getJSONArray("weather").getJSONObject(0).getString("description");
-                    double temp = jsonObject.getJSONObject("main").getDouble("temp");
-                    weatherLabel.setText(String.format("Météo à %s: %s, %.1f°C", event.getLieuxEvent(), description, temp));
-                    weatherLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
-                } else {
-                    throw new IOException("Failed to fetch weather data");
-                }
+            // Load the HTML template
+            java.net.URL resourceUrl = getClass().getResource("/ors_map.html");
+            if (resourceUrl == null) {
+                Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Fichier ors_map.html introuvable")));
+                return;
             }
+            String htmlContent = new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
+
+            // Replace placeholders with actual values
+            htmlContent = htmlContent.replace("LATITUDE", String.valueOf(coordinates[0]))
+                    .replace("LONGITUDE", String.valueOf(coordinates[1]))
+                    .replace("LOCATION_NAME", event.getLieuxEvent());
+
+            // Create and configure WebView
+            WebView webView = new WebView();
+            webView.getEngine().loadContent(htmlContent);
+            webView.setPrefSize(504, 250);
+            webView.getEngine().setOnError(event -> System.err.println("WebView error: " + event.getMessage()));
+
+            // Add WebView to mapPlaceholder
+            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(webView));
         } catch (Exception e) {
-            System.err.println("Error loading weather: " + e.getMessage());
-            weatherLabel.setText("Erreur lors du chargement de la météo");
-            weatherLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #e74c3c;");
+            e.printStackTrace();
+            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Erreur lors du chargement de la carte: " + e.getMessage())));
         }
     }
 }

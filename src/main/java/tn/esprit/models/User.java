@@ -33,6 +33,12 @@ public class User {
     private String socialProvider; // e.g., "google"
     private String socialAccessToken;
 
+
+    public User(int id, String username) {
+        this.id = id;
+        this.nom = nom;
+    }
+
     public User() {
         this.createdAt = LocalDateTime.now();
         this.userType = determineUserType();

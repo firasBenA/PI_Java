@@ -55,6 +55,14 @@ public class MainController {
         loadUI("GestionReponse");
     }
 
+    public void goGestionEvenements() {
+        loadUI("GestionEvenements");
+    }
+
+    public void goGestionArticles() {
+        loadUI("GestionArticles");
+    }
+
     public void goGestionPatient() {
         loadUI("PatientDashboard");
     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<ScrollPane fx:id="contentArea" fitToWidth="true" fitToHeight="true" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionArticles">
+    <content>
+        <VBox fx:id="contentVBox" spacing="10" style="-fx-padding: 10;">
+            <children>
+                <Label fx:id="titleLabel" text="Articles" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <GridPane fx:id="articlesGrid" hgap="20" vgap="20" style="-fx-padding: 10;" />
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>
