@@ -1,9 +1,12 @@
 package tn.esprit.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Node;
+import tn.esprit.services.AuthService;
+import tn.esprit.utils.SceneManager;
 import java.io.IOException;
 
 public class MainController {
@@ -11,66 +14,95 @@ public class MainController {
     @FXML
     private StackPane contentArea;
 
+    private AuthService authService;
+    private SceneManager sceneManager;
+
+    // Setters for dependencies
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
     @FXML
     public void initialize() {
-        // Load home page by default
-        loadUI("Home");
+        // Load login page by default
+        loadUI("login");
     }
 
     public void goHome() {
-        loadUI("Home");
+        loadUI("login");
     }
 
     public void goDiagnostique() {
         loadUI("GestionDiagnostique");
     }
-
     public void goPrescription() {
-        loadUI("GestionPrescription");
+        loadUI("GestionPrescription"); // Assuming you have this FXML already
     }
 
     public void goGestionMedecin() {
-        loadUI("MedecinPrescDiag");
+        loadUI("MedecinPrescDiag"); // Assuming you have this FXML already
     }
-
     public void goGestionReclamation() {
-        loadUI("ListeReclamation");
+        loadUI("ListeReclamation"); // Assuming you have this FXML already
     }
-
     public void goGestionReponse() {
-        loadUI("GestionReponse");
+        loadUI("GestionReponse"); // Assuming you have this FXML already
     }
-
     public void goGestionPatient() {
-        loadUI("PatientDashboard");
+        loadUI("PatientDashboard"); // Assuming you have this FXML already
     }
 
     public void goStatistiques() {
         loadUI("Statistiques");
     }
 
+
     public void handleLogout() {
         System.out.println("Déconnexion...");
+        loadUI("login");
     }
+
 
     private void loadUI(String fxml) {
         try {
-            String fxmlPath = "/" + fxml + ".fxml";
-            System.out.println("Loading FXML from path: " + fxmlPath);
-            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
-            if (fxmlLocation == null) {
-                throw new IOException("Cannot find FXML file at " + fxmlPath);
-            }
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            System.out.println("Loading FXML: /" + fxml + ".fxml");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/" + fxml + ".fxml"));
             Node node = loader.load();
-            if (contentArea != null) {
-                contentArea.getChildren().setAll(node);
-            } else {
-                System.out.println("Error: contentArea is null. Cannot load UI.");
+
+            // Initialize LoginController for login.fxml
+            if ("login".equals(fxml)) {
+                LoginController controller = loader.getController();
+                if (controller == null) {
+                    System.err.println("LoginController is null. Check login.fxml controller binding.");
+                    return;
+                }
+                if (authService == null || sceneManager == null) {
+                    System.err.println("authService or sceneManager is null in MainController.");
+                    return;
+                }
+                System.out.println("Setting authService and sceneManager for LoginController");
+                controller.setAuthService(authService);
+                controller.setSceneManager(sceneManager);
             }
+
+            if (contentArea == null) {
+                System.err.println("contentArea is null in MainController.");
+                return;
+            }
+            contentArea.getChildren().setAll(node);
         } catch (IOException e) {
+            System.err.println("Error loading FXML: /" + fxml + ".fxml");
             e.printStackTrace();
-            System.err.println("Failed to load FXML: " + fxml + ".fxml - " + e.getMessage());
         }
+    }
+
+    public void goGestionEvenements(ActionEvent actionEvent) {
+    }
+
+    public void goGestionArticles(ActionEvent actionEvent) {
     }
 }

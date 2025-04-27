@@ -30,6 +30,17 @@ public class MyDataBase {
     }
 
     public Connection getCnx() {
+        try {
+            if (cnx == null || cnx.isClosed()) {
+                System.out.println("Reconnecting to database...");
+                cnx = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                System.out.println("Reconnected to database: ehealth_database");
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to reconnect: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to reconnect to database", e);
+        }
         return cnx;
     }
 }

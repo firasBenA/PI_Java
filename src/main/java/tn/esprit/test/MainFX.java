@@ -5,28 +5,39 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.IOException;
+import tn.esprit.controllers.MainController;
+import tn.esprit.repository.UserRepositoryImpl;
+import tn.esprit.services.AuthService;
+import tn.esprit.utils.SceneManager;
 
 public class MainFX extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        // Initialize AuthService
+        AuthService authService = new AuthService(new UserRepositoryImpl());
+
+        // Initialize SceneManager
+        SceneManager sceneManager = new SceneManager(primaryStage, authService);
+
+        // Load Main.fxml and initialize MainController
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
+        Parent root = loader.load();
+
+        // Initialize MainController with dependencies
+        MainController controller = loader.getController();
+        if (controller == null) {
+            throw new IllegalStateException("MainController is null. Check Main.fxml controller binding.");
+        }
+        controller.setAuthService(authService);
+        controller.setSceneManager(sceneManager);
+
+        primaryStage.setTitle("Ajouter Réclamation");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-
-        FXMLLoader loader =new FXMLLoader(getClass().getResource("/Main.fxml"));
-        try {
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("---- Gestion Personne -----");
-            primaryStage.show();
-
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+    public static void main(String[] args) {
+        launch(args);
     }
 }
