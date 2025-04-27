@@ -6,6 +6,7 @@ tn\esprit\controllers\MedecinPrescDiag$1.class
 tn\esprit\controllers\GestionReponse.class
 tn\esprit\controllers\MainController.class
 tn\esprit\test\TestMain.class
+tn\esprit\utils\BadWordsFilter.class
 tn\esprit\controllers\HomeController.class
 tn\esprit\controllers\ModifierPrescriptionController.class
 tn\esprit\interfaces\IService.class

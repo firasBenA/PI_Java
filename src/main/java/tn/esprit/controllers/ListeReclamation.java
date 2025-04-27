@@ -18,6 +18,7 @@ import tn.esprit.models.Reclamation;
 import tn.esprit.models.Reponse;
 import tn.esprit.services.ServiceReclamation;
 import tn.esprit.services.ServiceReponse;
+import tn.esprit.utils.BadWordsFilter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -76,12 +77,22 @@ public class ListeReclamation {
                 TFsujet.setText(oldValue);
                 showAlert("Avertissement", "Le sujet ne peut pas dépasser " + MAX_SUJET_LENGTH + " caractères !");
             }
+            String badWord = BadWordsFilter.containsBadWord(newValue);
+            if (badWord != null) {
+                TFsujet.setText(oldValue);
+                showAlert("Erreur", "Le mot interdit '" + badWord + "' n'est pas autorisé dans le sujet !");
+            }
         });
 
         TFdescription.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > MAX_DESCRIPTION_LENGTH) {
                 TFdescription.setText(oldValue);
                 showAlert("Avertissement", "La description ne peut pas dépasser " + MAX_DESCRIPTION_LENGTH + " caractères !");
+            }
+            String badWord = BadWordsFilter.containsBadWord(newValue);
+            if (badWord != null) {
+                TFdescription.setText(oldValue);
+                showAlert("Erreur", "Le mot interdit '" + badWord + "' n'est pas autorisé dans la description !");
             }
         });
 
@@ -413,6 +424,16 @@ public class ListeReclamation {
                 showAlert("Erreur", "Ce sujet existe déjà ! Veuillez choisir un sujet unique.");
                 return;
             }
+            String badWord = BadWordsFilter.containsBadWord(sujet);
+            if (badWord != null) {
+                showAlert("Erreur", "Le sujet contient le mot interdit '" + badWord + "' !");
+                return;
+            }
+            badWord = BadWordsFilter.containsBadWord(description);
+            if (badWord != null) {
+                showAlert("Erreur", "La description contient le mot interdit '" + badWord + "' !");
+                return;
+            }
 
             Reclamation r = new Reclamation(sujet, description, date, null, 1);
             service.add(r);
@@ -476,6 +497,16 @@ public class ListeReclamation {
 
             if (isSujetDuplicate(sujet, id)) {
                 showAlert("Erreur", "Ce sujet existe déjà ! Veuillez choisir un sujet unique.");
+                return;
+            }
+            String badWord = BadWordsFilter.containsBadWord(sujet);
+            if (badWord != null) {
+                showAlert("Erreur", "Le sujet contient le mot interdit '" + badWord + "' !");
+                return;
+            }
+            badWord = BadWordsFilter.containsBadWord(description);
+            if (badWord != null) {
+                showAlert("Erreur", "La description contient le mot interdit '" + badWord + "' !");
                 return;
             }
 
