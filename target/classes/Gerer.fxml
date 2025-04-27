@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.GererController">
+    <tabs>
+        <!-- Tab for Evenements -->
+        <Tab text="Événements" closable="false">
+            <content>
+                <AnchorPane>
+                    <TableView fx:id="evenementTable" layoutX="10" layoutY="10" prefWidth="600">
+                        <columns>
+                            <TableColumn fx:id="evenementIdColumn" text="ID" prefWidth="50" />
+                            <TableColumn fx:id="evenementNomColumn" text="Nom" prefWidth="100" />
+                            <TableColumn fx:id="evenementContenueColumn" text="Contenu" prefWidth="150" />
+                            <TableColumn fx:id="evenementTypeColumn" text="Type" prefWidth="100" />
+                            <TableColumn fx:id="evenementStatutColumn" text="Statut" prefWidth="100" />
+                            <TableColumn fx:id="evenementLieuxColumn" text="Lieu" prefWidth="100" />
+                            <TableColumn fx:id="evenementDateColumn" text="Date" prefWidth="100" />
+                        </columns>
+                    </TableView>
+                    <VBox layoutX="620" layoutY="10" spacing="10">
+                        <TextField fx:id="evenementNomField" promptText="Nom" />
+                        <TextArea fx:id="evenementContenueField" promptText="Contenu" prefHeight="100" />
+                        <TextField fx:id="evenementTypeField" promptText="Type" />
+                        <TextField fx:id="evenementStatutField" promptText="Statut" />
+                        <TextField fx:id="evenementLieuxField" promptText="Lieu" />
+                        <DatePicker fx:id="evenementDateField" promptText="Date" />
+                        <Label fx:id="evenementErrorLabel" style="-fx-text-fill: red;" />
+                        <HBox spacing="10">
+                            <Button text="Ajouter" onAction="#addEvenement" />
+                            <Button text="Modifier" onAction="#updateEvenement" />
+                            <Button text="Supprimer" onAction="#deleteEvenement" />
+                            <Button text="Effacer" onAction="#clearEvenementFields" />
+                        </HBox>
+                    </VBox>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <!-- Tab for Articles -->
+        <Tab text="Articles" closable="false">
+            <content>
+                <AnchorPane>
+                    <TableView fx:id="articleTable" layoutX="10" layoutY="10" prefWidth="600">
+                        <columns>
+                            <TableColumn fx:id="articleIdColumn" text="ID" prefWidth="50" />
+                            <TableColumn fx:id="articleTitreColumn" text="Titre" prefWidth="150" />
+                            <TableColumn fx:id="articleContenueColumn" text="Contenu" prefWidth="300" />
+                            <TableColumn fx:id="articleImageColumn" text="Image" prefWidth="100" />
+                        </columns>
+                    </TableView>
+                    <VBox layoutX="620" layoutY="10" spacing="10">
+                        <TextField fx:id="articleTitreField" promptText="Titre" />
+                        <TextArea fx:id="articleContenueField" promptText="Contenu" prefHeight="100" />
+                        <TextField fx:id="articleImageField" promptText="Chemin de l'image" />
+                        <Label fx:id="articleErrorLabel" style="-fx-text-fill: red;" />
+                        <HBox spacing="10">
+                            <Button text="Ajouter" onAction="#addArticle" />
+                            <Button text="Modifier" onAction="#updateArticle" />
+                            <Button text="Supprimer" onAction="#deleteArticle" />
+                            <Button text="Effacer" onAction="#clearArticleFields" />
+                        </HBox>
+                    </VBox>
+                </AnchorPane>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>

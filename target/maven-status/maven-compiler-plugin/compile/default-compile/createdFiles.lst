@@ -57,6 +57,7 @@ tn\esprit\controllers\GestionRendezVous.class
 tn\esprit\interfaces\IService.class
 tn\esprit\models\Article.class
 tn\esprit\controllers\ListeConsultationsController$1.class
+tn\esprit\controllers\GererController.class
 tn\esprit\controllers\AjouterPrescriptionDepuisDiag.class
 tn\esprit\controllers\GestionReclamation$1.class
 tn\esprit\models\User.class
