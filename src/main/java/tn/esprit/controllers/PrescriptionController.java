@@ -147,23 +147,17 @@ public class PrescriptionController {
     @FXML
     private void handleDownloadPrescription() {
         try {
-            // Find the Downloads folder dynamically
             String userHome = System.getProperty("user.home");
             String downloadsPath = userHome + File.separator + "Downloads";
 
-            // File name
             String fileName = "Prescription_" + System.currentTimeMillis() + ".pdf";
 
-            // Full path
             String dest = downloadsPath + File.separator + fileName;
 
-            // Create PdfWriter instance
             PdfWriter writer = new PdfWriter(dest);
 
-            // Create PdfDocument instance
             PdfDocument pdf = new PdfDocument(writer);
 
-            // Create Document instance
             Document document = new Document(pdf);
             document.add(new Paragraph("Prescription Médicale")
                     .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
