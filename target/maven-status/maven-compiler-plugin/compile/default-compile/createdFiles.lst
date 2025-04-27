@@ -27,6 +27,7 @@ tn\esprit\controllers\HomeController.class
 tn\esprit\controllers\ModifierPrescriptionController.class
 tn\esprit\controllers\RegisterController$GoogleTokenResponse.class
 tn\esprit\controllers\GestionListeRdv.class
+tn\esprit\controllers\GererController$1.class
 tn\esprit\test\Main.class
 tn\esprit\models\Patient.class
 tn\esprit\repository\UserRepository.class
@@ -35,6 +36,7 @@ tn\esprit\models\Reclamation.class
 tn\esprit\controllers\RegisterController$GoogleUserInfo.class
 tn\esprit\services\ServiceReponse.class
 tn\esprit\controllers\EvenementController.class
+tn\esprit\controllers\GererController$2.class
 tn\esprit\controllers\GestionReponse.class
 tn\esprit\controllers\ModifierRendezVousController.class
 tn\esprit\test\TestMain.class

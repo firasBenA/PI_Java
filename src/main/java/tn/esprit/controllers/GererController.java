@@ -2,18 +2,19 @@ package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import tn.esprit.models.Evenement;
 import tn.esprit.models.Article;
 import tn.esprit.services.ServiceEvenement;
 import tn.esprit.services.ServiceArticle;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GererController {
 
-    // Evenement UI elements
     @FXML
     private TextField evenementNomField;
     @FXML
@@ -29,23 +30,8 @@ public class GererController {
     @FXML
     private Label evenementErrorLabel;
     @FXML
-    private TableView<Evenement> evenementTable;
-    @FXML
-    private TableColumn<Evenement, Integer> evenementIdColumn;
-    @FXML
-    private TableColumn<Evenement, String> evenementNomColumn;
-    @FXML
-    private TableColumn<Evenement, String> evenementContenueColumn;
-    @FXML
-    private TableColumn<Evenement, String> evenementTypeColumn;
-    @FXML
-    private TableColumn<Evenement, String> evenementStatutColumn;
-    @FXML
-    private TableColumn<Evenement, String> evenementLieuxColumn;
-    @FXML
-    private TableColumn<Evenement, LocalDate> evenementDateColumn;
+    private VBox evenementContainer;
 
-    // Article UI elements
     @FXML
     private TextField articleTitreField;
     @FXML
@@ -53,75 +39,74 @@ public class GererController {
     @FXML
     private TextField articleImageField;
     @FXML
+    private ComboBox<Evenement> articleEvenementCombo;
+    @FXML
     private Label articleErrorLabel;
     @FXML
-    private TableView<Article> articleTable;
-    @FXML
-    private TableColumn<Article, Integer> articleIdColumn;
-    @FXML
-    private TableColumn<Article, String> articleTitreColumn;
-    @FXML
-    private TableColumn<Article, String> articleContenueColumn;
-    @FXML
-    private TableColumn<Article, String> articleImageColumn;
+    private VBox articleContainer;
 
     private ServiceEvenement serviceEvenement;
     private ServiceArticle serviceArticle;
     private Evenement selectedEvenement;
     private Article selectedArticle;
+    private List<Evenement> tempEvenementList;
 
     @FXML
     public void initialize() {
         serviceEvenement = new ServiceEvenement();
         serviceArticle = new ServiceArticle();
-
-        // Set up Evenement table columns
-        evenementIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        evenementNomColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        evenementContenueColumn.setCellValueFactory(new PropertyValueFactory<>("contenue"));
-        evenementTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        evenementStatutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
-        evenementLieuxColumn.setCellValueFactory(new PropertyValueFactory<>("lieuxEvent"));
-        evenementDateColumn.setCellValueFactory(new PropertyValueFactory<>("dateEvent"));
-
-        // Set up Article table columns
-        articleIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        articleTitreColumn.setCellValueFactory(new PropertyValueFactory<>("titre"));
-        articleContenueColumn.setCellValueFactory(new PropertyValueFactory<>("contenue"));
-        articleImageColumn.setCellValueFactory(new PropertyValueFactory<>("image"));
-
-        // Load data into tables
+        tempEvenementList = new ArrayList<>();
+        updateEvenementCombo();
         loadEvenements();
         loadArticles();
-
-        // Add listeners for table selections
-        evenementTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                selectedEvenement = newSelection;
-                evenementNomField.setText(selectedEvenement.getNom());
-                evenementContenueField.setText(selectedEvenement.getContenue());
-                evenementTypeField.setText(selectedEvenement.getType());
-                evenementStatutField.setText(selectedEvenement.getStatut());
-                evenementLieuxField.setText(selectedEvenement.getLieuxEvent());
-                evenementDateField.setValue(selectedEvenement.getDateEvent());
-            }
-        });
-
-        articleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                selectedArticle = newSelection;
-                articleTitreField.setText(selectedArticle.getTitre());
-                articleContenueField.setText(selectedArticle.getContenue());
-                articleImageField.setText(selectedArticle.getImage());
+        articleEvenementCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null && !tempEvenementList.contains(newValue)) {
+                tempEvenementList.add(newValue);
+                articleErrorLabel.setText("Événements sélectionnés : " +
+                        String.join(", ", tempEvenementList.stream().map(Evenement::getNom).toList()));
+                articleErrorLabel.setStyle("-fx-text-fill: black;");
+                articleEvenementCombo.getSelectionModel().clearSelection();
             }
         });
     }
 
-    // Evenement CRUD methods
     private void loadEvenements() {
+        evenementContainer.getChildren().clear();
         List<Evenement> evenements = serviceEvenement.getAll();
-        evenementTable.getItems().clear();
-        evenementTable.getItems().addAll(evenements);
+        for (Evenement evenement : evenements) {
+            HBox card = createEvenementCard(evenement);
+            evenementContainer.getChildren().add(card);
+        }
+        updateEvenementCombo();
+    }
+
+    private HBox createEvenementCard(Evenement evenement) {
+        HBox card = new HBox(10);
+        card.setUserData(evenement);
+        card.setOnMouseClicked(event -> selectEvenement(evenement));
+        card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);"));
+        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"));
+        VBox details = new VBox(5);
+        details.getChildren().addAll(
+                new Label("Nom: " + truncate(evenement.getNom(), 30)),
+                new Label("Type: " + truncate(evenement.getType(), 30)),
+                new Label("Statut: " + truncate(evenement.getStatut(), 30)),
+                new Label("Lieu: " + truncate(evenement.getLieuxEvent(), 30)),
+                new Label("Date: " + evenement.getDateEvent())
+        );
+        card.getChildren().add(details);
+        return card;
+    }
+
+    private void selectEvenement(Evenement evenement) {
+        selectedEvenement = evenement;
+        evenementNomField.setText(evenement.getNom());
+        evenementContenueField.setText(evenement.getContenue());
+        evenementTypeField.setText(evenement.getType());
+        evenementStatutField.setText(evenement.getStatut());
+        evenementLieuxField.setText(evenement.getLieuxEvent());
+        evenementDateField.setValue(evenement.getDateEvent());
     }
 
     @FXML
@@ -129,7 +114,6 @@ public class GererController {
         if (!validateEvenementInputs()) {
             return;
         }
-
         Evenement evenement = new Evenement();
         evenement.setNom(evenementNomField.getText());
         evenement.setContenue(evenementContenueField.getText());
@@ -137,7 +121,6 @@ public class GererController {
         evenement.setStatut(evenementStatutField.getText());
         evenement.setLieuxEvent(evenementLieuxField.getText());
         evenement.setDateEvent(evenementDateField.getValue());
-
         serviceEvenement.add(evenement);
         loadEvenements();
         clearEvenementFields();
@@ -150,18 +133,15 @@ public class GererController {
             showEvenementError("Veuillez sélectionner un événement à modifier.");
             return;
         }
-
         if (!validateEvenementInputs()) {
             return;
         }
-
         selectedEvenement.setNom(evenementNomField.getText());
         selectedEvenement.setContenue(evenementContenueField.getText());
         selectedEvenement.setType(evenementTypeField.getText());
         selectedEvenement.setStatut(evenementStatutField.getText());
         selectedEvenement.setLieuxEvent(evenementLieuxField.getText());
         selectedEvenement.setDateEvent(evenementDateField.getValue());
-
         serviceEvenement.update(selectedEvenement);
         loadEvenements();
         clearEvenementFields();
@@ -174,7 +154,6 @@ public class GererController {
             showEvenementError("Veuillez sélectionner un événement à supprimer.");
             return;
         }
-
         serviceEvenement.delete(selectedEvenement);
         loadEvenements();
         clearEvenementFields();
@@ -218,6 +197,10 @@ public class GererController {
             showEvenementError("La date ne peut pas être vide.");
             return false;
         }
+        if (!evenementDateField.getValue().isAfter(LocalDate.now())) {
+            showEvenementError("Ce champ doit être ultérieur à aujourd'hui.");
+            return false;
+        }
         return true;
     }
 
@@ -231,11 +214,66 @@ public class GererController {
         evenementErrorLabel.setStyle("-fx-text-fill: green;");
     }
 
-    // Article CRUD methods
     private void loadArticles() {
+        articleContainer.getChildren().clear();
         List<Article> articles = serviceArticle.getAll();
-        articleTable.getItems().clear();
-        articleTable.getItems().addAll(articles);
+        for (Article article : articles) {
+            HBox card = createArticleCard(article);
+            articleContainer.getChildren().add(card);
+        }
+    }
+
+    private HBox createArticleCard(Article article) {
+        HBox card = new HBox(10);
+        card.setUserData(article);
+        card.setOnMouseClicked(event -> selectArticle(article));
+        card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);"));
+        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"));
+        VBox details = new VBox(5);
+        String evenementsStr = article.getEvenements().isEmpty() ? "Aucun" :
+                String.join(", ", article.getEvenements().stream().map(Evenement::getNom).toList());
+        details.getChildren().addAll(
+                new Label("Titre: " + truncate(article.getTitre(), 30)),
+                new Label("Événements: " + truncate(evenementsStr, 30)),
+                new Label("Image: " + truncate(article.getImage(), 30)),
+                new Label("Likes: " + article.getLikeCount())
+        );
+        card.getChildren().add(details);
+        return card;
+    }
+
+    private void selectArticle(Article article) {
+        selectedArticle = article;
+        articleTitreField.setText(article.getTitre());
+        articleContenueField.setText(article.getContenue());
+        articleImageField.setText(article.getImage());
+        tempEvenementList.clear();
+        tempEvenementList.addAll(article.getEvenements());
+        articleEvenementCombo.getSelectionModel().clearSelection();
+        articleErrorLabel.setText("Événements sélectionnés : " +
+                String.join(", ", tempEvenementList.stream().map(Evenement::getNom).toList()));
+        articleErrorLabel.setStyle("-fx-text-fill: black;");
+    }
+
+    private void updateEvenementCombo() {
+        articleEvenementCombo.getItems().clear();
+        List<Evenement> evenements = serviceEvenement.getAll();
+        articleEvenementCombo.getItems().addAll(evenements);
+        articleEvenementCombo.setCellFactory(param -> new ListCell<Evenement>() {
+            @Override
+            protected void updateItem(Evenement item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getNom());
+            }
+        });
+        articleEvenementCombo.setButtonCell(new ListCell<Evenement>() {
+            @Override
+            protected void updateItem(Evenement item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? "" : item.getNom());
+            }
+        });
     }
 
     @FXML
@@ -243,12 +281,11 @@ public class GererController {
         if (!validateArticleInputs()) {
             return;
         }
-
         Article article = new Article();
         article.setTitre(articleTitreField.getText());
         article.setContenue(articleContenueField.getText());
         article.setImage(articleImageField.getText());
-
+        article.setEvenements(new ArrayList<>(tempEvenementList));
         serviceArticle.add(article);
         loadArticles();
         clearArticleFields();
@@ -261,15 +298,13 @@ public class GererController {
             showArticleError("Veuillez sélectionner un article à modifier.");
             return;
         }
-
         if (!validateArticleInputs()) {
             return;
         }
-
         selectedArticle.setTitre(articleTitreField.getText());
         selectedArticle.setContenue(articleContenueField.getText());
         selectedArticle.setImage(articleImageField.getText());
-
+        selectedArticle.setEvenements(new ArrayList<>(tempEvenementList));
         serviceArticle.update(selectedArticle);
         loadArticles();
         clearArticleFields();
@@ -282,7 +317,6 @@ public class GererController {
             showArticleError("Veuillez sélectionner un article à supprimer.");
             return;
         }
-
         serviceArticle.delete(selectedArticle);
         loadArticles();
         clearArticleFields();
@@ -294,8 +328,11 @@ public class GererController {
         articleTitreField.clear();
         articleContenueField.clear();
         articleImageField.clear();
+        tempEvenementList.clear();
+        articleEvenementCombo.getSelectionModel().clearSelection();
+        articleErrorLabel.setText("Événements sélectionnés : Aucun");
+        articleErrorLabel.setStyle("-fx-text-fill: black;");
         selectedArticle = null;
-        articleErrorLabel.setText("");
     }
 
     private boolean validateArticleInputs() {
@@ -311,6 +348,10 @@ public class GererController {
             showArticleError("Le chemin de l'image ne peut pas être vide.");
             return false;
         }
+        if (tempEvenementList.isEmpty()) {
+            showArticleError("Veuillez associer au moins un événement.");
+            return false;
+        }
         return true;
     }
 
@@ -322,5 +363,9 @@ public class GererController {
     private void showArticleSuccess(String message) {
         articleErrorLabel.setText(message);
         articleErrorLabel.setStyle("-fx-text-fill: green;");
+    }
+
+    private String truncate(String text, int maxLength) {
+        return text.length() > maxLength ? text.substring(0, maxLength) + "..." : text;
     }
 }

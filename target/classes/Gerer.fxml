@@ -1,64 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <TabPane xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.GererController">
     <tabs>
-        <!-- Tab for Evenements -->
         <Tab text="Événements" closable="false">
             <content>
                 <AnchorPane>
-                    <TableView fx:id="evenementTable" layoutX="10" layoutY="10" prefWidth="600">
-                        <columns>
-                            <TableColumn fx:id="evenementIdColumn" text="ID" prefWidth="50" />
-                            <TableColumn fx:id="evenementNomColumn" text="Nom" prefWidth="100" />
-                            <TableColumn fx:id="evenementContenueColumn" text="Contenu" prefWidth="150" />
-                            <TableColumn fx:id="evenementTypeColumn" text="Type" prefWidth="100" />
-                            <TableColumn fx:id="evenementStatutColumn" text="Statut" prefWidth="100" />
-                            <TableColumn fx:id="evenementLieuxColumn" text="Lieu" prefWidth="100" />
-                            <TableColumn fx:id="evenementDateColumn" text="Date" prefWidth="100" />
-                        </columns>
-                    </TableView>
-                    <VBox layoutX="620" layoutY="10" spacing="10">
-                        <TextField fx:id="evenementNomField" promptText="Nom" />
-                        <TextArea fx:id="evenementContenueField" promptText="Contenu" prefHeight="100" />
-                        <TextField fx:id="evenementTypeField" promptText="Type" />
-                        <TextField fx:id="evenementStatutField" promptText="Statut" />
-                        <TextField fx:id="evenementLieuxField" promptText="Lieu" />
-                        <DatePicker fx:id="evenementDateField" promptText="Date" />
-                        <Label fx:id="evenementErrorLabel" style="-fx-text-fill: red;" />
+                    <ScrollPane layoutX="10" layoutY="10" prefWidth="780" prefHeight="300" style="-fx-background-color: #f4f4f4;">
+                        <content>
+                            <VBox fx:id="evenementContainer" spacing="10" style="-fx-padding: 10;" />
+                        </content>
+                    </ScrollPane>
+                    <VBox layoutX="10" layoutY="320" spacing="15" prefWidth="780">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10" />
+                        </padding>
+                        <Label text="Ajouter/Modifier Événement" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
                         <HBox spacing="10">
-                            <Button text="Ajouter" onAction="#addEvenement" />
-                            <Button text="Modifier" onAction="#updateEvenement" />
-                            <Button text="Supprimer" onAction="#deleteEvenement" />
-                            <Button text="Effacer" onAction="#clearEvenementFields" />
+                            <VBox spacing="5" prefWidth="380">
+                                <Label text="Nom" />
+                                <TextField fx:id="evenementNomField" promptText="Nom" prefWidth="380" />
+                                <Label text="Contenu" />
+                                <TextArea fx:id="evenementContenueField" promptText="Contenu" prefHeight="80" prefWidth="380" />
+                                <Label text="Type" />
+                                <TextField fx:id="evenementTypeField" promptText="Type" prefWidth="380" />
+                            </VBox>
+                            <VBox spacing="5" prefWidth="380">
+                                <Label text="Statut" />
+                                <TextField fx:id="evenementStatutField" promptText="Statut" prefWidth="380" />
+                                <Label text="Lieu" />
+                                <TextField fx:id="evenementLieuxField" promptText="Lieu" prefWidth="380" />
+                                <Label text="Date" />
+                                <DatePicker fx:id="evenementDateField" promptText="Date" prefWidth="380" />
+                            </VBox>
+                        </HBox>
+                        <Label fx:id="evenementErrorLabel" style="-fx-font-size: 12px;" />
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button text="Ajouter" onAction="#addEvenement" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
+                            <Button text="Modifier" onAction="#updateEvenement" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
+                            <Button text="Supprimer" onAction="#deleteEvenement" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
+                            <Button text="Effacer" onAction="#clearEvenementFields" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
                         </HBox>
                     </VBox>
                 </AnchorPane>
             </content>
         </Tab>
-        <!-- Tab for Articles -->
         <Tab text="Articles" closable="false">
             <content>
                 <AnchorPane>
-                    <TableView fx:id="articleTable" layoutX="10" layoutY="10" prefWidth="600">
-                        <columns>
-                            <TableColumn fx:id="articleIdColumn" text="ID" prefWidth="50" />
-                            <TableColumn fx:id="articleTitreColumn" text="Titre" prefWidth="150" />
-                            <TableColumn fx:id="articleContenueColumn" text="Contenu" prefWidth="300" />
-                            <TableColumn fx:id="articleImageColumn" text="Image" prefWidth="100" />
-                        </columns>
-                    </TableView>
-                    <VBox layoutX="620" layoutY="10" spacing="10">
-                        <TextField fx:id="articleTitreField" promptText="Titre" />
-                        <TextArea fx:id="articleContenueField" promptText="Contenu" prefHeight="100" />
-                        <TextField fx:id="articleImageField" promptText="Chemin de l'image" />
-                        <Label fx:id="articleErrorLabel" style="-fx-text-fill: red;" />
+                    <ScrollPane layoutX="10" layoutY="10" prefWidth="780" prefHeight="300" style="-fx-background-color: #f4f4f4;">
+                        <content>
+                            <VBox fx:id="articleContainer" spacing="10" style="-fx-padding: 10;" />
+                        </content>
+                    </ScrollPane>
+                    <VBox layoutX="10" layoutY="320" spacing="15" prefWidth="780">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10" />
+                        </padding>
+                        <Label text="Ajouter/Modifier Article" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
                         <HBox spacing="10">
-                            <Button text="Ajouter" onAction="#addArticle" />
-                            <Button text="Modifier" onAction="#updateArticle" />
-                            <Button text="Supprimer" onAction="#deleteArticle" />
-                            <Button text="Effacer" onAction="#clearArticleFields" />
+                            <VBox spacing="5" prefWidth="380">
+                                <Label text="Titre" />
+                                <TextField fx:id="articleTitreField" promptText="Titre" prefWidth="380" />
+                                <Label text="Contenu" />
+                                <TextArea fx:id="articleContenueField" promptText="Contenu" prefHeight="80" prefWidth="380" />
+                            </VBox>
+                            <VBox spacing="5" prefWidth="380">
+                                <Label text="Image" />
+                                <TextField fx:id="articleImageField" promptText="Chemin de l'image" prefWidth="380" />
+                                <Label text="Événements Associés" />
+                                <ComboBox fx:id="articleEvenementCombo" promptText="Sélectionner des événements" prefWidth="380" />
+                            </VBox>
+                        </HBox>
+                        <Label fx:id="articleErrorLabel" style="-fx-font-size: 12px;" />
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button text="Ajouter" onAction="#addArticle" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
+                            <Button text="Modifier" onAction="#updateArticle" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
+                            <Button text="Supprimer" onAction="#deleteArticle" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
+                            <Button text="Effacer" onAction="#clearArticleFields" style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-padding: 8 15 8 15;" />
                         </HBox>
                     </VBox>
                 </AnchorPane>
