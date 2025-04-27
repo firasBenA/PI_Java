@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionEvenements" style="-fx-background-color: #f0f0f0;">
+
+
+    <!-- Main content area on the right -->
+    <center>
+        <ScrollPane fx:id="contentArea" fitToWidth="true" fitToHeight="true">
+            <VBox fx:id="contentVBox" spacing="10" style="-fx-padding: 20;" alignment="TOP_CENTER">
+                <Label fx:id="titleLabel" text="Bienvenue" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

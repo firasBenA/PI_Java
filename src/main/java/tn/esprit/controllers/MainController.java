@@ -55,9 +55,12 @@ public class MainController {
         loadUI("GestionReponse");
     }
 
-    public void goGestionEvenements() {
-        loadUI("GestionEvenements");
+    public void goGestionEvenements() {loadUI("GestionEvenements");}
+
+    public void goGererEvenements() {
+        loadUI("Gerer");
     }
+
 
     public void goGestionArticles() {
         loadUI("GestionArticles");

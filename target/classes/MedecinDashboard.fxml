@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.controllers.MedecinDashboardController"
+      spacing="20" style="-fx-background-color: #f8f9fa;" alignment="CENTER">
+
+    <stylesheets>
+        <URL value="@/css/medecin.css" />
+    </stylesheets>
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- Header Section -->
+    <HBox spacing="20" alignment="CENTER_LEFT">
+        <!-- Profile Picture with Edit Button -->
+        <StackPane>
+            <Circle radius="50" fill="WHITE" stroke="#ddd" strokeWidth="2">
+                <effect>
+                    <DropShadow radius="5" spread="0.1" color="rgba(0,0,0,0.2)"/>
+                </effect>
+            </Circle>
+            <ImageView fx:id="profileImage" fitWidth="90" fitHeight="90" preserveRatio="true"
+                       pickOnBounds="true">
+                <clip>
+                    <Circle centerX="45" centerY="45" radius="45"/>
+                </clip>
+            </ImageView>
+            <Button fx:id="changeImageBtn" text="Modifier"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px;"
+                    StackPane.alignment="BOTTOM_CENTER"
+                    onAction="#handleChangeImage"/>
+        </StackPane>
+
+        <!-- Welcome Message -->
+        <VBox spacing="5">
+            <Text text="Tableau de Bord Médical" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-fill: #2c3e50;"/>
+            <Label fx:id="welcomeLabel" style="-fx-font-size: 16; -fx-text-fill: #7f8c8d;"/>
+            <Label fx:id="specialiteLabel" style="-fx-font-size: 14; -fx-text-fill: #3498db; -fx-font-style: italic;"/>
+        </VBox>
+
+        <!-- Spacer -->
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Logout Button -->
+        <Button fx:id="deconnexionBtn" text="Déconnexion"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white;"
+                onAction="#handleDeconnexion"/>
+    </HBox>
+
+    <Label fx:id="messageLabel" styleClass="status-message"/>
+
+    <!-- Main Content - Centré avec une largeur fixe -->
+    <GridPane hgap="15" vgap="5" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;"
+              maxWidth="600" alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints prefWidth="150" halignment="RIGHT"/>
+            <ColumnConstraints prefWidth="300" halignment="LEFT"/>
+        </columnConstraints>
+
+        <!-- Personal Information - Chaque champ dans sa propre ligne avec message d'erreur -->
+
+        <!-- Nom -->
+        <Label text="Nom:" style="-fx-font-weight: bold;" GridPane.rowIndex="0"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="2">
+            <TextField fx:id="nomField" editable="false"/>
+            <Label fx:id="nomErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+
+        <!-- Prénom -->
+        <Label text="Prénom:" style="-fx-font-weight: bold;" GridPane.rowIndex="1"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="2">
+            <TextField fx:id="prenomField" editable="false"/>
+            <Label fx:id="prenomErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+
+        <!-- Email -->
+        <Label text="Email:" style="-fx-font-weight: bold;" GridPane.rowIndex="2"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="2" spacing="2">
+            <TextField fx:id="emailField" editable="false"/>
+            <Label fx:id="emailErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+
+        <!-- Téléphone -->
+        <Label text="Téléphone:" style="-fx-font-weight: bold;" GridPane.rowIndex="3"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="3" spacing="2">
+            <TextField fx:id="telephoneField" editable="false"/>
+            <Label fx:id="telErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+
+        <!-- Spécialité -->
+        <Label text="Spécialité:" style="-fx-font-weight: bold;" GridPane.rowIndex="4"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="4" spacing="2">
+            <TextField fx:id="specialiteField" editable="false"/>
+            <Label fx:id="specialiteErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+
+        <!-- Adresse -->
+        <Label text="Adresse:" style="-fx-font-weight: bold;" GridPane.rowIndex="5"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="5" spacing="2">
+            <TextArea fx:id="adresseField" editable="false" prefRowCount="3" wrapText="true"/>
+            <Label fx:id="adresseErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+
+        <!-- Sexe -->
+        <Label text="Sexe:" style="-fx-font-weight: bold;" GridPane.rowIndex="6"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="6" spacing="2">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <ComboBox fx:id="sexeComboBox" prefWidth="150" disable="true"/>
+            </HBox>
+            <Label fx:id="sexeErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+
+        <!-- Certificat -->
+        <Label text="Certificat:" style="-fx-font-weight: bold;" GridPane.rowIndex="7"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="7" spacing="2">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Hyperlink fx:id="certificatLink" text="Aucun certificat" onAction="#openCertificat"/>
+                <Button fx:id="changeCertificatBtn" text="Modifier Certificat"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white;"
+                        onAction="#handleChangeCertificat"/>
+            </HBox>
+            <Label fx:id="certificatErrorLabel" style="-fx-text-fill: red; -fx-font-size: 12;"/>
+        </VBox>
+    </GridPane>
+
+    <!-- Buttons -->
+    <HBox spacing="15" alignment="CENTER">
+        <Button fx:id="modifierBtn" text="Modifier Profil"
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"
+                onAction="#handleModification"/>
+
+        <Button fx:id="supprimerBtn" text="Supprimer Compte"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;"
+                onAction="#handleSuppression"/>
+    </HBox>
+</VBox>

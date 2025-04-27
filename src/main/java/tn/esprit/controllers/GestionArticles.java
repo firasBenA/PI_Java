@@ -39,7 +39,7 @@ public class GestionArticles {
     @FXML
     public void initialize() {
         serviceArticle = new ServiceArticle();
-        currentUser = new User(6, "patient1", "patient"); // Updated with role
+        currentUser = new User(6, "patient1");
         loadArticles();
         displayArticles();
     }
