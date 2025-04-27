@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -14,20 +14,12 @@
     <!-- Title Section -->
     <Label text="Historique des Notifications" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
-    <!-- Notification Card -->
-    <VBox fx:id="notificationCard" style="-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-padding: 20; -fx-effect: dropshadow(gaussian, #7f8c8d, 10, 0.5, 0, 2); -fx-border-radius: 10;">
-        <!-- Notification Item -->
-        <StackPane style="-fx-background-color: #ecf0f1; -fx-background-radius: 8; -fx-padding: 15; -fx-border-radius: 8;">
-            <HBox spacing="15" alignment="CENTER_LEFT">
-                <Label text="Notification 1" style="-fx-font-size: 18px; -fx-font-weight: medium; -fx-text-fill: #34495e;" />
-            </HBox>
-        </StackPane>
-
-        <!-- Additional notifications (can be added dynamically) -->
-        <ListView fx:id="notificationListView" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
-            <!-- ListView will dynamically display notification items here -->
-        </ListView>
-    </VBox>
+    <!-- Notification Cards Container -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-padding: 0;">
+        <VBox fx:id="notificationsContainer" spacing="15" style="-fx-background-color: transparent; -fx-padding: 5;">
+            <!-- Notification cards will be added here dynamically -->
+        </VBox>
+    </ScrollPane>
 
     <!-- Button Section -->
     <Button onAction="#closeWindow" text="Fermer" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, #2980b9, 10, 0.5, 0, 2);" />

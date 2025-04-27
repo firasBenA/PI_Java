@@ -30,7 +30,6 @@ tn\esprit\controllers\GestionPrescription$1.class
 tn\esprit\models\Diagnostique.class
 tn\esprit\controllers\GestionReclamation.class
 tn\esprit\services\EmailService.class
-tn\esprit\controllers\GestionListeRdv$1.class
 tn\esprit\models\RendeVous$TypeRendezVous.class
 tn\esprit\controllers\ListeConsultationsController.class
 tn\esprit\controllers\HomeController.class
