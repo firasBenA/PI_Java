@@ -98,7 +98,7 @@
             </Label>
          </children>
       </VBox>
-       <Button fx:id="addBtn" mnemonicParsing="false" onAction="#handleAddPrescription" prefHeight="25.0" prefWidth="193.0" text="Créer une Ordonnance" />
+      <Button fx:id="addBtn" mnemonicParsing="false" onAction="#handleAddPrescription" prefHeight="25.0" prefWidth="193.0" text="Créer une Ordonnance" visible="false" />
    </children>
    <padding>
       <Insets bottom="8.0" left="8.0" right="8.0" top="10.0" />

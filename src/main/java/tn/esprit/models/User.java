@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class User {
     private int id;
     private String email;
-    private String roles; // You can use List<String> if roles are stored as JSON or CSV
+    private String roles;
     private String password;
     private String nom;
     private String prenom;

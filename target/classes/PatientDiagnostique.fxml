@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.PatientDiagnostiquePrescription">
+    <content>
+        <VBox spacing="5">
+            <children>
+
+                <Label text="Mes Diagnostiques" style="-fx-font-size: 24px; -fx-font-family: 'Berlin Sans FB';" />
+
+                <!-- Diagnostique cards container -->
+                <HBox fx:id="cardContainer" spacing="10" alignment="CENTER" />
+
+                <!-- Pagination controls for Diagnostiques -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Button fx:id="prevButton" text="Précédent" onAction="#handlePrevDiagnostiquePage" />
+                    <Button fx:id="nextButton" text="Suivant" onAction="#handleNextDiagnostiquePage" />
+                </HBox>
+
+                <!-- Mes Prescriptions -->
+                <Label text="Mes Prescriptions" style="-fx-font-size: 24px; -fx-font-family: 'Berlin Sans FB';" />
+
+                <!-- Prescription cards container -->
+                <HBox fx:id="prescriptionCardContainer" spacing="10" alignment="CENTER" />
+
+                <!-- Pagination controls for Prescriptions -->
+                <HBox alignment="CENTER" spacing="10">
+                    <Button fx:id="prevPrescriptionButton" text="Précédent" onAction="#handlePrevPrescriptionPage" />
+                    <Button fx:id="nextPrescriptionButton" text="Suivant" onAction="#handleNextPrescriptionPage" />
+                </HBox>
+
+            </children>
+            <padding>
+                <Insets top="20" left="20" right="20" bottom="20" />
+            </padding>
+        </VBox>
+    </content>
+</ScrollPane>

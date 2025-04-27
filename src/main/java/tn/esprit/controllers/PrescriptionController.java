@@ -49,23 +49,55 @@ public class PrescriptionController {
     private Node cardNode;
     private Pane parentContainer;
 
+    private String userRole;
 
+    public PrescriptionController() {
+        userRole = "patient";
+    }
+
+
+//    public void setData(Prescription prescription, javafx.scene.Node cardNode, javafx.scene.layout.Pane parentContainer) {
+//        this.currentPrescription = prescription;
+//        this.cardNode = cardNode;
+//        this.parentContainer = parentContainer;
+//
+//        ServiceUser patientService = new ServiceUser();
+//        User patient = patientService.getUserById(prescription.getPatient_id());
+//
+//        titre.setText(prescription.getTitre());
+//        contenue.setText(prescription.getContenue());
+//        numTel.setText(patient.getTelephone());
+//        datePrescription.setText(prescription.getDate_prescription().toString());
+//        nom.setText(patient.getNom());
+//        prenom.setText(patient.getPrenom());
+//    }
 
 
     public void setData(Prescription prescription, javafx.scene.Node cardNode, javafx.scene.layout.Pane parentContainer) {
+        if ("patient".equals(userRole)) {
+            deleteBtn.setVisible(false);
+            modifyBtn.setVisible(false);
+        } else {
+            deleteBtn.setVisible(true);
+            modifyBtn.setVisible(true);
+        }
+
+
         this.currentPrescription = prescription;
         this.cardNode = cardNode;
         this.parentContainer = parentContainer;
 
+        int staticPatientId = 1;
+
         ServiceUser patientService = new ServiceUser();
-        User patient = patientService.getUserById(prescription.getPatient_id());
+        User patient = patientService.getUserById(staticPatientId);
 
         titre.setText(prescription.getTitre());
         contenue.setText(prescription.getContenue());
-        numTel.setText(patient.getTelephone());
+        numTel.setText("27025110");
         datePrescription.setText(prescription.getDate_prescription().toString());
-        nom.setText(patient.getNom());
-        prenom.setText(patient.getPrenom());
+        nom.setText("firas");
+        prenom.setText("ba");
     }
 
 

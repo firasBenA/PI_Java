@@ -39,21 +39,49 @@ public class DiagnostiqueController {
 
     @FXML
     private Button addBtn;
+
+    private String userRole;
     private Diagnostique diagnostiquePassedToThisCard;
 
-    public void setData(Diagnostique diagnostique){
+
+    public DiagnostiqueController() {
+        userRole = "patient";
+    }
+
+    /*public void setData(Diagnostique diagnostique){
         this.diagnostiquePassedToThisCard = diagnostique;
 
         ServiceUser patientService = new ServiceUser();
         User patient = patientService.getUserById(diagnostique.getPatientId());
-
+        System.out.println(patient);
         selectedSymptomes.setText(diagnostique.getSelectedSymptoms());
         zoneCorps.setText(diagnostique.getZoneCorps());
         nomDiagnostique.setText(diagnostique.getNom());
         dateDiagnostique.setText(diagnostique.getDateDiagnostique().toString());
         nom.setText(patient.getNom());
         prenom.setText(patient.getPrenom());
+    }*/
+
+    public void setData(Diagnostique diagnostique) {
+
+        if ("patient".equals(userRole)) {
+            addBtn.setVisible(false); // Hide the button if the user is a patient
+        } else {
+            addBtn.setVisible(true); // Show the button if the user is a doctor
+        }
+
+
+        this.diagnostiquePassedToThisCard = diagnostique;
+
+        selectedSymptomes.setText(diagnostique.getSelectedSymptoms());
+        zoneCorps.setText(diagnostique.getZoneCorps());
+        nomDiagnostique.setText(diagnostique.getNom());
+        dateDiagnostique.setText(diagnostique.getDateDiagnostique().toString());
+
+        nom.setText("Static Nom");
+        prenom.setText("Static Prenom");
     }
+
 
 
 

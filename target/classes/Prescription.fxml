@@ -139,8 +139,8 @@
     <bottom>
         <HBox alignment="CENTER" prefHeight="40.0" spacing="10.0" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="modifyBtn" onAction="#onModifyClicked" prefHeight="25.0" prefWidth="100.0" text="Modifier" />
-                <Button fx:id="deleteBtn" onAction="#onDeleteClicked" prefHeight="25.0" prefWidth="107.0" text="Supprimer" />
+                <Button fx:id="modifyBtn" onAction="#onModifyClicked" prefHeight="25.0" prefWidth="100.0" text="Modifier" visible="false"/>
+                <Button fx:id="deleteBtn" onAction="#onDeleteClicked" prefHeight="25.0" prefWidth="107.0" text="Supprimer" visible="false" />
             </children>
             <styleClass>
                 <String fx:value="diagnostiqueCard" />

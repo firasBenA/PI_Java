@@ -6,6 +6,7 @@ tn\esprit\test\TestMain.class
 tn\esprit\controllers\HomeController.class
 tn\esprit\controllers\ModifierPrescriptionController.class
 tn\esprit\interfaces\IService.class
+tn\esprit\controllers\PatientDiagnostiquePrescription.class
 tn\esprit\controllers\AjouterPrescriptionDepuisDiag.class
 tn\esprit\models\Prescription.class
 tn\esprit\utils\MyDataBase.class
