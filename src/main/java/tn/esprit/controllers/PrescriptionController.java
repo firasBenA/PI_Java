@@ -1,5 +1,7 @@
 package tn.esprit.controllers;
 
+import com.itextpdf.layout.properties.TextAlignment;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -15,6 +17,13 @@ import tn.esprit.services.ServicePrescription;
 import tn.esprit.services.ServiceUser;
 
 import java.io.IOException;
+
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import javafx.fxml.FXML;
+import java.io.File;
 
 public class PrescriptionController {
 
@@ -131,6 +140,58 @@ public class PrescriptionController {
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleDownloadPrescription() {
+        try {
+            // Find the Downloads folder dynamically
+            String userHome = System.getProperty("user.home");
+            String downloadsPath = userHome + File.separator + "Downloads";
+
+            // File name
+            String fileName = "Prescription_" + System.currentTimeMillis() + ".pdf";
+
+            // Full path
+            String dest = downloadsPath + File.separator + fileName;
+
+            // Create PdfWriter instance
+            PdfWriter writer = new PdfWriter(dest);
+
+            // Create PdfDocument instance
+            PdfDocument pdf = new PdfDocument(writer);
+
+            // Create Document instance
+            Document document = new Document(pdf);
+            document.add(new Paragraph("Prescription Médicale")
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
+                    .setBold()
+                    .setFontSize(20));
+
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("ORDONNANCE MÉDICALE").setTextAlignment(TextAlignment.CENTER).setBold());
+
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Dr. Mohamed"));
+            document.add(new Paragraph("Contact: 25943666"));
+
+            document.add(new Paragraph("Titre: Teste"));
+            document.add(new Paragraph("Contenu: Teste"));
+            document.add(new Paragraph("Date: 23/02/2025"));
+
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Signature du médecin: ___________________"));
+
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Cette ordonnance est valable uniquement pour une durée limitée."));
+
+            document.close();
+
+            System.out.println("Prescription PDF created successfully: " + dest);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
