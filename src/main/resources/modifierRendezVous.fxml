@@ -1,47 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.Tooltip?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ModifierRendezVousController">
-    <children>
-        <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-            <children>
-                <Text text="Modifier Rendez-vous" style="-fx-font-size: 24; -fx-font-weight: bold;" />
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ModifierRendezVousController">
 
-                <GridPane hgap="10.0" vgap="10.0">
+    <top>
+        <HBox alignment="CENTER" spacing="20" style="-fx-background-color: #095d7e;">
+            <padding>
+                <Insets bottom="15" left="15" right="15" top="15" />
+            </padding>
+            <Text fill="WHITE" style="-fx-font-size: 24px; -fx-font-weight: bold;">
+                <effect>
+                    <DropShadow color="#14967f" radius="3" />
+                </effect>
+                eHealth
+            </Text>
+            <Rectangle fill="#ccecee" height="30" width="2" />
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px;" text="Modifier Rendez-vous" />
+            <HBox alignment="CENTER_RIGHT" spacing="10" HBox.hgrow="ALWAYS">
+                <Button fx:id="notificationButton" onAction="#showNotificationHistory" style="-fx-background-color: transparent; -fx-font-size: 18px;" text="🔔">
+                    <tooltip>
+                        <Tooltip text="Voir l'historique des notifications" />
+                    </tooltip>
+                </Button>
+                <Button style="-fx-background-color: #14967f; -fx-text-fill: white; -fx-font-weight: bold;" text="Mon Compte" />
+            </HBox>
+        </HBox>
+    </top>
+
+    <center>
+        <GridPane alignment="CENTER" hgap="20" style="-fx-background-color: #ccecee;" vgap="20">
+            <padding>
+                <Insets bottom="30" left="30" right="30" top="30" />
+            </padding>
+            <columnConstraints>
+                <ColumnConstraints percentWidth="40" />
+                <ColumnConstraints percentWidth="60" />
+            </columnConstraints>
+
+            <!-- Calendar Section -->
+            <VBox alignment="TOP_CENTER" spacing="15" GridPane.columnIndex="0">
+                <Label style="-fx-text-fill: #095d7e; -fx-font-size: 20px; -fx-font-weight: bold;" text="Disponibilités" />
+                <DatePicker fx:id="date" style="-fx-font-size: 14px;">
+                    <VBox.margin>
+                        <Insets bottom="10" />
+                    </VBox.margin>
+                </DatePicker>
+                <VBox alignment="CENTER_LEFT" spacing="5">
+                    <HBox alignment="CENTER_LEFT" spacing="5">
+                        <Rectangle fill="#6dc444" height="20" stroke="#5d5681" strokeWidth="1" width="20" />
+                        <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Disponible" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="5">
+                        <Rectangle fill="#ffbf66" height="20" stroke="#095d7e" strokeWidth="1" width="20" />
+                        <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Occupé" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="5">
+                        <Rectangle fill="#ff0707" height="20" stroke="#095d7e" strokeWidth="1" width="20" />
+                        <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Complet" />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Form Section -->
+            <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" GridPane.columnIndex="1">
+                <padding>
+                    <Insets bottom="20" left="20" right="20" top="20" />
+                </padding>
+                <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #095d7e;" text="Modifier Rendez-vous" />
+
+                <GridPane hgap="10" vgap="5">
                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="200.0" />
+                        <ColumnConstraints percentWidth="30" />
+                        <ColumnConstraints percentWidth="70" />
                     </columnConstraints>
-                    <children>
-                        <!-- Date Field -->
-                        <Label text="Date:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                        <DatePicker fx:id="datePicker" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-                        <Label fx:id="dateError" textFill="RED" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                    <rowConstraints>
+                        <RowConstraints minHeight="35" />
+                        <RowConstraints minHeight="35" />
+                        <RowConstraints minHeight="35" />
+                        <RowConstraints minHeight="100" />
+                    </rowConstraints>
 
-                        <!-- Type Field -->
-                        <Label text="Type:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                        <ComboBox fx:id="typeComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1" />
-                        <Label fx:id="typeError" textFill="RED" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                    <!-- Médecin -->
+                    <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Médecin:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="medecin" promptText="Choisissez un médecin" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <Label fx:id="medecinError" style="-fx-text-fill: red; -fx-font-size: 12px;" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <GridPane.margin>
+                            <Insets top="30" />
+                        </GridPane.margin>
+                    </Label>
 
-                        <!-- Cause Field -->
-                        <Label text="Cause:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-                        <TextArea fx:id="causeTextArea" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="4" GridPane.columnIndex="1" />
-                        <Label fx:id="causeError" textFill="RED" GridPane.rowIndex="5" GridPane.columnIndex="1" />
-                    </children>
+                    <!-- Type -->
+                    <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Type:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <ComboBox fx:id="type_rdv" promptText="Type de consultation" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <Label fx:id="typeError" style="-fx-text-fill: red; -fx-font-size: 12px;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <GridPane.margin>
+                            <Insets top="30" />
+                        </GridPane.margin>
+                    </Label>
+
+                    <!-- Date -->
+                    <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <DatePicker fx:id="datePicker" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <Label fx:id="dateError" style="-fx-text-fill: red; -fx-font-size: 12px;" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <GridPane.margin>
+                            <Insets top="30" />
+                        </GridPane.margin>
+                    </Label>
+
+                    <!-- Détails -->
+                    <Label style="-fx-text-fill: #095d7e; -fx-font-weight: bold;" text="Détails:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <TextArea fx:id="cause" promptText="Décrivez votre problème" style="-fx-background-color: #e2fcd6; -fx-border-color: #14967f;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <Label fx:id="causeError" style="-fx-text-fill: red; -fx-font-size: 12px;" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <GridPane.margin>
+                            <Insets top="5" />
+                        </GridPane.margin>
+                    </Label>
                 </GridPane>
 
-                <HBox alignment="CENTER" spacing="20.0">
-                    <children>
-                        <Button fx:id="btnValider" mnemonicParsing="false" onAction="#handleValider" text="Valider" />
-                        <Button fx:id="btnAnnuler" mnemonicParsing="false" onAction="#handleAnnuler" text="Annuler" />
-                    </children>
-                </HBox>
-            </children>
-        </VBox>
-    </children>
-</AnchorPane>
+                <Button fx:id="saveButton" onAction="#save" style="-fx-background-color: #14967f; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 8 20; -fx-background-radius: 5;" text="Confirmer les Modifications" />
+            </VBox>
+
+            <rowConstraints>
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #095d7e;">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+            <Label fx:id="notificationLabel" style="-fx-text-fill: white; -fx-font-size: 14px;" text="Rendez-vous modifié avec succès !" visible="false" managed="false" />
+            <Label style="-fx-text-fill: white;" text="© 2025 eHealth - Tous droits réservés" HBox.hgrow="ALWAYS" />
+        </HBox>
+    </bottom>
+</BorderPane>

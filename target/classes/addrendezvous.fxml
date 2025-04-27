@@ -129,6 +129,12 @@
 
             <Button onAction="#save" style="-fx-background-color: #14967f; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 8 20; -fx-background-radius: 5;" text="Confirmer le Rendez-vous" />
          </VBox>
+
+         <!-- Notification Section -->
+         <VBox alignment="BOTTOM_LEFT" spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            <Label fx:id="notificationLabel" style="-fx-text-fill: #095d7e; -fx-background-color: #e0ffe0; -fx-padding: 10px; -fx-background-radius: 5; -fx-font-weight: bold;" text="Rendez-vous enregistré avec succès !" visible="false" managed="false" />
+         </VBox>
+
          <rowConstraints>
             <RowConstraints />
          </rowConstraints>

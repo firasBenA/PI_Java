@@ -16,25 +16,65 @@ import tn.esprit.services.ServiceAddRdv;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class GestionListeRdv implements Initializable {
 
-    @FXML
-    private ListView<RendeVous> rdvListView;
-
-    @FXML
-    private Button addButton;
+    @FXML private ListView<RendeVous> rdvListView;
+    @FXML private Button addButton;
+    @FXML private Button notificationButton;
 
     private final ServiceAddRdv serviceRendezVous = new ServiceAddRdv();
     private final int patientId = 1; // ID du patient fixé à 1
+    private final List<String> notificationHistory = new ArrayList<>(); // Historique des notifications
+    private Connection connection;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        connectDB();
         configureListView();
         loadPatientRDVs();
+        // Ajouter une notification initiale pour tester
+        addNotification("Application démarrée à " + LocalDateTime.now());
+    }
+
+    private void connectDB() {
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
+            System.out.println("Connexion à la base de données réussie !");
+        } catch (SQLException e) {
+            showAlert("Erreur", "Connexion à la base de données échouée", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private String getDoctorName(int medecinId) {
+        String doctorName = "Inconnu";
+        try {
+            String query = "SELECT prenom, nom FROM user WHERE id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setInt(1, medecinId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    String prenom = rs.getString("prenom");
+                    String nom = rs.getString("nom");
+                    doctorName = prenom + " " + nom;
+                }
+            }
+        } catch (SQLException e) {
+            showAlert("Erreur", "Impossible de récupérer le nom du médecin", e.getMessage());
+            e.printStackTrace();
+        }
+        return doctorName;
     }
 
     private void configureListView() {
@@ -73,10 +113,11 @@ public class GestionListeRdv implements Initializable {
                     setText(null);
                     setGraphic(null);
                 } else {
+                    String doctorName = getDoctorName(rdv.getIdMedecin());
                     Label infoLabel = new Label(String.format(
-                            "Date: %s | Médecin: %d | Type: %s | Statut: %s | Cause: %s",
+                            "Date: %s | Médecin: Dr %s | Type: %s | Statut: %s | Cause: %s",
                             rdv.getDate(),
-                            rdv.getIdMedecin(),
+                            doctorName,
                             rdv.getType(),
                             rdv.getStatut(),
                             rdv.getCause()
@@ -97,11 +138,18 @@ public class GestionListeRdv implements Initializable {
 
     private void editRDV(RendeVous rdv) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/modifierRendezVous.fxml"));
+            // Debug: Vérifier si le fichier FXML est trouvé
+            URL fxmlLocation = getClass().getResource("/modifierRendezVous.fxml");
+            if (fxmlLocation == null) {
+                throw new IOException("Cannot find /tn/esprit/views/modifierRendezVous.fxml");
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
             ModifierRendezVousController controller = loader.getController();
             controller.setRendezVous(rdv);
+            // Passer le listener de notifications
+            controller.setNotificationListener(message -> addNotification(message));
 
             Stage stage = new Stage();
             stage.setTitle("Modifier Rendez-vous");
@@ -111,10 +159,13 @@ public class GestionListeRdv implements Initializable {
 
             if (controller.isModificationValidee()) {
                 loadPatientRDVs();
+                String doctorName = getDoctorName(rdv.getIdMedecin());
+                addNotification(String.format("Rendez-vous avec Dr %s modifié pour le %s. Veuillez attendre la réponse du médecin.",
+                        doctorName, rdv.getDate()));
             }
         } catch (IOException e) {
             showAlert("Erreur", "Impossible d'ouvrir l'éditeur",
-                    "Une erreur s'est produite lors de l'ouverture de l'éditeur: " + e.getMessage());
+                    "Vérifiez que le fichier modifierRendezVous.fxml est dans src/main/resources/tn/esprit/views/: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -129,6 +180,9 @@ public class GestionListeRdv implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             serviceRendezVous.delete(rdv);
             loadPatientRDVs();
+            String doctorName = getDoctorName(rdv.getIdMedecin());
+            addNotification(String.format("Rendez-vous avec Dr %s du %s supprimé.",
+                    doctorName, rdv.getDate()));
             showAlert("Succès", "Rendez-vous supprimé", "Le rendez-vous a été supprimé avec succès.");
         }
     }
@@ -136,8 +190,17 @@ public class GestionListeRdv implements Initializable {
     @FXML
     private void addNewRDV() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/addrendezvous.fxml"));
+            // Debug: Vérifier si le fichier FXML est trouvé
+            URL fxmlLocation = getClass().getResource("/addrendezvous.fxml");
+            if (fxmlLocation == null) {
+                throw new IOException("Cannot find /tn/esprit/views/addrendezvous.fxml");
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
+
+            // Récupérer le contrôleur pour écouter l'ajout
+            GestionRendezVous controller = loader.getController();
+            controller.setNotificationListener(message -> addNotification(message));
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -147,8 +210,40 @@ public class GestionListeRdv implements Initializable {
 
             loadPatientRDVs();
         } catch (IOException e) {
-            showAlert("Erreur", "Impossible d'ouvrir le formulaire d'ajout", e.getMessage());
+            showAlert("Erreur", "Impossible d'ouvrir le formulaire d'ajout",
+                    "Vérifiez que le fichier addrendezvous.fxml est dans src/main/resources/tn/esprit/views/: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void showNotificationHistory() {
+        try {
+            // Debug: Vérifier si le fichier FXML est trouvé
+            URL fxmlLocation = getClass().getResource("/notificationHistorique.fxml");
+            if (fxmlLocation == null) {
+                throw new IOException("Cannot find /notificationHistorique.fxml");
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            NotificationHistoryController controller = loader.getController();
+            controller.setNotifications(notificationHistory);
+
+            Stage stage = new Stage();
+            stage.setTitle("Historique des Notifications");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            showAlert("Erreur", "Impossible d'ouvrir l'historique des notifications",
+                    "Vérifiez que le fichier notificationHistorique.fxml est dans src/main/resources/tn/esprit/views/: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void addNotification(String message) {
+        notificationHistory.add(message);
     }
 
     private void showAlert(String title, String header, String content) {

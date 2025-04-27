@@ -14,6 +14,7 @@ C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\MainController.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\MedecinPrescDiag.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\ModifierPrescriptionController.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\ModifierRendezVousController.java
+C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\NotificationHistoryController.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\controllers\PatientDashboardController.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\interfaces\IService.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\models\Consultation.java

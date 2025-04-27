@@ -16,10 +16,12 @@ tn\esprit\controllers\ListeConsultationsController$ApprovalData.class
 tn\esprit\controllers\ListeReclamation.class
 tn\esprit\controllers\EmailService$1.class
 tn\esprit\models\Prescription.class
+tn\esprit\controllers\NotificationHistoryController.class
 tn\esprit\services\ServiceConsultation.class
 tn\esprit\utils\MyDataBase.class
 tn\esprit\controllers\PatientDashboardController$1.class
 tn\esprit\controllers\DoctorStatsController.class
+tn\esprit\controllers\ModifierRendezVousController$1.class
 tn\esprit\controllers\PatientDashboardController.class
 tn\esprit\controllers\GestionRendezVous$1.class
 tn\esprit\controllers\MedecinPrescDiag$2.class
@@ -41,6 +43,7 @@ tn\esprit\controllers\GestionListeRdv.class
 tn\esprit\controllers\GestionReclamation$1.class
 tn\esprit\services\ServicePrescription.class
 tn\esprit\controllers\ListeConsultationsController$2.class
+tn\esprit\controllers\ModifierRendezVousController$1$1.class
 tn\esprit\controllers\EmailService.class
 tn\esprit\controllers\GestionPrescription.class
 tn\esprit\controllers\MedecinPrescDiag.class
