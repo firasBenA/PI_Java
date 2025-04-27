@@ -8,6 +8,16 @@
         <VBox fx:id="contentVBox" spacing="10" style="-fx-padding: 10;">
             <children>
                 <Label fx:id="titleLabel" text="Événements" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+                <HBox fx:id="filterHBox" spacing="10" alignment="CENTER">
+                    <Label text="Filtrer par type:" />
+                    <ComboBox fx:id="typeFilter" promptText="Tous les types" />
+                    <Button fx:id="filterButton" text="Filtrer" onAction="#filterEvents" style="-fx-background-color: #3498db; -fx-text-fill: white;" />
+                </HBox>
+                <HBox fx:id="paginationControls" spacing="10" alignment="CENTER" visible="false" managed="false">
+                    <Button fx:id="prevButton" text="Précédent" onAction="#previousPage" style="-fx-background-color: #3498db; -fx-text-fill: white;" />
+                    <Label fx:id="pageLabel" text="Page 1" />
+                    <Button fx:id="nextButton" text="Suivant" onAction="#nextPage" style="-fx-background-color: #3498db; -fx-text-fill: white;" />
+                </HBox>
             </children>
         </VBox>
     </content>
