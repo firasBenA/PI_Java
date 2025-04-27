@@ -1,5 +1,12 @@
 package tn.esprit.controllers;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.control.Tooltip;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -187,9 +194,39 @@ public class EventDetailsController {
     }
 
     private void generateQRCode() {
-        // Placeholder for QR Code generation
-        if (qrCodeImageView != null) {
-            qrCodeImageView.setImage(null); // Placeholder
+        try {
+            // Instagram URL - replace "your_instagram_handle" with your actual Instagram handle
+            String instagramUrl = "https://www.instagram.com/esprit.recover.plus/";
+
+            // Load QR code generation library
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            int width = 300;
+            int height = 300;
+
+            // Create QR code bit matrix
+            BitMatrix bitMatrix = qrCodeWriter.encode(instagramUrl, BarcodeFormat.QR_CODE, width, height);
+
+            // Convert bit matrix to JavaFX image
+            WritableImage qrImage = new WritableImage(width, height);
+            PixelWriter pixelWriter = qrImage.getPixelWriter();
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    pixelWriter.setColor(x, y, bitMatrix.get(x, y) ? javafx.scene.paint.Color.BLACK : javafx.scene.paint.Color.WHITE);
+                }
+            }
+
+            // Set the QR code image to the ImageView
+            qrCodeImageView.setImage(qrImage);
+
+            // Optionally add a tooltip to show where the QR code links to
+            Tooltip tooltip = new Tooltip("Scanner pour visiter notre page Instagram");
+            Tooltip.install(qrCodeImageView, tooltip);
+
+            System.out.println("QR Code generated successfully for URL: " + instagramUrl);
+        } catch (Exception e) {
+            System.err.println("Error generating QR code: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -237,7 +274,7 @@ public class EventDetailsController {
         }
 
         try {
-            // Load the HTML template
+
             java.net.URL resourceUrl = getClass().getResource("/ors_map.html");
             if (resourceUrl == null) {
                 Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Fichier ors_map.html introuvable")));
@@ -245,12 +282,12 @@ public class EventDetailsController {
             }
             String htmlContent = new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
 
-            // Replace placeholders with actual values
+
             htmlContent = htmlContent.replace("LATITUDE", String.valueOf(coordinates[0]))
                     .replace("LONGITUDE", String.valueOf(coordinates[1]))
                     .replace("LOCATION_NAME", event.getLieuxEvent());
 
-            // Create and configure WebView
+
             WebView webView = new WebView();
             webView.getEngine().loadContent(htmlContent);
             webView.setPrefSize(504, 250);
