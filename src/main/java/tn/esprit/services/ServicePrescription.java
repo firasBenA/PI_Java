@@ -36,6 +36,7 @@ public class ServicePrescription implements IService<Prescription> {
         }
     }
 
+
     @Override
     public List<Prescription> getAll() {
         List<Prescription> prescriptions = new ArrayList<>();

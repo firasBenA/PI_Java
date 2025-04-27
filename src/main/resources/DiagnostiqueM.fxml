@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.TextField?>
 <BorderPane fx:id="rootPane" prefHeight="650.0" prefWidth="750.0" styleClass="trensparent" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.DiagnostiqueCardsController">
     <center>
         <VBox spacing="10.0" stylesheets="@../../../../PI/src/main/resources/CSS/style.css" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
@@ -26,6 +27,8 @@
                   <Insets left="4.0" top="4.0" />
                </VBox.margin>
                 </Label>
+
+                <TextField fx:id="searchField" promptText="Rechercher par nom..." VBox.vgrow="NEVER" maxWidth="400" />
 
                 <!-- ScrollPane that takes the rest of the space -->
                 <ScrollPane fx:id="scrollPane" fitToHeight="false" fitToWidth="true" pannable="true" styleClass="white-background" stylesheets="@CSS/style.css" VBox.vgrow="ALWAYS">
