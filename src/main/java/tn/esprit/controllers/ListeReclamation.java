@@ -80,7 +80,7 @@ public class ListeReclamation {
             String badWord = BadWordsFilter.containsBadWord(newValue);
             if (badWord != null) {
                 TFsujet.setText(oldValue);
-                showAlert("Erreur", "Le mot interdit '" + badWord + "' n'est pas autorisé dans le sujet !");
+                showAlert("Erreur", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler 😊.");
             }
         });
 
@@ -92,7 +92,7 @@ public class ListeReclamation {
             String badWord = BadWordsFilter.containsBadWord(newValue);
             if (badWord != null) {
                 TFdescription.setText(oldValue);
-                showAlert("Erreur", "Le mot interdit '" + badWord + "' n'est pas autorisé dans la description !");
+                showAlert("error", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler 😊.");
             }
         });
 
@@ -426,12 +426,12 @@ public class ListeReclamation {
             }
             String badWord = BadWordsFilter.containsBadWord(sujet);
             if (badWord != null) {
-                showAlert("Erreur", "Le sujet contient le mot interdit '" + badWord + "' !");
+                showAlert("error", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler 😊.");
                 return;
             }
             badWord = BadWordsFilter.containsBadWord(description);
             if (badWord != null) {
-                showAlert("Erreur", "La description contient le mot interdit '" + badWord + "' !");
+                showAlert("error", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler 😊.");
                 return;
             }
 
@@ -501,12 +501,12 @@ public class ListeReclamation {
             }
             String badWord = BadWordsFilter.containsBadWord(sujet);
             if (badWord != null) {
-                showAlert("Erreur", "Le sujet contient le mot interdit '" + badWord + "' !");
+                showAlert("error", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler 😊.");
                 return;
             }
             badWord = BadWordsFilter.containsBadWord(description);
             if (badWord != null) {
-                showAlert("Erreur", "La description contient le mot interdit '" + badWord + "' !");
+                showAlert("error", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler 😊.");
                 return;
             }
 
