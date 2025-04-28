@@ -1,5 +1,6 @@
 package tn.esprit.controllers;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,12 +10,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
+import tn.esprit.services.FirebaseNotificationService;
 import tn.esprit.services.ServiceAddRdv;
 
 import java.io.IOException;
@@ -30,15 +30,21 @@ import java.util.stream.Collectors;
 
 public class GestionListeRdv implements Initializable {
 
-    // FXML Components
-    @FXML private VBox rdvContainer;
-    @FXML private StackPane toastContainer;
-    @FXML private ComboBox<String> statusFilter;
-    @FXML private Label pageInfo;
-    @FXML private Button addButton;
-    @FXML private Button notificationButton;
+    // Composants FXML
+    @FXML
+    private VBox rdvContainer;
+    @FXML
+    private StackPane toastContainer;
+    @FXML
+    private ComboBox<String> statusFilter;
+    @FXML
+    private Label pageInfo;
+    @FXML
+    private Button addButton;
+    @FXML
+    private Button notificationButton;
 
-    // Services and Data
+    // Services et données
     private final ServiceAddRdv serviceRendezVous = new ServiceAddRdv();
     private final int patientId = 1;
     private final List<String> notificationHistory = new ArrayList<>();
@@ -50,13 +56,26 @@ public class GestionListeRdv implements Initializable {
     private List<RendeVous> allRdvs = new ArrayList<>();
     private List<RendeVous> filteredRdvs = new ArrayList<>();
 
+    // Sujet Firebase pour les notifications
+    private static final String FIREBASE_TOPIC = "appointments";
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        connectDB();
-        setupStatusFilter();
-        loadAllRdvs();
-        setupPagination();
-        addNotification("Application démarrée à " + LocalDateTime.now());
+        try {
+            // Initialiser Firebase
+            FirebaseNotificationService.initialize();
+
+            connectDB();
+            setupStatusFilter();
+            loadAllRdvs();
+            setupPagination();
+
+            // Envoyer une notification de test au démarrage
+            sendFirebaseNotification("Application démarrée", "L'application a été lancée avec succès");
+            addNotification("Application démarrée à " + LocalDateTime.now());
+        } catch (Exception e) {
+            showAlert("Erreur", "Initialisation Firebase échouée", e.getMessage());
+        }
     }
 
     private void connectDB() {
@@ -68,7 +87,7 @@ public class GestionListeRdv implements Initializable {
     }
 
     private void setupStatusFilter() {
-        statusFilter.getItems().addAll("Tous", "Approuvé", "En attente", "Refusé");
+        statusFilter.getItems().addAll("Tous", "approuvé", "en_attente", "refusé");
         statusFilter.getSelectionModel().selectFirst();
         statusFilter.setOnAction(e -> filterRdvs());
     }
@@ -96,18 +115,12 @@ public class GestionListeRdv implements Initializable {
 
     private void updatePagination() {
         int totalPages = (int) Math.ceil((double) filteredRdvs.size() / itemsPerPage);
-
-        // Update page info
         pageInfo.setText(String.format("Page %d/%d", currentPage, totalPages == 0 ? 1 : totalPages));
-
-        // Clear current cards
         rdvContainer.getChildren().clear();
 
-        // Calculate start and end indices
         int startIndex = (currentPage - 1) * itemsPerPage;
         int endIndex = Math.min(startIndex + itemsPerPage, filteredRdvs.size());
 
-        // Add cards for current page
         for (int i = startIndex; i < endIndex; i++) {
             RendeVous rdv = filteredRdvs.get(i);
             StackPane card = createRdvCard(rdv);
@@ -117,33 +130,29 @@ public class GestionListeRdv implements Initializable {
 
     private StackPane createRdvCard(RendeVous rdv) {
         StackPane card = new StackPane();
-        card.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 15; " +
+        String baseStyle = "-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 15; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2); " +
-                "-fx-border-radius: 8; -fx-border-width: 2;");
+                "-fx-border-radius: 8; -fx-border-width: 2;";
 
-        // Status-based border color
-        String statusColor = switch(rdv.getStatut().toLowerCase()) {
-            case "approuvé" -> "#2ecc71"; // Green
-            case "en attente" -> "#f39c12"; // Orange
-            case "refusé" -> "#e74c3c"; // Red
-            default -> "#3498db"; // Blue
+        String statusColor = switch (rdv.getStatut().toLowerCase()) {
+            case "approuvé" -> "#2ecc71";
+            case "en_attente" -> "#f39c12";
+            case "refusé" -> "#e74c3c";
+            default -> "#3498db";
         };
-        card.setStyle(card.getStyle() + "-fx-border-color: " + statusColor + ";");
 
-        // Card content
+        card.setStyle(baseStyle + "-fx-border-color: " + statusColor + ";");
+        card.setOnMouseEntered(e -> card.setStyle(baseStyle.replace("0.1", "0.2") + "-fx-border-color: " + statusColor + ";"));
+        card.setOnMouseExited(e -> card.setStyle(baseStyle.replace("0.2", "0.1") + "-fx-border-color: " + statusColor + ";"));
+
         String doctorName = getDoctorName(rdv.getIdMedecin());
         Label infoLabel = new Label(String.format(
                 "Date: %s\nMédecin: Dr %s\nType: %s\nStatut: %s\nCause: %s",
-                rdv.getDate(),
-                doctorName,
-                rdv.getType(),
-                rdv.getStatut(),
-                rdv.getCause()
+                rdv.getDate(), doctorName, rdv.getType(), rdv.getStatut(), rdv.getCause()
         ));
         infoLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
         infoLabel.setWrapText(true);
 
-        // Action buttons
         HBox buttonsBox = new HBox(10);
         buttonsBox.setAlignment(Pos.CENTER_RIGHT);
 
@@ -156,13 +165,7 @@ public class GestionListeRdv implements Initializable {
         deleteButton.setOnAction(event -> deleteRDV(rdv));
 
         buttonsBox.getChildren().addAll(editButton, deleteButton);
-
-        VBox cardContent = new VBox(10, infoLabel, buttonsBox);
-        card.getChildren().add(cardContent);
-
-        // Hover effects
-        card.setOnMouseEntered(e -> card.setStyle(card.getStyle().replace("0.1", "0.2")));
-        card.setOnMouseExited(e -> card.setStyle(card.getStyle().replace("0.2", "0.1")));
+        card.getChildren().add(new VBox(10, infoLabel, buttonsBox));
 
         return card;
     }
@@ -201,7 +204,10 @@ public class GestionListeRdv implements Initializable {
 
             if (controller.isModificationValidee()) {
                 loadAllRdvs();
-                showToast("Rendez-vous modifié avec succès", "#2ecc71");
+                String doctorName = getDoctorName(rdv.getIdMedecin());
+                String message = String.format("Rendez-vous avec Dr %s modifié pour le %s", doctorName, rdv.getDate());
+                addNotification(message);
+                sendFirebaseNotification("Rendez-vous modifié", message);
             }
         } catch (IOException e) {
             showAlert("Erreur", "Impossible d'ouvrir l'éditeur", e.getMessage());
@@ -218,11 +224,11 @@ public class GestionListeRdv implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             serviceRendezVous.delete(rdv);
             String doctorName = getDoctorName(rdv.getIdMedecin());
-            String notificationMessage = String.format("Rendez-vous avec Dr %s du %s supprimé.",
-                    doctorName, rdv.getDate());
+            String message = String.format("Rendez-vous avec Dr %s du %s supprimé", doctorName, rdv.getDate());
 
-            // Ajouter à l'historique ET afficher le toast
-            addNotification(notificationMessage);
+            // Ajouter à l'historique et envoyer notification
+            addNotification(message);
+            sendFirebaseNotification("Rendez-vous supprimé", message);
             loadAllRdvs();
         }
     }
@@ -234,7 +240,10 @@ public class GestionListeRdv implements Initializable {
             Parent root = loader.load();
 
             GestionRendezVous controller = loader.getController();
-            controller.setNotificationListener(this::addNotification);
+            controller.setNotificationListener(message -> {
+                addNotification(message);
+                sendFirebaseNotification("Nouveau rendez-vous", message);
+            });
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -267,6 +276,20 @@ public class GestionListeRdv implements Initializable {
         }
     }
 
+    private void sendFirebaseNotification(String title, String message) {
+        try {
+            FirebaseNotificationService.sendNotificationToTopic(FIREBASE_TOPIC, title, message);
+        } catch (FirebaseMessagingException e) {
+            System.err.println("Erreur d'envoi de notification Firebase: " + e.getMessage());
+        }
+    }
+
+    private void addNotification(String message) {
+        String fullMessage = LocalDateTime.now().toString() + " - " + message;
+        notificationHistory.add(fullMessage);
+        showToast(message, "#3498db");
+    }
+
     private void showToast(String message, String color) {
         Label toast = new Label(message);
         toast.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-padding: 10 20; " +
@@ -277,12 +300,6 @@ public class GestionListeRdv implements Initializable {
         PauseTransition delay = new PauseTransition(Duration.seconds(3));
         delay.setOnFinished(e -> toastContainer.getChildren().remove(toast));
         delay.play();
-    }
-
-    private void addNotification(String message) {
-        String fullMessage = LocalDateTime.now().toString() + " - " + message;
-        notificationHistory.add(fullMessage);
-        showToast(message, "#3498db");
     }
 
     private String getDoctorName(int medecinId) {

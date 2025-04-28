@@ -43,6 +43,10 @@ public class MainController {
     public void goGestionPatient() {
         loadUI("PatientDashboard"); // Assuming you have this FXML already
     }
+    public void goGestionStatDoc() {
+        loadUI("DoctorStats"); // Assuming you have this FXML already
+    }
+
     public void handleLogout() {
         System.out.println("Déconnexion...");
     }

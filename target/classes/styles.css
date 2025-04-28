@@ -383,3 +383,62 @@
 .sweet-alert .button:cancel:hover {
     -fx-background-color: #e63939;
 }
+
+/* Styles de base des cartes */
+.appointment-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-border-radius: 8;
+    -fx-border-width: 2;
+}
+
+/* Styles des statuts */
+.status-pending {
+    -fx-border-color: #f39c12; /* Orange */
+    -fx-background-color: #fff8e6;
+}
+
+.status-approved {
+    -fx-border-color: #2ecc71; /* Vert */
+    -fx-background-color: #e6f7ee;
+}
+
+.status-rejected {
+    -fx-border-color: #e74c3c; /* Rouge */
+    -fx-background-color: #fce8e6;
+}
+
+/* Styles du texte */
+.appointment-info {
+    -fx-font-size: 14px;
+    -fx-text-fill: #34495e;
+}
+
+/* Styles des boutons */
+.edit-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.cancel-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+/* Notification toast */
+.toast-notification {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+
+/* Label de statut */
+.status-label {
+    -fx-font-weight: bold;
+    -fx-padding: 5 10;
+    -fx-background-radius: 10;
+}

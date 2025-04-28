@@ -1,175 +1,247 @@
 package tn.esprit.controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.util.converter.LocalTimeStringConverter;
 import tn.esprit.models.Consultation;
 import tn.esprit.services.ServiceConsultation;
-import tn.esprit.controllers.EmailService;
+import tn.esprit.services.EmailService;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class ListeConsultationsController implements Initializable {
 
     @FXML
-    private ListView<Consultation> consultationsListView;
+    private FlowPane consultationsContainer;
+    @FXML
+    private ComboBox<String> typeFilterComboBox;
+    @FXML
+    private Button prevPageButton;
+    @FXML
+    private Button nextPageButton;
+    @FXML
+    private Label pageInfoLabel;
 
     private final ServiceConsultation serviceConsultation = new ServiceConsultation();
     private final EmailService emailService = new EmailService();
     private final int medecinId = 4;
+    private final int itemsPerPage = 10;
+    private int currentPage = 1;
+    private int totalPages = 1;
+    private List<Consultation> allConsultations;
+    private String currentFilter = "Tous";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        chargerConsultations();
-        configurerListView();
+        setupFilterComboBox();
+        loadAllConsultations();
+        setupPaginationControls();
     }
 
-    private void chargerConsultations() {
-        ObservableList<Consultation> consultations = FXCollections.observableArrayList(
-                serviceConsultation.getByMedecinId(medecinId)
-        );
-        consultationsListView.setItems(consultations);
+    private void setupFilterComboBox() {
+        typeFilterComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            currentFilter = newVal;
+            currentPage = 1;
+            updateDisplayedConsultations();
+        });
     }
 
-    private void configurerListView() {
-        consultationsListView.setCellFactory(param -> new ListCell<Consultation>() {
-            private final Button btnApprouver = new Button("Approuver");
-            private final Button btnRefuser = new Button("Refuser");
-            private final Button btnModifier = new Button("Modifier");
-            private final HBox buttonBox = new HBox(5, btnModifier, btnApprouver, btnRefuser);
-            private final Label statusLabel = new Label();
+    private void loadAllConsultations() {
+        allConsultations = serviceConsultation.getByMedecinId(medecinId);
+        updateDisplayedConsultations();
+    }
 
-            {
-                // Style des boutons
-                btnApprouver.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-                btnRefuser.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
-                btnModifier.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
-
-                // Gestion des événements
-                btnApprouver.setOnAction(event -> {
-                    Consultation consultation = getItem();
-                    if (consultation != null) {
-                        showApprovalDialog(consultation);
-                    }
-                });
-
-                btnRefuser.setOnAction(event -> {
-                    Consultation consultation = getItem();
-                    if (consultation != null) {
-                        serviceConsultation.updateStatutRendezVous(consultation.getRendez_vous_id(), "refusé");
-                        consultation.setStatut("refusé");
-                        updateItem(consultation, false);
-                        try {
-                            String patientEmail = serviceConsultation.getPatientEmailById(consultation.getPatient_id());
-                            emailService.sendRejectionEmail(patientEmail);
-                            showAlert("Succès", "Consultation refusée et email envoyé au patient");
-                        } catch (Exception e) {
-                            showAlert("Erreur", "Échec de l'envoi de l'email : " + e.getMessage());
-                        }
-                    }
-                });
-
-                btnModifier.setOnAction(event -> {
-                    Consultation consultation = getItem();
-                    if (consultation != null && consultation.isEnAttente()) {
-                        modifierDateConsultation(consultation);
-                    } else if (consultation != null) {
-                        showAlert("Attention", "Seules les consultations en attente peuvent être modifiées");
-                    }
-                });
-            }
-
-            @Override
-            protected void updateItem(Consultation consultation, boolean empty) {
-                super.updateItem(consultation, empty);
-
-                if (empty || consultation == null) {
-                    setText(null);
-                    setGraphic(null);
-                } else {
-                    setText(String.format(
-                            "Date: %s | Type: %s | Patient: %s %s | Statut: ",
-                            consultation.getDate(),
-                            consultation.getType_consultation(),
-                            consultation.getPatientPrenom(),
-                            consultation.getPatientNom()
-                    ));
-
-                    statusLabel.setText(consultation.getStatut());
-                    updateStatusColor(consultation.getStatut());
-
-                    setGraphic(new HBox(10, statusLabel, buttonBox));
-
-                    // Désactiver les boutons selon le statut
-                    boolean statutDefini = !consultation.isEnAttente();
-                    btnApprouver.setDisable(statutDefini);
-                    btnRefuser.setDisable(statutDefini);
-                    btnModifier.setDisable(statutDefini);
-                }
-            }
-
-            private void updateStatusColor(String statut) {
-                switch (statut) {
-                    case "approuvé":
-                        statusLabel.setTextFill(Color.GREEN);
-                        break;
-                    case "refusé":
-                        statusLabel.setTextFill(Color.RED);
-                        break;
-                    default:
-                        statusLabel.setTextFill(Color.ORANGE);
-                }
+    private void setupPaginationControls() {
+        prevPageButton.setOnAction(e -> {
+            if (currentPage > 1) {
+                currentPage--;
+                updateDisplayedConsultations();
             }
         });
+
+        nextPageButton.setOnAction(e -> {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateDisplayedConsultations();
+            }
+        });
+    }
+
+    private void updateDisplayedConsultations() {
+        List<Consultation> filteredConsultations = filterConsultations();
+        totalPages = (int) Math.ceil((double) filteredConsultations.size() / itemsPerPage);
+        totalPages = Math.max(totalPages, 1);
+
+        int fromIndex = (currentPage - 1) * itemsPerPage;
+        int toIndex = Math.min(fromIndex + itemsPerPage, filteredConsultations.size());
+
+        List<Consultation> pageConsultations = filteredConsultations.subList(fromIndex, toIndex);
+
+        consultationsContainer.getChildren().clear();
+        pageConsultations.forEach(consultation ->
+                consultationsContainer.getChildren().add(createConsultationCard(consultation))
+        );
+
+        updatePaginationControls();
+    }
+
+    private List<Consultation> filterConsultations() {
+        if ("Tous".equals(currentFilter)) {
+            return allConsultations;
+        }
+        return allConsultations.stream()
+                .filter(c -> currentFilter.equalsIgnoreCase(c.getType_consultation()))
+                .collect(Collectors.toList());
+    }
+
+    private void updatePaginationControls() {
+        pageInfoLabel.setText(String.format("Page %d/%d", currentPage, totalPages));
+        prevPageButton.setDisable(currentPage <= 1);
+        nextPageButton.setDisable(currentPage >= totalPages);
+    }
+
+    private VBox createConsultationCard(Consultation consultation) {
+        VBox card = new VBox();
+        card.setSpacing(10);
+        card.setPadding(new Insets(15));
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);");
+        card.setPrefWidth(300);
+
+        // Titre
+        Label titleLabel = new Label("Consultation #" + consultation.getId());
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+
+        // Informations
+        Label dateLabel = new Label("Date: " + consultation.getDate());
+        Label typeLabel = new Label("Type: " + consultation.getType_consultation());
+        Label patientLabel = new Label("Patient: " + consultation.getPatientPrenom() + " " + consultation.getPatientNom());
+
+        // Statut
+        Label statusLabel = new Label("Statut: " + consultation.getStatut());
+        switch (consultation.getStatut()) {
+            case "approuvé":
+                statusLabel.setTextFill(Color.GREEN);
+                break;
+            case "refusé":
+                statusLabel.setTextFill(Color.RED);
+                break;
+            default:
+                statusLabel.setTextFill(Color.ORANGE);
+        }
+
+        // Boutons
+        HBox buttonBox = new HBox(10);
+        Button btnModifier = new Button("Modifier");
+        Button btnApprouver = new Button("Approuver");
+        Button btnRefuser = new Button("Refuser");
+
+        // Style des boutons
+        btnModifier.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
+        btnApprouver.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        btnRefuser.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+
+        // Désactiver les boutons si statut déjà défini
+        boolean statutDefini = !consultation.isEnAttente();
+        btnModifier.setDisable(statutDefini);
+        btnApprouver.setDisable(statutDefini);
+        btnRefuser.setDisable(statutDefini);
+
+        // Gestion des événements
+        btnModifier.setOnAction(event -> {
+            if (consultation.isEnAttente()) {
+                modifierDateConsultation(consultation);
+            } else {
+                showAlert("Attention", "Seules les consultations en attente peuvent être modifiées");
+            }
+        });
+
+        btnApprouver.setOnAction(event -> showApprovalDialog(consultation));
+
+        btnRefuser.setOnAction(event -> {
+            serviceConsultation.updateStatutRendezVous(consultation.getRendez_vous_id(), "refusé");
+            consultation.setStatut("refusé");
+            try {
+                String patientEmail = serviceConsultation.getPatientEmailById(consultation.getPatient_id());
+                emailService.sendRejectionEmail(patientEmail);
+                showAlert("Succès", "Consultation refusée et email envoyé au patient");
+                loadAllConsultations();
+            } catch (Exception e) {
+                showAlert("Erreur", "Échec de l'envoi de l'email : " + e.getMessage());
+            }
+        });
+
+        buttonBox.getChildren().addAll(btnModifier, btnApprouver, btnRefuser);
+
+        card.getChildren().addAll(titleLabel, dateLabel, typeLabel, patientLabel, statusLabel, buttonBox);
+
+        return card;
     }
 
     private void showApprovalDialog(Consultation consultation) {
         Dialog<ApprovalData> dialog = new Dialog<>();
         dialog.setTitle("Approuver la consultation");
-        dialog.setHeaderText("Entrez la date et le prix de la consultation");
+        dialog.setHeaderText("Définir le prix et l'heure de la consultation");
 
-        // Ajouter les boutons
+        // Boutons
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        // Créer les champs
-        DatePicker datePicker = new DatePicker(consultation.getDate());
-        datePicker.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                setDisable(date.isBefore(LocalDate.now()));
-            }
-        });
 
         TextField priceField = new TextField();
         priceField.setPromptText("Prix (TND)");
-        priceField.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*(\\.\\d*)?")) {
-                priceField.setText(oldValue);
+
+        // Champ Heure - Solution simplifiée
+        TextField timeField = new TextField();
+        timeField.setPromptText("HH:mm");
+
+        timeField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.length() == 2 && oldVal.length() == 1) {
+                timeField.setText(newVal + ":");
+                timeField.positionCaret(3);
             }
         });
 
-        dialog.getDialogPane().setContent(new HBox(10,
-                new Label("Date:"), datePicker,
-                new Label("Prix:"), priceField
-        ));
 
-        // Convertir le résultat
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        grid.add(new Label("Prix (TND):"), 0, 0);
+        grid.add(priceField, 1, 0);
+        grid.add(new Label("Heure (HH:mm):"), 0, 1);
+        grid.add(timeField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
         dialog.setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
                 try {
-                    LocalDate date = datePicker.getValue();
                     double price = Double.parseDouble(priceField.getText());
-                    return new ApprovalData(date, price);
+                    String timeStr = timeField.getText();
+
+                    if (!timeStr.matches("^([01]?\\d|2[0-3]):[0-5]\\d$")) {
+                        showAlert("Erreur", "Format d'heure invalide. Utilisez HH:mm");
+                        return null;
+                    }
+
+                    return new ApprovalData(consultation.getDate(), timeStr, price);
                 } catch (NumberFormatException e) {
-                    showAlert("Erreur", "Veuillez entrer un prix valide (nombre décimal).");
+                    showAlert("Erreur", "Prix invalide");
                     return null;
                 }
             }
@@ -178,23 +250,21 @@ public class ListeConsultationsController implements Initializable {
 
         Optional<ApprovalData> result = dialog.showAndWait();
         result.ifPresent(data -> {
-            // Mettre à jour la consultation
-            serviceConsultation.updateConsultationDateAndPrice(consultation.getId(), data.date, data.price);
-            consultation.setDate(data.date);
-            consultation.setPrix(data.price);
+            serviceConsultation.updateStatutRendezVous(consultation.getRendez_vous_id(), "approuvé");
             consultation.setStatut("approuvé");
 
-            // Envoyer l'email
             try {
-                String patientEmail = serviceConsultation.getPatientEmailById(consultation.getPatient_id());
-                emailService.sendApprovalEmail(patientEmail, data.date.toString(), data.price);
-                showAlert("Succès", "Consultation approuvée et email envoyé au patient");
+                emailService.sendApprovalEmail(
+                        serviceConsultation.getPatientEmailById(consultation.getPatient_id()),
+                        consultation.getDate().toString(),
+                        data.time,
+                        data.price
+                );
+                showAlert("Succès", "Consultation approuvée");
+                loadAllConsultations();
             } catch (Exception e) {
-                showAlert("Erreur", "Échec de l'envoi de l'email : " + e.getMessage());
+                showAlert("Erreur", "Erreur d'envoi d'email");
             }
-
-            // Rafraîchir l'affichage
-            consultationsListView.refresh();
         });
     }
 
@@ -227,7 +297,7 @@ public class ListeConsultationsController implements Initializable {
         result.ifPresent(newDate -> {
             serviceConsultation.updateConsultationDate(consultation.getId(), newDate);
             consultation.setDate(newDate);
-            consultationsListView.refresh();
+            loadAllConsultations();
             showAlert("Succès", "Date de consultation modifiée avec succès");
         });
     }
@@ -240,13 +310,14 @@ public class ListeConsultationsController implements Initializable {
         alert.showAndWait();
     }
 
-    // Classe interne pour stocker les données du popup
     private static class ApprovalData {
         LocalDate date;
+        String time;
         double price;
 
-        ApprovalData(LocalDate date, double price) {
+        ApprovalData(LocalDate date, String time, double price) {
             this.date = date;
+            this.time = time;
             this.price = price;
         }
     }

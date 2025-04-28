@@ -24,6 +24,8 @@ C:\PI\javafx_clone\src\main\java\tn\esprit\models\Reclamation.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\models\RendeVous.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\models\Reponse.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\services\EmailService.java
+C:\PI\javafx_clone\src\main\java\tn\esprit\services\FirebaseNotificationService.java
+C:\PI\javafx_clone\src\main\java\tn\esprit\services\NotificationHistoryService.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\services\ServiceAddRdv.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\services\ServiceConsultation.java
 C:\PI\javafx_clone\src\main\java\tn\esprit\services\ServiceDiagnostique.java

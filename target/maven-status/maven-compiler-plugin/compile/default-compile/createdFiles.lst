@@ -6,8 +6,8 @@ tn\esprit\controllers\GestionReponse.class
 tn\esprit\controllers\MainController.class
 tn\esprit\controllers\ModifierRendezVousController.class
 tn\esprit\test\TestMain.class
-tn\esprit\controllers\ListeConsultationsController$3.class
 tn\esprit\models\RendeVous$StatutRendezVous.class
+tn\esprit\services\FirebaseNotificationService.class
 tn\esprit\services\EmailService$1.class
 tn\esprit\controllers\GestionRendezVous$1$1.class
 tn\esprit\controllers\GestionReponse$1.class
@@ -36,12 +36,12 @@ tn\esprit\controllers\HomeController.class
 tn\esprit\controllers\GestionRendezVous.class
 tn\esprit\controllers\ModifierPrescriptionController.class
 tn\esprit\interfaces\IService.class
+tn\esprit\services\NotificationHistoryService.class
 tn\esprit\controllers\ListeConsultationsController$1.class
 tn\esprit\controllers\AjouterPrescriptionDepuisDiag.class
 tn\esprit\controllers\GestionListeRdv.class
 tn\esprit\controllers\GestionReclamation$1.class
 tn\esprit\services\ServicePrescription.class
-tn\esprit\controllers\ListeConsultationsController$2.class
 tn\esprit\controllers\ModifierRendezVousController$1$1.class
 tn\esprit\controllers\EmailService.class
 tn\esprit\controllers\GestionPrescription.class
