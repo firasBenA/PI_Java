@@ -80,7 +80,7 @@ public class ListeReclamation {
             String badWord = BadWordsFilter.containsBadWord(newValue);
             if (badWord != null) {
                 TFsujet.setText(oldValue);
-                showAlert("Erreur", "Le mot interdit '" + badWord + "' n'est pas autorisé dans le sujet !");
+                showAlert("Erreur", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler \uD83D\uDE0A.");
             }
         });
 
@@ -92,7 +92,7 @@ public class ListeReclamation {
             String badWord = BadWordsFilter.containsBadWord(newValue);
             if (badWord != null) {
                 TFdescription.setText(oldValue);
-                showAlert("Erreur", "Le mot interdit '" + badWord + "' n'est pas autorisé dans la description !");
+                showAlert("Erreur", "Oops ! Certains mots de votre commentaire ne respectent pas nos règles. Essayez de les reformuler \uD83D\uDE0A.");
             }
         });
 
