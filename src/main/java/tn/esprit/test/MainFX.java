@@ -5,28 +5,38 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tn.esprit.controllers.LoginController;
+import tn.esprit.repository.UserRepository;
+import tn.esprit.repository.UserRepositoryImpl;
+import tn.esprit.services.AuthService;
+import tn.esprit.utils.SceneManager;
 
 import java.io.IOException;
 
 public class MainFX extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
-    @Override
-    public void start(Stage primaryStage) {
+        private SceneManager sceneManager;
+        private AuthService authService;
 
-        FXMLLoader loader =new FXMLLoader(getClass().getResource("/Main.fxml"));
-        try {
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("---- Gestion Personne -----");
+        @Override
+        public void start(Stage primaryStage) {
+            // Initialize dependencies
+            UserRepository userRepository = new UserRepositoryImpl();
+            authService = new AuthService(userRepository);
+            sceneManager = new SceneManager(primaryStage, authService);
+
+            // Set the stage title
+            primaryStage.setTitle("Medical Application");
+
+            // Show the login scene on launch
+            sceneManager.showLoginScene();
+
+            // Show the stage
             primaryStage.show();
+        }
 
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        public static void main(String[] args) {
+            launch(args);
         }
     }
-}

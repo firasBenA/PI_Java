@@ -21,6 +21,8 @@
                 <Button text="Gestion Reclamation" onAction="#goGestionReclamation" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reponse" onAction="#goGestionReponse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
 
+                <Button text="Gestion Produit" onAction="#goGestionProduit" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
+
                 <!-- Spacer -->
                 <VBox fx:id="spacer" VBox.vgrow="ALWAYS" />
 

@@ -1,23 +1,65 @@
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\AjouterPrescriptionDepuisDiag.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\GestionDiagnostique.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\GestionPrescription.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\GestionReclamation.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\GestionReponse.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\HomeController.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\ListeReclamation.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\MainController.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\MedecinPrescDiag.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\ModifierPrescriptionController.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\controllers\PatientDashboardController.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\interfaces\IService.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\models\Diagnostique.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\models\Prescription.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\models\Reclamation.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\models\Reponse.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\services\ServiceDiagnostique.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\services\ServicePrescription.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\services\ServiceReclamation.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\services\ServiceReponse.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\test\MainFX.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\test\TestMain.java
-C:\Users\Mechket Mlayeh\Downloads\PI_Java-main_clone\src\main\java\tn\esprit\utils\MyDataBase.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\AdminDashboard.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\AjouterPrescriptionDepuisDiag.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\ArticleController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\CallbackServerManager.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\DoctorStatsController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\EvenementController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\EventDetailsController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\GestionDiagnostique.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\GestionListeRdv.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\GestionPersonne.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\GestionPrescription.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\GestionReclamation.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\GestionRendezVous.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\GestionReponse.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\HomeController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\ListeConsultationsController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\ListeReclamation.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\LoginController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\MainController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\MedecinDashboardController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\MedecinPrescDiag.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\ModifierPrescriptionController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\ModifierRendezVousController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\PanierController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\PatientDashboardController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\PatientDashboardEAController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\ProduitController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\controllers\RegisterController.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\interfaces\IService.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Admin.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Article.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Consultation.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Diagnostique.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Evenement.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Medecin.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Panier.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Patient.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Personne.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Prescription.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Produit.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Reclamation.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\RendeVous.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\Reponse.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\models\User.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\repository\UserRepository.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\repository\UserRepositoryImpl.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\AuthException.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\AuthService.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceAddRdv.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceArticle.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceConsultation.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceDiagnostique.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceEvenement.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServicePanier.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServicePersonne.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServicePrescription.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceProduit.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceReclamation.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceReponse.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\services\ServiceUser.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\test\Main.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\test\MainFX.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\test\TestMain.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\utils\MyDataBase.java
+C:\Users\Pc\Desktop\pidev_2025\uzi\PI_Java\src\main\java\tn\esprit\utils\SceneManager.java

@@ -1,0 +1,242 @@
+/* Base Styles */
+.root {
+    -fx-background-color: #f8f9fa;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Header Styles */
+.header-box {
+    -fx-padding: 15px;
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+.cart-count-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: #e74c3c;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 10px;
+}
+
+.dashboard-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-fill: #2c3e50;
+}
+
+.welcome-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #7f8c8d;
+}
+
+.info-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #3498db;
+}
+
+/* Button Styles */
+.edit-profile-btn {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5 10;
+    -fx-background-radius: 15;
+}
+
+.nav-btn {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+}
+
+.nav-btn:hover {
+    -fx-background-color: #2980b9;
+}
+
+.logout-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+}
+
+.logout-btn:hover {
+    -fx-background-color: #c0392b;
+}
+
+.primary-btn {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #2980b9;
+}
+
+.danger-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+}
+
+.danger-btn:hover {
+    -fx-background-color: #c0392b;
+}
+
+.quick-action-btn {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+}
+
+.quick-action-btn:hover {
+    -fx-background-color: #27ae60;
+}
+
+.emergency-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+}
+
+.emergency-btn:hover {
+    -fx-background-color: #c0392b;
+    -fx-effect: dropshadow(gaussian, rgba(231, 76, 60, 0.4), 10, 0, 0, 0);
+}
+
+/* Card Styles */
+.info-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-fill: #2c3e50;
+}
+
+/* Form Styles */
+.field-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4a5568;
+}
+
+.form-field {
+    -fx-pref-height: 35px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-background-color: white;
+    -fx-padding: 0 10px;
+}
+
+.form-field:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.2), 10, 0, 0, 0);
+}
+
+.form-textarea {
+    -fx-pref-height: 80px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-background-color: white;
+    -fx-padding: 5px 10px;
+}
+
+/* Medical Info Styles */
+.medical-summary {
+    -fx-padding: 15px;
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.medical-info-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #4a5568;
+}
+
+/* Appointments List */
+.appointments-list {
+    -fx-background-color: transparent;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.appointments-list .list-cell {
+    -fx-padding: 10px;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.appointments-list .list-cell:filled:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.placeholder-label {
+    -fx-text-fill: #718096;
+    -fx-font-style: italic;
+}
+
+/* Status Message */
+.status-message {
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER;
+    -fx-padding: 10px;
+}
+
+.status-message {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+
+.success-message {
+    -fx-text-fill: #2ecc71; /* Vert */
+    -fx-background-color: #e8f8f5;
+}
+
+.error-message {
+    -fx-text-fill: #e74c3c; /* Rouge */
+    -fx-background-color: #fdedec;
+}
+
+/* Style pour les messages d'erreur */
+.error-label {
+    -fx-text-fill: #e74c3c; /* Rouge */
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Style pour le messageLabel */
+#messageLabel.success {
+    -fx-text-fill: #27ae60; /* Vert */
+    -fx-font-weight: bold;
+}
+
+#messageLabel.error {
+    -fx-text-fill: #e74c3c; /* Rouge */
+    -fx-font-weight: bold;
+}

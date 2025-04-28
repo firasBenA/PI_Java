@@ -3,21 +3,27 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="your.java.package.controllers.ProduitController" prefWidth="600" prefHeight="400">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.ProduitController" prefWidth="600" prefHeight="450">
     <children>
         <TableView fx:id="tableProduit" layoutX="20" layoutY="20" prefWidth="560" prefHeight="200">
             <columns>
-                <TableColumn fx:id="colId" text="ID" />
-                <TableColumn fx:id="colName" text="Name" />
-                <TableColumn fx:id="colPrice" text="Price" />
+                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                <TableColumn fx:id="colName" text="Nom" prefWidth="250"/>
+                <TableColumn fx:id="colPrice" text="Prix" prefWidth="150"/>
             </columns>
         </TableView>
 
-        <TextField fx:id="tfName" layoutX="20" layoutY="230" promptText="Name"/>
-        <TextField fx:id="tfPrice" layoutX="200" layoutY="230" promptText="Price"/>
+        <!-- Champs formulaire -->
+        <TextField fx:id="tfNom" layoutX="20" layoutY="230" prefWidth="200" promptText="Nom"/>
+        <TextArea fx:id="taDescription" layoutX="20" layoutY="270" prefWidth="200" prefHeight="60" promptText="Description"/>
 
-        <Button text="Add" layoutX="20" layoutY="270" onAction="#addProduit"/>
-        <Button text="Update" layoutX="100" layoutY="270" onAction="#updateProduit"/>
-        <Button text="Delete" layoutX="180" layoutY="270" onAction="#deleteProduit"/>
+        <TextField fx:id="tfPrix" layoutX="250" layoutY="230" prefWidth="200" promptText="Prix"/>
+        <TextField fx:id="tfStock" layoutX="250" layoutY="270" prefWidth="200" promptText="Stock"/>
+        <TextField fx:id="tfImage" layoutX="250" layoutY="310" prefWidth="200" promptText="Image URL"/>
+
+        <!-- Boutons -->
+        <Button text="Add" layoutX="20" layoutY="370" prefWidth="80" onAction="#addProduit"/>
+        <Button text="Update" layoutX="120" layoutY="370" prefWidth="80" onAction="#updateProduit"/>
+        <Button text="Delete" layoutX="220" layoutY="370" prefWidth="80" onAction="#deleteProduit"/>
     </children>
 </AnchorPane>

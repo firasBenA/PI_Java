@@ -8,6 +8,7 @@ import tn.esprit.services.ServicePanier;
 import tn.esprit.models.Panier;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class PanierController {
 
@@ -16,7 +17,7 @@ public class PanierController {
     @FXML private TableColumn<Panier, Integer> colUserId;
     @FXML private TextField tfUserId;
 
-    private final PanierDAO panierDAO = new PanierDAO();
+    private final ServicePanier servicePanier = new ServicePanier();
 
     @FXML
     public void initialize() {
@@ -27,22 +28,20 @@ public class PanierController {
     }
 
     private void refreshTable() {
-        try {
-            ObservableList<Panier> list = FXCollections.observableArrayList(panierDAO.getAllPaniers());
-            tablePanier.setItems(list);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        ObservableList<Panier> list = FXCollections.observableArrayList(servicePanier.getAll());
+        tablePanier.setItems(list);
     }
 
     @FXML
     private void addPanier() {
         try {
             int userId = Integer.parseInt(tfUserId.getText());
-            panierDAO.addPanier(new Panier(userId));
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            Panier newPanier = new Panier(userId, now, now); // Create a full Panier
+            servicePanier.add(newPanier);
             refreshTable();
             tfUserId.clear();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -51,13 +50,10 @@ public class PanierController {
     private void updatePanier() {
         Panier selected = tablePanier.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            try {
-                selected.setUserId(Integer.parseInt(tfUserId.getText()));
-                panierDAO.updatePanier(selected);
-                refreshTable();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            selected.setUserId(Integer.parseInt(tfUserId.getText()));
+            selected.setMajLe(new Timestamp(System.currentTimeMillis())); // Update last modified
+            servicePanier.update(selected);
+            refreshTable();
         }
     }
 
@@ -66,9 +62,9 @@ public class PanierController {
         Panier selected = tablePanier.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
-                panierDAO.deletePanier(selected.getId());
+                servicePanier.delete(selected); // Pass the full Panier, not ID
                 refreshTable();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

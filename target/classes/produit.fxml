@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.ProduitController" prefWidth="800" prefHeight="600">
+    <children>
+
+        <!-- Download PDF Button -->
+        <Button text="Download PDF" onAction="#handleDownloadPdf" layoutX="20" layoutY="10" prefWidth="150"/>
+
+        <!-- TableView shifted lower -->
+        <TableView fx:id="tableProduit" layoutX="20" layoutY="60" prefWidth="760" prefHeight="250">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                <TableColumn fx:id="colName" text="Nom" prefWidth="150"/>
+                <TableColumn fx:id="colPrice" text="Prix" prefWidth="100"/>
+                <TableColumn fx:id="colStock" text="Stock" prefWidth="80"/>
+                <TableColumn fx:id="colImage" text="Image" prefWidth="200"/>
+                <TableColumn fx:id="colDescription" text="Description" prefWidth="300"/>
+            </columns>
+        </TableView>
+
+        <!-- Fields and Labels -->
+        <Label text="Nom:" layoutX="20" layoutY="330"/>
+        <TextField fx:id="tfNom" layoutX="100" layoutY="325" prefWidth="200" promptText="Nom"/>
+
+        <Label text="Prix:" layoutX="20" layoutY="380"/>
+        <TextField fx:id="tfPrix" layoutX="100" layoutY="375" prefWidth="200" promptText="Prix"/>
+
+        <Label text="Stock:" layoutX="20" layoutY="430"/>
+        <TextField fx:id="tfStock" layoutX="100" layoutY="425" prefWidth="200" promptText="Stock"/>
+
+        <Label text="Image:" layoutX="20" layoutY="480"/>
+        <TextField fx:id="tfImage" layoutX="100" layoutY="475" prefWidth="200" promptText="Image Name"/>
+        <Button text="Select Image" layoutX="320" layoutY="475" onAction="#handleSelectImage" prefWidth="120"/>
+
+        <Label text="Description:" layoutX="350" layoutY="330"/>
+        <TextArea fx:id="taDescription" layoutX="450" layoutY="325" prefWidth="330" prefHeight="170" promptText="Description..."/>
+
+        <!-- Action Buttons -->
+        <Button text="Add" layoutX="100" layoutY="530" onAction="#addProduit" prefWidth="100"/>
+        <Button text="Update" layoutX="250" layoutY="530" onAction="#updateProduit" prefWidth="100"/>
+        <Button text="Delete" layoutX="400" layoutY="530" onAction="#deleteProduit" prefWidth="100"/>
+
+    </children>
+</AnchorPane>

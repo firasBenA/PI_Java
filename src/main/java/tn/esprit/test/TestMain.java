@@ -5,18 +5,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tn.esprit.controllers.MainController;
+import tn.esprit.repository.UserRepositoryImpl;
+import tn.esprit.services.AuthService;
+import tn.esprit.utils.SceneManager;
 
-import java.util.Objects;
+import static javafx.application.Application.launch;
 
-public class TestMain extends Application {
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/Main.fxml")));
-        primaryStage.setTitle("Ajouter Réclamation");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
-    }
+public class TestMain  {
 
     public static void main(String[] args) {
         launch(args);

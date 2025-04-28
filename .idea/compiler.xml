@@ -10,5 +10,8 @@
         <module name="PI_Java" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="PI_JAVA" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
