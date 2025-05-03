@@ -4,14 +4,21 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import tn.esprit.models.Evenement;
 import tn.esprit.models.Article;
 import tn.esprit.services.ServiceEvenement;
 import tn.esprit.services.ServiceArticle;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GererController {
 
@@ -37,7 +44,9 @@ public class GererController {
     @FXML
     private TextArea articleContenueField;
     @FXML
-    private TextField articleImageField;
+    private Button articleImageButton;
+    @FXML
+    private Label articleImageLabel;
     @FXML
     private ComboBox<Evenement> articleEvenementCombo;
     @FXML
@@ -50,6 +59,7 @@ public class GererController {
     private Evenement selectedEvenement;
     private Article selectedArticle;
     private List<Evenement> tempEvenementList;
+    private String uploadedImagePath;
 
     @FXML
     public void initialize() {
@@ -64,10 +74,34 @@ public class GererController {
                 tempEvenementList.add(newValue);
                 articleErrorLabel.setText("Événements sélectionnés : " +
                         String.join(", ", tempEvenementList.stream().map(Evenement::getNom).toList()));
-                articleErrorLabel.setStyle("-fx-text-fill: black;");
+                articleErrorLabel.setStyle("-fx-text-fill: #34495e; -fx-font-family: 'Arial';");
                 articleEvenementCombo.getSelectionModel().clearSelection();
             }
         });
+        articleImageButton.setOnAction(e -> uploadImage());
+    }
+
+    private void uploadImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
+        );
+        File selectedFile = fileChooser.showOpenDialog(articleImageButton.getScene().getWindow());
+        if (selectedFile != null) {
+            try {
+                Path targetDir = Paths.get("src/main/resources/ImagesArticles");
+                Files.createDirectories(targetDir);
+                String fileName = UUID.randomUUID() + "_" + selectedFile.getName();
+                Path targetPath = targetDir.resolve(fileName);
+                Files.copy(selectedFile.toPath(), targetPath);
+                uploadedImagePath = "/ImagesArticles/" + fileName;
+                articleImageLabel.setText("Image: " + selectedFile.getName());
+                articleImageLabel.setStyle("-fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+            } catch (IOException ex) {
+                showArticleError("Erreur lors du téléchargement de l'image : " + ex.getMessage());
+            }
+        }
     }
 
     private void loadEvenements() {
@@ -81,20 +115,24 @@ public class GererController {
     }
 
     private HBox createEvenementCard(Evenement evenement) {
-        HBox card = new HBox(10);
+        HBox card = new HBox(15);
         card.setUserData(evenement);
         card.setOnMouseClicked(event -> selectEvenement(evenement));
-        card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
-        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"));
-        VBox details = new VBox(5);
-        details.getChildren().addAll(
-                new Label("Nom: " + truncate(evenement.getNom(), 30)),
-                new Label("Type: " + truncate(evenement.getType(), 30)),
-                new Label("Statut: " + truncate(evenement.getStatut(), 30)),
-                new Label("Lieu: " + truncate(evenement.getLieuxEvent(), 30)),
-                new Label("Date: " + evenement.getDateEvent())
-        );
+        card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0, 0, 3);"));
+        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);"));
+        VBox details = new VBox(8);
+        Label nomLabel = new Label("Nom: " + truncate(evenement.getNom(), 30));
+        nomLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Arial';");
+        Label typeLabel = new Label("Type: " + truncate(evenement.getType(), 30));
+        typeLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+        Label statutLabel = new Label("Statut: " + truncate(evenement.getStatut(), 30));
+        statutLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+        Label lieuLabel = new Label("Lieu: " + truncate(evenement.getLieuxEvent(), 30));
+        lieuLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+        Label dateLabel = new Label("Date: " + evenement.getDateEvent());
+        dateLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+        details.getChildren().addAll(nomLabel, typeLabel, statutLabel, lieuLabel, dateLabel);
         card.getChildren().add(details);
         return card;
     }
@@ -206,12 +244,12 @@ public class GererController {
 
     private void showEvenementError(String message) {
         evenementErrorLabel.setText(message);
-        evenementErrorLabel.setStyle("-fx-text-fill: red;");
+        evenementErrorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-family: 'Arial';");
     }
 
     private void showEvenementSuccess(String message) {
         evenementErrorLabel.setText(message);
-        evenementErrorLabel.setStyle("-fx-text-fill: green;");
+        evenementErrorLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-family: 'Arial';");
     }
 
     private void loadArticles() {
@@ -224,21 +262,24 @@ public class GererController {
     }
 
     private HBox createArticleCard(Article article) {
-        HBox card = new HBox(10);
+        HBox card = new HBox(15);
         card.setUserData(article);
         card.setOnMouseClicked(event -> selectArticle(article));
-        card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
-        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"));
-        VBox details = new VBox(5);
+        card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0, 0, 3);"));
+        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);"));
+        VBox details = new VBox(8);
         String evenementsStr = article.getEvenements().isEmpty() ? "Aucun" :
                 String.join(", ", article.getEvenements().stream().map(Evenement::getNom).toList());
-        details.getChildren().addAll(
-                new Label("Titre: " + truncate(article.getTitre(), 30)),
-                new Label("Événements: " + truncate(evenementsStr, 30)),
-                new Label("Image: " + truncate(article.getImage(), 30)),
-                new Label("Likes: " + article.getLikeCount())
-        );
+        Label titreLabel = new Label("Titre: " + truncate(article.getTitre(), 30));
+        titreLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Arial';");
+        Label evenementsLabel = new Label("Événements: " + truncate(evenementsStr, 30));
+        evenementsLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+        Label imageLabel = new Label("Image: " + truncate(article.getImage(), 30));
+        imageLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+        Label likesLabel = new Label("Likes: " + article.getLikeCount());
+        likesLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';");
+        details.getChildren().addAll(titreLabel, evenementsLabel, imageLabel, likesLabel);
         card.getChildren().add(details);
         return card;
     }
@@ -247,13 +288,15 @@ public class GererController {
         selectedArticle = article;
         articleTitreField.setText(article.getTitre());
         articleContenueField.setText(article.getContenue());
-        articleImageField.setText(article.getImage());
+        uploadedImagePath = article.getImage();
+        articleImageLabel.setText("Image: " + (article.getImage().isEmpty() ? "Aucune" : Paths.get(article.getImage()).getFileName().toString()));
+        articleImageLabel.setStyle("-fx-text-fill: #34495e; -fx-font-family: 'Arial';");
         tempEvenementList.clear();
         tempEvenementList.addAll(article.getEvenements());
         articleEvenementCombo.getSelectionModel().clearSelection();
         articleErrorLabel.setText("Événements sélectionnés : " +
                 String.join(", ", tempEvenementList.stream().map(Evenement::getNom).toList()));
-        articleErrorLabel.setStyle("-fx-text-fill: black;");
+        articleErrorLabel.setStyle("-fx-text-fill: #34495e; -fx-font-family: 'Arial';");
     }
 
     private void updateEvenementCombo() {
@@ -284,7 +327,7 @@ public class GererController {
         Article article = new Article();
         article.setTitre(articleTitreField.getText());
         article.setContenue(articleContenueField.getText());
-        article.setImage(articleImageField.getText());
+        article.setImage(uploadedImagePath);
         article.setEvenements(new ArrayList<>(tempEvenementList));
         serviceArticle.add(article);
         loadArticles();
@@ -303,7 +346,7 @@ public class GererController {
         }
         selectedArticle.setTitre(articleTitreField.getText());
         selectedArticle.setContenue(articleContenueField.getText());
-        selectedArticle.setImage(articleImageField.getText());
+        selectedArticle.setImage(uploadedImagePath);
         selectedArticle.setEvenements(new ArrayList<>(tempEvenementList));
         serviceArticle.update(selectedArticle);
         loadArticles();
@@ -327,11 +370,13 @@ public class GererController {
     private void clearArticleFields() {
         articleTitreField.clear();
         articleContenueField.clear();
-        articleImageField.clear();
+        uploadedImagePath = null;
+        articleImageLabel.setText("Image: Aucune");
+        articleImageLabel.setStyle("-fx-text-fill: #34495e; -fx-font-family: 'Arial';");
         tempEvenementList.clear();
         articleEvenementCombo.getSelectionModel().clearSelection();
         articleErrorLabel.setText("Événements sélectionnés : Aucun");
-        articleErrorLabel.setStyle("-fx-text-fill: black;");
+        articleErrorLabel.setStyle("-fx-text-fill: #34495e; -fx-font-family: 'Arial';");
         selectedArticle = null;
     }
 
@@ -344,8 +389,8 @@ public class GererController {
             showArticleError("Le contenu ne peut pas être vide.");
             return false;
         }
-        if (articleImageField.getText().isEmpty()) {
-            showArticleError("Le chemin de l'image ne peut pas être vide.");
+        if (uploadedImagePath == null || uploadedImagePath.isEmpty()) {
+            showArticleError("Veuillez sélectionner une image.");
             return false;
         }
         if (tempEvenementList.isEmpty()) {
@@ -357,12 +402,12 @@ public class GererController {
 
     private void showArticleError(String message) {
         articleErrorLabel.setText(message);
-        articleErrorLabel.setStyle("-fx-text-fill: red;");
+        articleErrorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-family: 'Arial';");
     }
 
     private void showArticleSuccess(String message) {
         articleErrorLabel.setText(message);
-        articleErrorLabel.setStyle("-fx-text-fill: green;");
+        articleErrorLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-family: 'Arial';");
     }
 
     private String truncate(String text, int maxLength) {
