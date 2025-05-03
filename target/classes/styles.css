@@ -355,7 +355,6 @@
     -fx-text-fill: #FFFFFF; /* White text for contrast */
 }
 
-/* Sweet Alert styling for confirmation dialogs */
 .sweet-alert {
     -fx-background-color: #ffffff;
     -fx-border-radius: 12px;
@@ -413,7 +412,7 @@
     transition: -fx-text-fill 0.3s ease, -fx-scale-x 0.3s ease, -fx-scale-y 0.3s ease;
 }
 
-/* Hover effect for stars */
+
 .star:hover {
     -fx-text-fill: #ffd700; /* Gold color on hover */
     -fx-scale-x: 1.1; /* Slight scale increase */
@@ -426,7 +425,7 @@
     -fx-text-fill: #ffd700; /* Gold for filled stars */
 }
 
-/* Styling for rated stars */
+
 .rating-text {
     -fx-font-size: 24px;
     -fx-text-fill: #ffd700 !important; /* Gold for rated stars, enforce with !important */
@@ -441,8 +440,8 @@
 
 /* Refresh button styling */
 .refresh-button {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: white;
+    -fx-background-color: #095d7e;
+    -fx-text-fill: #ffffff;
     -fx-font-size: 14px;
     -fx-padding: 8 16;
     -fx-background-radius: 4;
@@ -450,7 +449,7 @@
 }
 
 .refresh-button:hover {
-    -fx-background-color: #45a049;
+    -fx-background-color:#14967f;
     transition: -fx-background-color 0.2s ease;
 }
 

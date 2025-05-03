@@ -440,8 +440,8 @@
 
 /* Refresh button styling */
 .refresh-button {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: white;
+    -fx-background-color: #095d7e;
+    -fx-text-fill: #ffffff;
     -fx-font-size: 14px;
     -fx-padding: 8 16;
     -fx-background-radius: 4;
@@ -449,7 +449,7 @@
 }
 
 .refresh-button:hover {
-    -fx-background-color: #45a049;
+    -fx-background-color:#14967f;
     transition: -fx-background-color 0.2s ease;
 }
 
