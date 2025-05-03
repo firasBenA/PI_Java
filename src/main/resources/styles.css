@@ -373,7 +373,7 @@
 }
 
 .sweet-alert .content {
-    -fx-wrap-text: true; 
+    -fx-wrap-text: true;
     -fx-font-size: 14px;
     -fx-text-fill: #2f4f4f;
     -fx-padding: 20px;
@@ -407,7 +407,7 @@
 }
 .star {
     -fx-font-size: 24px;
-    -fx-text-fill: #cccccc; /* Default gray color for empty stars */
+    -fx-text-fill: #cccccc;
     -fx-cursor: hand;
     -fx-padding: 5;
     transition: -fx-text-fill 0.3s ease, -fx-scale-x 0.3s ease, -fx-scale-y 0.3s ease;
