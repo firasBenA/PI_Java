@@ -438,3 +438,29 @@
 .rating-box .text {
     -fx-fill: #ffd700 !important; /* Ensure all text in rating box is gold */
 }
+
+/* Refresh button styling */
+.refresh-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8 16;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.refresh-button:hover {
+    -fx-background-color: #45a049;
+    transition: -fx-background-color 0.2s ease;
+}
+
+/* Centered label for PieChart total */
+.pie-chart-center-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-background-radius: 20;
+    -fx-padding: 5 10;
+    -fx-alignment: center;
+}
