@@ -33,7 +33,7 @@ public class Statistiques {
         this.unratedCount = unratedCount;
     }
 
-    // Getters
+    
     public int getTotalCount() { return totalCount; }
     public int getEnAttenteCount() { return enAttenteCount; }
     public int getTraiteCount() { return traiteCount; }

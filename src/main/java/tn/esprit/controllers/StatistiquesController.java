@@ -20,7 +20,7 @@ public class StatistiquesController {
     private PieChart ratingPieChart; // PieChart for client satisfaction
 
     @FXML
-    private Label ratingTotalLabel; 
+    private Label ratingTotalLabel;
 
     private final ServiceStatistiques serviceStatistiques = new ServiceStatistiques();
 
