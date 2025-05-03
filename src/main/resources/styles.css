@@ -355,7 +355,6 @@
     -fx-text-fill: #FFFFFF; /* White text for contrast */
 }
 
-/* Sweet Alert styling for confirmation dialogs */
 .sweet-alert {
     -fx-background-color: #ffffff;
     -fx-border-radius: 12px;
