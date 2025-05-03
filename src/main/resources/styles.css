@@ -406,7 +406,7 @@
     -fx-background-color: #e63939;
 }
 .star {
-    -fx-font-size: 24px; /* Larger stars */
+    -fx-font-size: 24px; 
     -fx-text-fill: #cccccc; /* Default gray color for empty stars */
     -fx-cursor: hand;
     -fx-padding: 5;
