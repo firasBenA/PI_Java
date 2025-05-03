@@ -15,7 +15,7 @@
 
     <VBox spacing="20" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
 
-        <!-- Title -->
+        
         <Text text="Statistiques des Réclamations" styleClass="title"/>
 
         <!-- Charts container -->
