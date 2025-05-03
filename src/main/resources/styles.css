@@ -373,11 +373,11 @@
 }
 
 .sweet-alert .content {
-    -fx-wrap-text: true; /* Permet au texte de passer à la ligne */
+    -fx-wrap-text: true; 
     -fx-font-size: 14px;
     -fx-text-fill: #2f4f4f;
     -fx-padding: 20px;
-    -fx-text-alignment: left; 
+    -fx-text-alignment: left;
 }
 
 .sweet-alert .button {
