@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
 import tn.esprit.services.ServiceAddRdv;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +29,7 @@ import java.util.function.Consumer;
 
 public class GestionRendezVous implements Initializable {
 
-    @FXML private DatePicker date;
+    @FXML private CalendarView calendarView;
     @FXML private ComboBox<String> type_rdv;
     @FXML private ComboBox<String> medecin;
     @FXML private TextArea cause;
@@ -49,7 +47,8 @@ public class GestionRendezVous implements Initializable {
     private Map<LocalDate, Integer> rdvCountByDate = new HashMap<>();
     private int currentMedecinId = -1;
     private Consumer<String> notificationListener;
-    private final List<String> notificationHistory = new ArrayList<>(); // Historique des notifications
+    private final List<String> notificationHistory = new ArrayList<>();
+    private LocalDate selectedDate;
 
     public void setNotificationListener(Consumer<String> listener) {
         this.notificationListener = listener;
@@ -66,11 +65,10 @@ public class GestionRendezVous implements Initializable {
         // Chargement des médecins
         loadMedecins();
 
-        // Configurer le DatePicker
-        configureDatePicker();
+        // Configurer le CalendarView
+        configureCalendarView();
 
         // Effacer les messages d'erreur lorsqu'on modifie les champs
-        date.valueProperty().addListener((obs, oldVal, newVal) -> dateError.setText(""));
         type_rdv.valueProperty().addListener((obs, oldVal, newVal) -> typeError.setText(""));
         medecin.valueProperty().addListener((obs, oldVal, newVal) -> {
             medecinError.setText("");
@@ -81,38 +79,37 @@ public class GestionRendezVous implements Initializable {
         cause.textProperty().addListener((obs, oldVal, newVal) -> causeError.setText(""));
     }
 
-    private void configureDatePicker() {
-        date.setDayCellFactory(new Callback<DatePicker, DateCell>() {
-            @Override
-            public DateCell call(DatePicker param) {
-                return new DateCell() {
-                    @Override
-                    public void updateItem(LocalDate item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                        if (item != null && !empty && currentMedecinId != -1) {
-                            int count = rdvCountByDate.getOrDefault(item, 0);
-
-                            if (count >= 3) {
-                                setStyle("-fx-background-color: #ffcccc;"); // Rouge
-                            } else if (count == 2) {
-                                setStyle("-fx-background-color: #ffebcc;"); // Orange
-                            } else if (count <= 1) {
-                                setStyle("-fx-background-color: #ccffcc;"); // Vert
-                            }
-
-                            setTooltip(new Tooltip(count + " consultation(s) ce jour"));
-
-                            // Désactiver les dates passées
-                            if (item.isBefore(LocalDate.now())) {
-                                setDisable(true);
-                                setStyle("-fx-background-color: #eeeeee;");
-                            }
-                        }
-                    }
-                };
-            }
+    private void configureCalendarView() {
+        calendarView.setOnDateSelected(date -> {
+            this.selectedDate = date;
+            dateError.setText("");
+            updateCalendarAppearance();
         });
+    }
+
+    private void updateCalendarAppearance() {
+        if (currentMedecinId != -1) {
+            calendarView.getCalendarDays().forEach(day -> {
+                LocalDate date = day.getDate();
+                int count = rdvCountByDate.getOrDefault(date, 0);
+
+                if (date.equals(selectedDate)) {
+                    day.setSelected(true);
+                }
+
+                if (count >= 3) {
+                    day.setStyle("-fx-background-color: #ffcccc;");
+                } else if (count == 2) {
+                    day.setStyle("-fx-background-color: #ffebcc;");
+                } else if (count <= 1 && !date.isBefore(LocalDate.now())) {
+                    day.setStyle("-fx-background-color: #ccffcc;");
+                }
+
+                if (date.isBefore(LocalDate.now())) {
+                    day.setDisable(true);
+                }
+            });
+        }
     }
 
     private void updateMedecinSelection() {
@@ -161,9 +158,7 @@ public class GestionRendezVous implements Initializable {
                 rdvCountByDate.put(date, count);
             }
 
-            // Rafraîchir le DatePicker
-            date.setValue(null);
-            date.show();
+            updateCalendarAppearance();
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors du chargement des rendez-vous");
             e.printStackTrace();
@@ -231,7 +226,7 @@ public class GestionRendezVous implements Initializable {
 
                 // Création et sauvegarde du rendez-vous
                 RendeVous rdv = new RendeVous();
-                rdv.setDate(date.getValue());
+                rdv.setDate(selectedDate);
                 rdv.setType(type_rdv.getValue());
                 rdv.setCause(cause.getText());
                 rdv.setIdMedecin(currentMedecinId);
@@ -242,17 +237,7 @@ public class GestionRendezVous implements Initializable {
                 serviceAddRdv.add(rdv);
 
                 // Afficher la notification
-                notificationLabel.setText("Rendez-vous enregistré avec succès !");
-                notificationLabel.setVisible(true);
-                notificationLabel.setManaged(true);
-
-                // Masquer la notification après 3 secondes
-                PauseTransition pause = new PauseTransition(Duration.seconds(3));
-                pause.setOnFinished(e -> {
-                    notificationLabel.setVisible(false);
-                    notificationLabel.setManaged(false);
-                });
-                pause.play();
+                showNotification("Rendez-vous enregistré avec succès !");
 
                 // Envoyer la notification à l'historique
                 String doctorName = getDoctorName(currentMedecinId);
@@ -263,15 +248,47 @@ public class GestionRendezVous implements Initializable {
                     notificationListener.accept(notificationMessage);
                 }
 
-                clearFields();
-
                 // Mettre à jour le calendrier après l'ajout
                 loadRendezVousForMedecin();
+
+                // Redirection vers listrdv.fxml
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/listrdv.fxml"));
+                    Parent root = loader.load();
+
+                    // Get the current stage
+                    Stage stage = (Stage) notificationLabel.getScene().getWindow();
+
+                    // Set the new scene
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    showAlert("Erreur", "Impossible de charger la page des rendez-vous. Vérifiez que listrdv.fxml existe dans /tn/esprit/views/.");
+                }
+
+                clearFields();
+
             } catch (Exception e) {
                 showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");
                 e.printStackTrace();
             }
         }
+    }
+
+    private void showNotification(String message) {
+        notificationLabel.setText(message);
+        notificationLabel.setVisible(true);
+        notificationLabel.setManaged(true);
+
+        // Masquer la notification après 3 secondes
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> {
+            notificationLabel.setVisible(false);
+            notificationLabel.setManaged(false);
+        });
+        pause.play();
     }
 
     private boolean validerFormulaire() {
@@ -283,10 +300,10 @@ public class GestionRendezVous implements Initializable {
         medecinError.setText("");
         causeError.setText("");
 
-        if (date.getValue() == null) {
+        if (selectedDate == null) {
             dateError.setText("La date est obligatoire");
             isValid = false;
-        } else if (date.getValue().isBefore(LocalDate.now())) {
+        } else if (selectedDate.isBefore(LocalDate.now())) {
             dateError.setText("La date ne peut pas être dans le passé");
             isValid = false;
         }
@@ -313,7 +330,8 @@ public class GestionRendezVous implements Initializable {
     }
 
     private void clearFields() {
-        date.setValue(null);
+        calendarView.setSelectedDate(null);
+        selectedDate = null;
         type_rdv.getSelectionModel().clearSelection();
         cause.clear();
     }
@@ -329,11 +347,7 @@ public class GestionRendezVous implements Initializable {
     @FXML
     private void showNotificationHistory() {
         try {
-            URL fxmlLocation = getClass().getResource("/tn/esprit/views/notificationHistorique.fxml");
-            if (fxmlLocation == null) {
-                throw new IOException("Cannot find /tn/esprit/views/notificationHistorique.fxml");
-            }
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/notificationHistorique.fxml"));
             Parent root = loader.load();
 
             NotificationHistoryController controller = loader.getController();
@@ -345,8 +359,7 @@ public class GestionRendezVous implements Initializable {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
         } catch (IOException e) {
-            showAlert("Erreur", "Impossible d'ouvrir l'historique des notifications"
-            );
+            showAlert("Erreur", "Impossible d'ouvrir l'historique des notifications");
             e.printStackTrace();
         }
     }
