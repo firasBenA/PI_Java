@@ -377,7 +377,7 @@
     -fx-font-size: 14px;
     -fx-text-fill: #2f4f4f;
     -fx-padding: 20px;
-    -fx-text-alignment: left; /* Alignement du texte */
+    -fx-text-alignment: left; 
 }
 
 .sweet-alert .button {
@@ -406,7 +406,7 @@
     -fx-background-color: #e63939;
 }
 .star {
-    -fx-font-size: 24px; 
+    -fx-font-size: 24px;
     -fx-text-fill: #cccccc; /* Default gray color for empty stars */
     -fx-cursor: hand;
     -fx-padding: 5;
