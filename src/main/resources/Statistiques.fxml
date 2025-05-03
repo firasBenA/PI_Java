@@ -23,13 +23,13 @@
 
             <!-- PieChart -->
             <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400.0">
-                <Text text="Répartition des Réclamations (Pie Chart)" styleClass="label"/>
+
                 <PieChart fx:id="pieChart" prefHeight="300" title="Répartition par État"/>
             </VBox>
 
             <!-- BarChart -->
             <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400.0">
-                <Text text="Nombre de Réclamations par État (Bar Chart)" styleClass="label"/>
+
                 <BarChart fx:id="barChart" prefHeight="300" title="Nombre par État">
                     <xAxis>
                         <CategoryAxis label="État"/>
