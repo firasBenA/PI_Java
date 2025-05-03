@@ -94,7 +94,7 @@ public class EventDetailsController {
     private void populateDetails() {
         if (event != null) {
             Platform.runLater(() -> {
-                titleLabel.setText("Détails de l'Événement: " + event.getNom());
+
                 nomLabel.setText("Nom: " + event.getNom());
                 contenueLabel.setText("Contenu: " + event.getContenue());
                 typeLabel.setText("Type: " + event.getType());
