@@ -53,7 +53,6 @@ public class GestionArticles {
     private void displayArticles() {
         titleLabel.setText("Articles");
 
-        // Clear previous content except title, grid, and pagination controls
         if (contentVBox.getChildren().size() > 3) {
             contentVBox.getChildren().remove(3, contentVBox.getChildren().size());
         }
@@ -68,12 +67,10 @@ public class GestionArticles {
             return;
         }
 
-        // Calculate articles to display for the current page
         int startIndex = (currentPage - 1) * articlesPerPage;
         int endIndex = Math.min(startIndex + articlesPerPage, filteredArticles.size());
         List<Article> articlesToDisplay = filteredArticles.subList(startIndex, endIndex);
 
-        // Display articles in GridPane
         int column = 0;
         int row = 0;
         for (Article article : articlesToDisplay) {
@@ -83,12 +80,10 @@ public class GestionArticles {
             articleCard.setPrefWidth(250);
             articleCard.setPrefHeight(200); // Reduced height since there's no image
 
-            // Article title
             Label titreLabel = new Label(article.getTitre());
             titreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
             titreLabel.setWrapText(true);
 
-            // Article content (truncate if too long)
             String content = article.getContenue() != null ?
                     (article.getContenue().length() > 100 ? article.getContenue().substring(0, 100) + "..." : article.getContenue()) :
                     "No content available";
@@ -96,7 +91,7 @@ public class GestionArticles {
             contenueLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
             contenueLabel.setWrapText(true);
 
-            // Like button
+
             Button likeButton = new Button("J'aime");
             likeButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
             if (serviceArticle.hasLiked(currentUser, article)) {
@@ -111,11 +106,9 @@ public class GestionArticles {
 
             articleCard.getChildren().addAll(titreLabel, contenueLabel, likeButton);
 
-            // Add to GridPane
             articlesGrid.add(articleCard, column, row);
             System.out.println("Added article card at column " + column + ", row " + row);
 
-            // Update column and row
             column++;
             if (column == 2) {
                 column = 0;

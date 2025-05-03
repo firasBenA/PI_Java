@@ -44,7 +44,7 @@ public class GestionEvenements {
     @FXML
     public void initialize() {
         serviceEvenement = new ServiceEvenement();
-        currentUser = new User(6, "patient1");
+        currentUser = new User(1, "patient1");
 
         typeFilter.getItems().addAll("Tous les types", "Conference", "Workshop", "Seminar"); // Add your event types
         typeFilter.setValue("Tous les types");
@@ -77,10 +77,8 @@ public class GestionEvenements {
     }
 
     private void displayEvents() {
-        // Clear previous content
         contentVBox.getChildren().clear();
 
-        // Add title, filter controls, and pagination controls
         contentVBox.getChildren().addAll(titleLabel, filterHBox, paginationControls);
 
         if (filteredEvents.isEmpty()) {
@@ -90,11 +88,9 @@ public class GestionEvenements {
             return;
         }
 
-        // Calculate events to display for current page
         int startIndex = (currentPage - 1) * eventsPerPage;
         int endIndex = Math.min(startIndex + eventsPerPage, filteredEvents.size());
 
-        // Display events for current page
         for (int i = startIndex; i < endIndex; i++) {
             Evenement evenement = filteredEvents.get(i);
             VBox eventBox = createEventBox(evenement);

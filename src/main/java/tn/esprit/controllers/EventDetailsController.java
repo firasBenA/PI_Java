@@ -1,18 +1,12 @@
 package tn.esprit.controllers;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import javafx.scene.image.WritableImage;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.control.Tooltip;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import tn.esprit.models.Evenement;
 import tn.esprit.models.Article;
@@ -21,52 +15,41 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.image.PixelWriter;
+
 public class EventDetailsController {
 
-    @FXML
-    private Label titleLabel;
-    @FXML
-    private VBox detailsBox;
-    @FXML
-    private Label nomLabel;
-    @FXML
-    private Label contenueLabel;
-    @FXML
-    private Label typeLabel;
-    @FXML
-    private Label statutLabel;
-    @FXML
-    private Label lieuxLabel;
-    @FXML
-    private Label dateLabel;
-    @FXML
-    private VBox relatedArticlesSection;
-    @FXML
-    private Button showRelatedArticlesButton;
-    @FXML
-    private ScrollPane relatedArticlesScrollPane;
-    @FXML
-    private HBox relatedArticlesBox;
-    @FXML
-    private ImageView qrCodeImageView;
-    @FXML
-    private StackPane mapPlaceholder;
-    @FXML
-    private HBox weatherBox;
-    @FXML
-    private ImageView weatherIcon;
-    @FXML
-    private Label weatherLabel;
+    @FXML private Label titleLabel;
+    @FXML private VBox detailsBox;
+    @FXML private Label nomLabel;
+    @FXML private Label contenueLabel;
+    @FXML private Label typeLabel;
+    @FXML private Label statutLabel;
+    @FXML private Label lieuxLabel;
+    @FXML private Label dateLabel;
+    @FXML private VBox relatedArticlesSection;
+    @FXML private Button showRelatedArticlesButton;
+    @FXML private ScrollPane relatedArticlesScrollPane;
+    @FXML private HBox relatedArticlesBox;
+    @FXML private ImageView qrCodeImageView;
+    @FXML private StackPane mapPlaceholder;
+    @FXML private HBox weatherBox;
+    @FXML private ImageView weatherIcon;
+    @FXML private Label weatherLabel;
 
     private ServiceArticle serviceArticle;
     private Evenement event;
@@ -77,13 +60,12 @@ public class EventDetailsController {
     @FXML
     public void initialize() {
         System.out.println("EventDetailsController initialized");
-        System.out.println("titleLabel: " + titleLabel);
-        System.out.println("mapPlaceholder: " + mapPlaceholder);
         if (relatedArticlesScrollPane != null) {
             relatedArticlesScrollPane.setVisible(false);
         }
         loadApiKeys();
     }
+
 
     private void loadApiKeys() {
         try {
@@ -134,7 +116,8 @@ public class EventDetailsController {
         }
 
         String location = event.getLieuxEvent();
-        String url = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s", URLEncoder.encode(location, StandardCharsets.UTF_8), WEATHER_API_KEY);
+        String url = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&appid=%s",
+                URLEncoder.encode(location, StandardCharsets.UTF_8), WEATHER_API_KEY);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -195,18 +178,14 @@ public class EventDetailsController {
 
     private void generateQRCode() {
         try {
-            // Instagram URL - replace "your_instagram_handle" with your actual Instagram handle
             String instagramUrl = "https://www.instagram.com/esprit.recover.plus/";
 
-            // Load QR code generation library
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             int width = 300;
             int height = 300;
 
-            // Create QR code bit matrix
             BitMatrix bitMatrix = qrCodeWriter.encode(instagramUrl, BarcodeFormat.QR_CODE, width, height);
 
-            // Convert bit matrix to JavaFX image
             WritableImage qrImage = new WritableImage(width, height);
             PixelWriter pixelWriter = qrImage.getPixelWriter();
 
@@ -216,10 +195,8 @@ public class EventDetailsController {
                 }
             }
 
-            // Set the QR code image to the ImageView
             qrCodeImageView.setImage(qrImage);
 
-            // Optionally add a tooltip to show where the QR code links to
             Tooltip tooltip = new Tooltip("Scanner pour visiter notre page Instagram");
             Tooltip.install(qrCodeImageView, tooltip);
 
@@ -230,13 +207,69 @@ public class EventDetailsController {
         }
     }
 
+    // FIX: Improved map loading method using direct OpenStreetMap URL
+    private void loadMap() {
+        if (event == null || event.getLieuxEvent() == null || event.getLieuxEvent().isEmpty()) {
+            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Lieu non spécifié")));
+            return;
+        }
+
+        try {
+            // This method directly uses OpenStreetMap's embed functionality
+            // Instead of trying to load HTML file from resources
+            WebView webView = new WebView();
+            WebEngine webEngine = webView.getEngine();
+
+            // Default coordinates for Tunis if we can't geocode
+            double[] coordinates = {36.8065, 10.1815}; // Default: Tunis
+
+            // Try to geocode if possible
+            double[] geocoded = geocodeLocation(event.getLieuxEvent());
+            if (geocoded != null) {
+                coordinates = geocoded;
+            }
+
+            // Format the OpenStreetMap URL with the coordinates
+            String mapUrl = String.format(
+                    "https://www.openstreetmap.org/export/embed.html?bbox=%.6f%%2C%.6f%%2C%.6f%%2C%.6f&layer=mapnik&marker=%.6f%%2C%.6f",
+                    coordinates[1] - 0.01, // longitude - offset
+                    coordinates[0] - 0.01, // latitude - offset
+                    coordinates[1] + 0.01, // longitude + offset
+                    coordinates[0] + 0.01, // latitude + offset
+                    coordinates[0],        // marker latitude
+                    coordinates[1]         // marker longitude
+            );
+
+            System.out.println("Loading map with URL: " + mapUrl);
+            webEngine.load(mapUrl);
+
+            webView.setPrefSize(504, 250);
+            webEngine.setOnError(event -> System.err.println("WebView error: " + event.getMessage()));
+
+            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(webView));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() ->
+                    mapPlaceholder.getChildren().setAll(
+                            new Label("Erreur lors du chargement de la carte: " + e.getMessage())
+                    )
+            );
+        }
+    }
+
     private double[] geocodeLocation(String location) {
         if (ORS_API_KEY == null || ORS_API_KEY.isEmpty()) {
             System.err.println("Clé API ORS manquante");
             return null;
         }
         try {
-            String url = String.format("https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s&size=1", ORS_API_KEY, URLEncoder.encode(location, StandardCharsets.UTF_8));
+            String url = String.format(
+                    "https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s&size=1",
+                    ORS_API_KEY,
+                    URLEncoder.encode(location, StandardCharsets.UTF_8)
+            );
+
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Accept", "application/json")
@@ -259,45 +292,5 @@ public class EventDetailsController {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private void loadMap() {
-        if (event == null || event.getLieuxEvent() == null || event.getLieuxEvent().isEmpty()) {
-            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Lieu non spécifié")));
-            return;
-        }
-
-        double[] coordinates = geocodeLocation(event.getLieuxEvent());
-        if (coordinates == null) {
-            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Impossible de géocoder le lieu")));
-            return;
-        }
-
-        try {
-
-            java.net.URL resourceUrl = getClass().getResource("/ors_map.html");
-            if (resourceUrl == null) {
-                Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Fichier ors_map.html introuvable")));
-                return;
-            }
-            String htmlContent = new String(Files.readAllBytes(Paths.get(resourceUrl.toURI())));
-
-
-            htmlContent = htmlContent.replace("LATITUDE", String.valueOf(coordinates[0]))
-                    .replace("LONGITUDE", String.valueOf(coordinates[1]))
-                    .replace("LOCATION_NAME", event.getLieuxEvent());
-
-
-            WebView webView = new WebView();
-            webView.getEngine().loadContent(htmlContent);
-            webView.setPrefSize(504, 250);
-            webView.getEngine().setOnError(event -> System.err.println("WebView error: " + event.getMessage()));
-
-            // Add WebView to mapPlaceholder
-            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(webView));
-        } catch (Exception e) {
-            e.printStackTrace();
-            Platform.runLater(() -> mapPlaceholder.getChildren().setAll(new Label("Erreur lors du chargement de la carte: " + e.getMessage())));
-        }
     }
 }
