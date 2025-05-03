@@ -426,7 +426,7 @@
     -fx-text-fill: #ffd700; /* Gold for filled stars */
 }
 
-/* Styling for rated stars */
+
 .rating-text {
     -fx-font-size: 24px;
     -fx-text-fill: #ffd700 !important; /* Gold for rated stars, enforce with !important */
