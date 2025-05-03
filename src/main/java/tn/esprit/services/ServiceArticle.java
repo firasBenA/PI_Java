@@ -88,31 +88,35 @@ public class ServiceArticle implements IService<Article> {
 
     // Add a like to an article
     public void like(User user, Article article) {
-        String query = "INSERT INTO `article_likes`(`user_id`, `article_id`) VALUES (?, ?)";
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(query);
-            pstm.setInt(1, user.getId());
-            pstm.setInt(2, article.getId());
-            pstm.executeUpdate();
-            System.out.println("User " + user.getPrenom() + " liked article " + article.getTitre());
-        } catch (SQLException e) {
-            System.out.println("Error while adding like: " + e.getMessage());
+        if (!hasLiked(user, article)) { // Prevent duplicate likes
+            String query = "INSERT INTO `article_likes`(`user_id`, `article_id`) VALUES (?, ?)";
+            try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+                pstm.setInt(1, user.getId());
+                pstm.setInt(2, article.getId());
+                pstm.executeUpdate();
+                System.out.println("User " + user.getPrenom() + " liked article " + article.getTitre());
+            } catch (SQLException e) {
+                System.err.println("Error while adding like: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("User " + user.getPrenom() + " has already liked article " + article.getTitre());
         }
     }
 
-    // Check if a user has already liked an article
     public boolean hasLiked(User user, Article article) {
         String query = "SELECT COUNT(*) FROM `article_likes` WHERE `user_id` = ? AND `article_id` = ?";
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(query);
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
             pstm.setInt(1, user.getId());
             pstm.setInt(2, article.getId());
-            ResultSet rs = pstm.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
         } catch (SQLException e) {
-            System.out.println("Error while checking like: " + e.getMessage());
+            System.err.println("Error while checking like: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
