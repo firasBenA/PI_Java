@@ -309,17 +309,33 @@ public class ListeReclamation {
         ratingBox.setAlignment(javafx.geometry.Pos.CENTER);
         Text ratingLabel = new Text("Note :");
         ratingLabel.getStyleClass().add("modal-label");
+
         if (response.getRating() == null) {
-            for (int i = 1; i <= 5; i++) {
-                final int ratingValue = i;
-                Label star = new Label("☆");
-                star.getStyleClass().add("star");
-                star.setOnMouseClicked(event -> {
+            Label[] stars = new Label[5];
+            for (int i = 0; i < 5; i++) {
+                final int starIndex = i; // Final variable for lambda expressions
+                final int ratingValue = i + 1;
+                stars[i] = new Label("☆");
+                stars[i].getStyleClass().add("star");
+                stars[i].setOnMouseClicked(event -> {
                     submitRating(reclamation, response, ratingValue);
                     dialog.close();
                     loadReclamations();
                 });
-                ratingBox.getChildren().add(star);
+                // Handle hover to fill stars up to the current one
+                stars[i].setOnMouseEntered(event -> {
+                    for (int j = 0; j <= starIndex; j++) {
+                        stars[j].setText("★");
+                        stars[j].getStyleClass().add("star-filled");
+                    }
+                });
+                stars[i].setOnMouseExited(event -> {
+                    for (int j = 0; j <= starIndex; j++) {
+                        stars[j].setText("☆");
+                        stars[j].getStyleClass().remove("star-filled");
+                    }
+                });
+                ratingBox.getChildren().add(stars[i]);
             }
         } else {
             Text ratingText = new Text("★".repeat(response.getRating()) + "☆".repeat(5 - response.getRating()));
@@ -355,7 +371,6 @@ public class ListeReclamation {
         dialog.setScene(dialogScene);
         dialog.showAndWait();
     }
-
     private void submitRating(Reclamation reclamation, Reponse response, int rating) {
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Confirmer la note");
