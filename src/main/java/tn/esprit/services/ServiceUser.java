@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServiceUser {
 
@@ -37,4 +39,46 @@ public class ServiceUser {
 
         return user;
     }
+
+    public static List<User> findMedecinsBySpecialite(String specialite) {
+        List<User> medecins = new ArrayList<>();
+        try {
+            Connection conn = MyDataBase.getInstance().getCnx();
+            String sql = "SELECT * FROM user WHERE specialite = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, specialite);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setNom(rs.getString("nom"));
+                u.setPrenom(rs.getString("prenom"));
+                u.setSpecialite(rs.getString("specialite"));
+                // Fill other fields if needed
+                medecins.add(u);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return medecins;
+    }
+
+    public static int findDoctorIdByName(String name) {
+        int id = -1;
+        try {
+            Connection conn = MyDataBase.getInstance().getCnx();
+            String query = "SELECT id FROM user WHERE nom = ?";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, name);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+
+
 }

@@ -20,7 +20,28 @@ public class Diagnostique {
 
 
 
-    public Diagnostique(){}
+    // Empty constructor
+    public Diagnostique() {}
+
+    // Constructor for basic use (when loading from DB with selected fields)
+    public Diagnostique(int id, Date dateDiagnostique, String nom, String zoneCorps, String selectedSymptoms, int patientId) {
+        this.id = id;
+        this.dateDiagnostique = dateDiagnostique;
+        this.nom = nom;
+        this.zoneCorps = zoneCorps;
+        this.selectedSymptoms = selectedSymptoms;
+        this.patientId = patientId;
+    }
+
+    // Constructor when creating a new Diagnostique (without IDs)
+    public Diagnostique(String dateDiagnostique, String nom, String zoneCorps, String selectedSymptoms) {
+        this.dateDiagnostique = Date.valueOf(dateDiagnostique);
+        this.nom = nom;
+        this.zoneCorps = zoneCorps;
+        this.selectedSymptoms = selectedSymptoms;
+    }
+
+    // Full constructor (used when you want all fields)
     public Diagnostique(int id, int dossierMedicalId, int patientId, int medecinId, Date dateDiagnostique, String nom, String description, String zoneCorps, Date dateSymptomes, int status, String selectedSymptoms) {
         this.id = id;
         this.dossierMedicalId = dossierMedicalId;
@@ -35,7 +56,8 @@ public class Diagnostique {
         this.selectedSymptoms = selectedSymptoms;
     }
 
-    public Diagnostique( int dossierMedicalId, int patientId, int medecinId, Date dateDiagnostique, String nom, String description, String zoneCorps, Date dateSymptomes, int status, String selectedSymptoms) {
+    // Constructor without id (for inserting new data)
+    public Diagnostique(int dossierMedicalId, int patientId, int medecinId, Date dateDiagnostique, String nom, String description, String zoneCorps, Date dateSymptomes, int status, String selectedSymptoms) {
         this.dossierMedicalId = dossierMedicalId;
         this.patientId = patientId;
         this.medecinId = medecinId;

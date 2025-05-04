@@ -59,11 +59,18 @@
                 <Label fx:id="passwordError" styleClass="error-text" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             </GridPane>
 
-            <Hyperlink fx:id="forgotPasswordLink" text="Mot de passe oublié ?" styleClass="link" />
-
+            <Hyperlink fx:id="forgotPasswordLink" text="Mot de passe oublié ?" styleClass="link" onAction="#handleForgotPassword" />
             <HBox alignment="CENTER">
                 <Button fx:id="loginButton" mnemonicParsing="false" text="Se connecter" styleClass="btn-primary" defaultButton="true" />
             </HBox>
+            <!-- Google Sign-In Button -->
+            <Button fx:id="googleLoginButton" text="Connexion avec Google" onAction="#handleGoogleLogin" style="-fx-background-color: #ffffff; -fx-border-color: #cbd5e0; -fx-border-radius: 4; -fx-text-fill: #4a5568; -fx-font-weight: bold; -fx-padding: 10 20;">
+                <graphic>
+                    <ImageView fitWidth="40" fitHeight="20" preserveRatio="true">
+                        <Image url="@/images/google-logo.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
 
             <Separator styleClass="separator" />
 

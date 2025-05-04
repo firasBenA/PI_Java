@@ -10,15 +10,16 @@
 <ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.RegisterController">
     <VBox alignment="CENTER" spacing="20" style="-fx-background-color: #f7fafc;">
         <padding>
-            <Insets bottom="50" left="400" right="400" top="50"/>
+            <Insets bottom="50" left="300" right="400" top="50"/>
         </padding>
 
         <!-- Center the content (image and form) -->
         <HBox alignment="CENTER" spacing="40">
             <!-- Image -->
-            <ImageView fitWidth="300" fitHeight="800" preserveRatio="true">
+            <ImageView fitWidth="400" fitHeight="950" preserveRatio="true">
                 <Image url="@/images/create-account-office.jpeg"/>
             </ImageView>
+
 
             <!-- Form -->
             <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8;" prefHeight="600">
@@ -121,14 +122,6 @@
                     <Label fx:id="imageError" style="-fx-text-fill: #e53e3e; -fx-font-size: 12;" visible="false"/>
                 </VBox>
 
-                <!-- Google Sign-In Button -->
-                <Button fx:id="googleLoginButton" text="Connexion avec Google" onAction="#handleGoogleLogin" style="-fx-background-color: #ffffff; -fx-border-color: #cbd5e0; -fx-border-radius: 4; -fx-text-fill: #4a5568; -fx-font-weight: bold; -fx-padding: 10 20;">
-                    <graphic>
-                        <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
-                            <Image url="@/images/google-logo.png"/>
-                        </ImageView>
-                    </graphic>
-                </Button>
 
                 <!-- Submit Button -->
                 <Button text="Créer un compte" onAction="#handleRegister" style="-fx-background-color: #805ad5; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 4; -fx-padding: 10 20;"/>
