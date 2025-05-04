@@ -291,18 +291,46 @@ public class GestionEvenements {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject("Event Details: " + evenement.getNom());
 
-            String emailContent = "Dear " + user.getPrenom() + ",\n\n" +
-                    "Thank you for participating in the following event:\n\n" +
-                    "Event Name: " + evenement.getNom() + "\n" +
-                    "Content: " + evenement.getContenue() + "\n" +
-                    "Type: " + evenement.getType() + "\n" +
-                    "Status: " + evenement.getStatut() + "\n" +
-                    "Location: " + evenement.getLieuxEvent() + "\n" +
-                    "Date: " + evenement.getDateEvent().toString() + "\n\n" +
-                    "We look forward to seeing you there!\n\n" +
-                    "Best regards,\nEvent Team";
+            // Create the HTML content with CSS styling
+            String htmlContent =
+                    "<!DOCTYPE html>" +
+                            "<html>" +
+                            "<head>" +
+                            "<style>" +
+                            "body { font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; }" +
+                            ".email-container { border: 1px solid #dddddd; border-radius: 5px; padding: 20px; background-color: #f9f9f9; }" +
+                            ".header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #4285f4; margin-bottom: 20px; }" +
+                            ".header h1 { color: #4285f4; margin: 0; }" +
+                            ".greeting { font-size: 18px; margin-bottom: 20px; }" +
+                            ".event-details { background-color: #ffffff; padding: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }" +
+                            ".event-property { margin-bottom: 10px; }" +
+                            ".property-label { font-weight: bold; color: #4285f4; display: inline-block; width: 100px; }" +
+                            ".footer { margin-top: 30px; text-align: center; font-size: 14px; color: #666666; }" +
+                            "</style>" +
+                            "</head>" +
+                            "<body>" +
+                            "<div class='email-container'>" +
+                            "<div class='header'><h1>Event Notification</h1></div>" +
+                            "<div class='greeting'>Dear " + user.getPrenom() + ",</div>" +
+                            "<p>Thank you for participating in the following event:</p>" +
+                            "<div class='event-details'>" +
+                            "<div class='event-property'><span class='property-label'>Event Name:</span> " + evenement.getNom() + "</div>" +
+                            "<div class='event-property'><span class='property-label'>Content:</span> " + evenement.getContenue() + "</div>" +
+                            "<div class='event-property'><span class='property-label'>Type:</span> " + evenement.getType() + "</div>" +
+                            "<div class='event-property'><span class='property-label'>Status:</span> " + evenement.getStatut() + "</div>" +
+                            "<div class='event-property'><span class='property-label'>Location:</span> " + evenement.getLieuxEvent() + "</div>" +
+                            "<div class='event-property'><span class='property-label'>Date:</span> " + evenement.getDateEvent().toString() + "</div>" +
+                            "</div>" +
+                            "<p>We look forward to seeing you there!</p>" +
+                            "<div class='footer'>" +
+                            "<p>Best regards,<br>Event Team</p>" +
+                            "</div>" +
+                            "</div>" +
+                            "</body>" +
+                            "</html>";
 
-            message.setText(emailContent);
+            // Set the email content as HTML
+            message.setContent(htmlContent, "text/html; charset=utf-8");
 
             Transport.send(message);
 
@@ -321,5 +349,6 @@ public class GestionEvenements {
             e.printStackTrace();
         }
     }
+
 
 }
