@@ -8,7 +8,6 @@ tn\esprit\controllers\ModifierRendezVousController.class
 tn\esprit\test\TestMain.class
 tn\esprit\controllers\CalendarView.class
 tn\esprit\models\RendeVous$StatutRendezVous.class
-tn\esprit\services\FirebaseNotificationService.class
 tn\esprit\services\EmailService$1.class
 tn\esprit\controllers\GestionReponse$1.class
 tn\esprit\models\Reponse.class

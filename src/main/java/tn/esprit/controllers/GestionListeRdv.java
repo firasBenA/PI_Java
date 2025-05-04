@@ -62,7 +62,6 @@ public class GestionListeRdv implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             // Initialiser Firebase
-            FirebaseNotificationService.initialize();
 
             connectDB();
             setupStatusFilter();
@@ -70,7 +69,6 @@ public class GestionListeRdv implements Initializable {
             setupPagination();
 
             // Envoyer une notification de test au démarrage
-            sendFirebaseNotification("Application démarrée", "L'application a été lancée avec succès");
             addNotification("Application démarrée à " + LocalDateTime.now());
         } catch (Exception e) {
             showAlert("Erreur", "Initialisation Firebase échouée", e.getMessage());
@@ -206,7 +204,6 @@ public class GestionListeRdv implements Initializable {
                 String doctorName = getDoctorName(rdv.getIdMedecin());
                 String message = String.format("Rendez-vous avec Dr %s modifié pour le %s", doctorName, rdv.getDate());
                 addNotification(message);
-                sendFirebaseNotification("Rendez-vous modifié", message);
             }
         } catch (IOException e) {
             showAlert("Erreur", "Impossible d'ouvrir l'éditeur", e.getMessage());
@@ -227,7 +224,6 @@ public class GestionListeRdv implements Initializable {
 
             // Ajouter à l'historique et envoyer notification
             addNotification(message);
-            sendFirebaseNotification("Rendez-vous supprimé", message);
             loadAllRdvs();
         }
     }
@@ -241,7 +237,6 @@ public class GestionListeRdv implements Initializable {
             GestionRendezVous controller = loader.getController();
             controller.setNotificationListener(message -> {
                 addNotification(message);
-                sendFirebaseNotification("Nouveau rendez-vous", message);
             });
 
             Stage stage = new Stage();
@@ -275,13 +270,8 @@ public class GestionListeRdv implements Initializable {
         }
     }
 
-    private void sendFirebaseNotification(String title, String message) {
-        try {
-            FirebaseNotificationService.sendNotificationToTopic(FIREBASE_TOPIC, title, message);
-        } catch (FirebaseMessagingException e) {
-            System.err.println("Erreur d'envoi de notification Firebase: " + e.getMessage());
-        }
-    }
+
+
 
     private void addNotification(String message) {
         String fullMessage = LocalDateTime.now().toString() + " - " + message;
