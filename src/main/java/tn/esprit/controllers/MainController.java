@@ -106,20 +106,7 @@ public class MainController {
     }
 
 
-    public void handleLogout() {
-        System.out.println("Déconnexion...");
-        stop();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        if (authService == null || sceneManager == null) {
-            System.err.println("Cannot load login page: authService or sceneManager is null");
-            return;
-        }
-        Platform.runLater(() -> initializeUI());
-    }
+
 
     private void loadUI(String fxml) {
         try {
@@ -163,14 +150,8 @@ public class MainController {
 
 
 
-
-    public void stop() {
-        if (loginController != null) {
-            System.out.println("Stopping LoginController server from MainController");
-            loginController.cleanup();
-            loginController = null;
-        } else {
-            System.out.println("No LoginController to stop");
-        }
+    public void handleLogout() {
+        System.out.println("Déconnexion...");
+        sceneManager.logout();
     }
 }

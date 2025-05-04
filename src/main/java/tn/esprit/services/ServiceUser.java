@@ -1,5 +1,6 @@
 package tn.esprit.services;
 
+import org.json.JSONArray;
 import tn.esprit.models.Admin;
 import tn.esprit.models.Medecin;
 import tn.esprit.models.Patient;
@@ -30,21 +31,20 @@ public class ServiceUser {
             try (ResultSet rs = ps.executeQuery()) {
 
                 if (rs.next()) {
-                    // Récupération du rôle de l'utilisateur
-                    String roles = rs.getString("roles");
+                    String rawRoles = rs.getString("roles");
+                    // Supposons que roles est une chaîne JSON comme ["ROLE_MEDECIN"]
+                    JSONArray jsonArray = new JSONArray(rawRoles);
+                    String role = jsonArray.getString(0);
 
-                    // Création de l'objet utilisateur selon le rôle
-                    switch (roles) {
+                    switch (role) {
                         case "ROLE_MEDECIN":
                             user = new Medecin();
                             user.setId(rs.getInt("id"));
-                            // Ajouter d'autres attributs spécifiques au médecin si nécessaire
                             break;
 
                         case "ROLE_PATIENT":
                             user = new Patient();
                             user.setId(rs.getInt("id"));
-                            // Ajouter d'autres attributs spécifiques au patient si nécessaire
                             break;
 
                         case "ROLE_ADMIN":
@@ -54,8 +54,11 @@ public class ServiceUser {
                             break;
 
                         default:
-                            throw new IllegalArgumentException("Role inconnu : " + roles);
+                            throw new IllegalArgumentException("Role inconnu : " + role);
                     }
+                    user.setId(rs.getInt("id"));
+                    user.setNom(rs.getString("nom"));
+                    user.setPrenom(rs.getString("prenom"));
                 }
 
             } catch (SQLException e) {

@@ -89,11 +89,8 @@ public class MainMController {
     public void setCurrentUser(User user) {
         if (user instanceof Medecin) {
             this.currentUser = (Medecin) user;
-            if (userNameLabel != null) {
-                userNameLabel.setText(currentUser.getNom() + " " + currentUser.getPrenom());
-            }
-        } else {
-            System.out.println("Erreur Utilisateur invalide pour le tableau de bord Médecin");
+            userNameLabel.setText(currentUser.getNom() + " " + currentUser.getPrenom());
+            setCenterContent("/MedecinDashboard.fxml"); // Load dashboard on login
         }
     }
 
@@ -114,12 +111,20 @@ public class MainMController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Pane newLoadedPane = loader.load();
+
+            // Always set dependencies, even when reloading
+            if (loader.getController() instanceof MedecinDashboardController) {
+                MedecinDashboardController controller = loader.getController();
+                controller.setAuthService(this.authService); // Ensure this is not null
+                controller.setSceneManager(this.sceneManager);
+                controller.setCurrentUser(this.currentUser);
+            }
+
             rootPane.setCenter(newLoadedPane);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
     @FXML
     public void handlePrescriptionClick(MouseEvent event) {
         setCenterContent("/PrescriptionM.fxml");
@@ -135,6 +140,8 @@ public class MainMController {
         if (rootPane == null) {
             System.out.println("Error: rootPane is null at initialize.");
         }
+        // Removed setCenterContent call from here to prevent premature loading
+        System.out.println("MainMController initialized. Waiting for setCurrentUser...");
     }
 
 
@@ -414,12 +421,7 @@ public class MainMController {
 
     @FXML
     private void handleProfilUserClick() {
-        User currentUser = authService.getCurrentUser();
-        if (currentUser != null) {
-            sceneManager.showMedecinProfile(currentUser);
-        } else {
-            System.err.println("No user is logged in!");
-        }
+        setCenterContent("/MedecinDashboard.fxml");
     }
 
 

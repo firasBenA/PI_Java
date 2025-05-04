@@ -4,12 +4,45 @@
     -fx-font-family: 'Segoe UI', Arial, sans-serif;
 }
 
+/* Sidebar Styles */
+.sidebar {
+    -fx-background-color: #34495e;
+    -fx-pref-width: 250px;
+    -fx-padding: 10px;
+}
+
+.sidebar .nav-btn {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+    -fx-alignment: center-left;
+    -fx-spacing: 10px;
+}
+
+.sidebar .nav-btn:hover {
+    -fx-background-color: #2980b9;
+}
+
+.sidebar .logout-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+    -fx-alignment: center-left;
+}
+
+.sidebar .logout-btn:hover {
+    -fx-background-color: #c0392b;
+}
+
 /* Header Styles */
 .header-box {
     -fx-padding: 15px;
     -fx-background-color: white;
     -fx-background-radius: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);
+    -fx-alignment: center;
 }
 
 .dashboard-title {
@@ -21,14 +54,15 @@
 .welcome-label {
     -fx-font-size: 16px;
     -fx-text-fill: #7f8c8d;
+    -fx-alignment: center; /* Center the welcome label */
 }
 
 .info-label {
     -fx-font-size: 14px;
     -fx-text-fill: #3498db;
+    -fx-alignment: center; /* Center the info label */
 }
 
-/* Button Styles */
 .edit-profile-btn {
     -fx-background-color: #4CAF50;
     -fx-text-fill: white;
@@ -37,82 +71,13 @@
     -fx-background-radius: 15;
 }
 
-.nav-btn {
-    -fx-background-color: #3498db;
-    -fx-text-fill: white;
-    -fx-padding: 8 15;
-    -fx-background-radius: 5;
-}
-
-.nav-btn:hover {
-    -fx-background-color: #2980b9;
-}
-
-.logout-btn {
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
-    -fx-padding: 8 15;
-    -fx-background-radius: 5;
-}
-
-.logout-btn:hover {
-    -fx-background-color: #c0392b;
-}
-
-.primary-btn {
-    -fx-background-color: #3498db;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 10 20;
-    -fx-background-radius: 5;
-}
-
-.primary-btn:hover {
-    -fx-background-color: #2980b9;
-}
-
-.danger-btn {
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 10 20;
-    -fx-background-radius: 5;
-}
-
-.danger-btn:hover {
-    -fx-background-color: #c0392b;
-}
-
-.quick-action-btn {
-    -fx-background-color: #2ecc71;
-    -fx-text-fill: white;
-    -fx-padding: 8 15;
-    -fx-background-radius: 5;
-}
-
-.quick-action-btn:hover {
-    -fx-background-color: #27ae60;
-}
-
-.emergency-btn {
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-padding: 8 15;
-    -fx-background-radius: 5;
-}
-
-.emergency-btn:hover {
-    -fx-background-color: #c0392b;
-    -fx-effect: dropshadow(gaussian, rgba(231, 76, 60, 0.4), 10, 0, 0, 0);
-}
-
 /* Card Styles */
 .info-card {
     -fx-background-color: white;
     -fx-background-radius: 10px;
     -fx-padding: 20px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);
+    -fx-alignment: center;
 }
 
 .section-title {
@@ -125,6 +90,7 @@
 .field-label {
     -fx-font-weight: bold;
     -fx-text-fill: #4a5568;
+    -fx-alignment: center; /* Center the field label */
 }
 
 .form-field {
@@ -135,6 +101,8 @@
     -fx-border-width: 1px;
     -fx-background-color: white;
     -fx-padding: 0 10px;
+    -fx-max-width: 300px;
+    -fx-alignment: center;
 }
 
 .form-field:focused {
@@ -150,86 +118,77 @@
     -fx-border-width: 1px;
     -fx-background-color: white;
     -fx-padding: 5px 10px;
+    -fx-max-width: 300px;
+    -fx-alignment: center;
 }
 
-/* Medical Info Styles */
-.medical-summary {
-    -fx-padding: 15px;
-    -fx-background-color: #f8f9fa;
-    -fx-background-radius: 8px;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 1px;
-    -fx-border-radius: 8px;
+/* Button Styles */
+.primary-btn {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-alignment: center;
 }
 
-.medical-info-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #4a5568;
+.primary-btn:hover {
+    -fx-background-color: #2980b9;
 }
 
-/* Appointments List */
-.appointments-list {
+.danger-btn {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-alignment: center;
+}
+
+.danger-btn:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* ScrollPane Styles */
+.scroll-pane {
     -fx-background-color: transparent;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 1px;
-    -fx-border-radius: 8px;
+    -fx-padding: 10;
+    -fx-alignment: center;
 }
 
-.appointments-list .list-cell {
-    -fx-padding: 10px;
-    -fx-border-color: transparent transparent #e2e8f0 transparent;
-    -fx-border-width: 0 0 1px 0;
-}
-
-.appointments-list .list-cell:filled:hover {
-    -fx-background-color: #f1f5f9;
-}
-
-.placeholder-label {
-    -fx-text-fill: #718096;
-    -fx-font-style: italic;
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
 }
 
 /* Status Message */
 .status-message {
     -fx-font-size: 14px;
-    -fx-alignment: CENTER;
-    -fx-padding: 10px;
-}
-
-.status-message {
-    -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-alignment: center;
+    -fx-alignment: center; /* Already centered, kept for consistency */
     -fx-padding: 10px;
     -fx-background-radius: 5px;
     -fx-border-radius: 5px;
+    -fx-max-width: 300px;
 }
 
-.success-message {
-    -fx-text-fill: #2ecc71; /* Vert */
+.success {
+    -fx-text-fill: #27ae60;
     -fx-background-color: #e8f8f5;
 }
 
-.error-message {
-    -fx-text-fill: #e74c3c; /* Rouge */
+.error {
+    -fx-text-fill: #e74c3c;
     -fx-background-color: #fdedec;
 }
 
-/* Style pour les messages d'erreur */
+.label {
+    -fx-alignment: center;
+}
+
+/* Error Label */
 .error-label {
-    -fx-text-fill: #e74c3c; /* Rouge */
+    -fx-text-fill: #e74c3c;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-}
-
-/* Style pour le messageLabel */
-#messageLabel.success {
-    -fx-text-fill: #27ae60; /* Vert */
-    -fx-font-weight: bold;
-}
-
-#messageLabel.error {
-    -fx-text-fill: #e74c3c; /* Rouge */
-    -fx-font-weight: bold;
+    -fx-alignment: center; /* Center the error label */
 }

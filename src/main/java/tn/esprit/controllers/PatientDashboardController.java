@@ -27,15 +27,11 @@ public class PatientDashboardController {
     @FXML private TextArea adresseField;
     @FXML private Button modifierBtn;
     @FXML private Button supprimerBtn;
-    @FXML private Button deconnexionBtn;
     @FXML private Label messageLabel;
     @FXML private ImageView profileImage;
     @FXML private Button changeImageBtn;
     @FXML private Label welcomeLabel;
     @FXML private Label ageLabel;
-    @FXML private Label ageValueLabel;
-    @FXML private Label latitudeLabel;
-    @FXML private Label longitudeLabel;
     @FXML private ComboBox<String> sexeComboBox;
     @FXML private Label nomErrorLabel;
     @FXML private Label prenomErrorLabel;
@@ -43,11 +39,6 @@ public class PatientDashboardController {
     @FXML private Label telErrorLabel;
     @FXML private Label adresseErrorLabel;
     @FXML private Label sexeErrorLabel;
-    @FXML private ListView<String> appointmentsList;
-    @FXML private Button appointmentsBtn;
-    @FXML private Button prescriptionsBtn;
-    @FXML private Button newAppointmentBtn;
-    @FXML private Button emergencyBtn;
     @FXML private TextField ageField;
     @FXML private Label ageErrorLabel;
 
@@ -55,9 +46,6 @@ public class PatientDashboardController {
     private AuthService authService;
     private SceneManager sceneManager;
     private File selectedImageFile;
-
-
-
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{8,15}$");
@@ -89,13 +77,8 @@ public class PatientDashboardController {
 
     private void configureButtonActions() {
         changeImageBtn.setOnAction(e -> handleChangeImage());
-        deconnexionBtn.setOnAction(e -> handleDeconnexion());
         modifierBtn.setOnAction(e -> handleModification());
         supprimerBtn.setOnAction(e -> handleSuppression());
-        appointmentsBtn.setOnAction(e -> handleShowAppointments());
-        prescriptionsBtn.setOnAction(e -> handleShowPrescriptions());
-        newAppointmentBtn.setOnAction(e -> handleNewAppointment());
-        emergencyBtn.setOnAction(e -> handleEmergency());
     }
 
     public void setCurrentUser(User user) {
@@ -123,24 +106,9 @@ public class PatientDashboardController {
 
             welcomeLabel.setText("Bienvenue " + currentUser.getPrenom() + " " + currentUser.getNom());
             ageLabel.setText("Âge: " + (currentUser.getAge() != null ? currentUser.getAge() + " ans" : "Non spécifié"));
-            ageValueLabel.setText(currentUser.getAge() != null ? currentUser.getAge().toString() : "N/A");
-
-            latitudeLabel.setText(currentUser.getLatitude() != null ? String.format("%.4f", currentUser.getLatitude()) : "N/A");
-            longitudeLabel.setText(currentUser.getLongitude() != null ? String.format("%.4f", currentUser.getLongitude()) : "N/A");
 
             loadProfileImage();
-            loadUpcomingAppointments();
         }
-    }
-
-
-
-    private void loadUpcomingAppointments() {
-        // TODO: Load actual appointments from service
-        appointmentsList.getItems().addAll(
-                "15 Nov - 10:00 - Dr. Smith - Cardiologie",
-                "20 Nov - 14:30 - Dr. Johnson - Généraliste"
-        );
     }
 
     private void loadProfileImage() {
@@ -166,7 +134,6 @@ public class PatientDashboardController {
             profileImage.setImage(null);
         }
     }
-
 
     @FXML
     private void handleChangeImage() {
@@ -233,12 +200,6 @@ public class PatientDashboardController {
         return normalizedFileName.substring(lastDot).toLowerCase();
     }
 
-
-    @FXML
-    private void handleDeconnexion() {
-        sceneManager.showLoginScene();
-    }
-
     @FXML
     private void handleModification() {
         if (modifierBtn.getText().equals("Modifier Profil")) {
@@ -250,7 +211,6 @@ public class PatientDashboardController {
             if (saveChanges()) {
                 disableFields();
                 modifierBtn.setText("Modifier Profil");
-
             }
         }
     }
@@ -258,26 +218,6 @@ public class PatientDashboardController {
     @FXML
     private void handleSuppression() {
         showModernDeleteConfirmation();
-    }
-
-    @FXML
-    private void handleShowAppointments() {
-        showSuccessMessage("Affichage des rendez-vous");
-    }
-
-    @FXML
-    private void handleShowPrescriptions() {
-        showSuccessMessage("Affichage des ordonnances");
-    }
-
-    @FXML
-    private void handleNewAppointment() {
-        showSuccessMessage("Création d'un nouveau rendez-vous");
-    }
-
-    @FXML
-    private void handleEmergency() {
-        showSuccessMessage("Contact d'urgence");
     }
 
     private void enableFields() {

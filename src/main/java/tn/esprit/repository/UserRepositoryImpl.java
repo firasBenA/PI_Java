@@ -18,7 +18,21 @@ public class UserRepositoryImpl implements UserRepository {
     private final Connection connection;
 
     public UserRepositoryImpl() {
-        this.connection = MyDataBase.getInstance().getCnx();
+        this.connection = getValidConnection();
+    }
+
+    private Connection getValidConnection() {
+        try {
+            Connection conn = MyDataBase.getInstance().getCnx();
+            if (conn == null || conn.isClosed()) {
+                System.err.println("Connection is closed or null. Attempting to reconnect...");
+                conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ehealth_database", "root", "");
+                System.out.println("New connection established.");
+            }
+            return conn;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to establish database connection: " + e.getMessage());
+        }
     }
 
     @Override
@@ -31,35 +45,62 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private User insert(User user) {
+        // Infer userType from roles if not set
+        if (user.getUserType() == null && user.getRoles() != null && !user.getRoles().isEmpty()) {
+            if (user.getRoles().contains("ROLE_ADMIN")) {
+                user.setUserType("ADMIN");
+            } else if (user.getRoles().contains("ROLE_PATIENT")) {
+                user.setUserType("PATIENT");
+            } else if (user.getRoles().contains("ROLE_MEDECIN")) {
+                user.setUserType("MEDECIN");
+            }
+        }
+        if (user.getUserType() == null) {
+            throw new IllegalArgumentException("User type must be set before saving user with email: " + user.getEmail());
+        }
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            user.setRoles(List.of("ROLE_USER"));
+            user.setRoles(List.of("ROLE_" + user.getUserType()));
         }
 
         String sql = "INSERT INTO user (user_type, email, roles, password, nom, prenom, age, adresse, sexe, telephone, " +
-                "image_profil, specialite, certificat, latitude, longitude, email_auth_enabled, " +
-                "email_auth_code, created_at, failed_login_attempts, lock_until) " +
+                "image_profil, specialite, certificat, latitude, longitude, email_auth_enabled, email_auth_code, " +
+                "created_at, failed_login_attempts, lock_until) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = getValidConnection();
+             PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setUserParameters(statement, user);
-            statement.executeUpdate();
-
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    user.setId(generatedKeys.getInt(1));
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected > 0) {
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        user.setId(generatedKeys.getInt(1));
+                    }
                 }
             }
             return user;
         } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Échec de l'enregistrement : " + e.getMessage(), e);
+            System.err.println("Error inserting user email: " + user.getEmail() + ": " + e.getMessage());
+            throw new RuntimeException("Failed to insert user: " + e.getMessage());
         }
     }
 
     private User update(User user) {
+        // Infer userType from roles if not set
+        if (user.getUserType() == null && user.getRoles() != null && !user.getRoles().isEmpty()) {
+            if (user.getRoles().contains("ROLE_ADMIN")) {
+                user.setUserType("ADMIN");
+            } else if (user.getRoles().contains("ROLE_PATIENT")) {
+                user.setUserType("PATIENT");
+            } else if (user.getRoles().contains("ROLE_MEDECIN")) {
+                user.setUserType("MEDECIN");
+            }
+        }
+        if (user.getUserType() == null) {
+            throw new IllegalArgumentException("User type must be set before updating user with email: " + user.getEmail());
+        }
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            user.setRoles(List.of("ROLE_USER"));
+            user.setRoles(List.of("ROLE_" + user.getUserType()));
         }
 
         String sql = "UPDATE user SET user_type = ?, email = ?, roles = ?, password = ?, nom = ?, prenom = ?, age = ?, " +
@@ -67,13 +108,17 @@ public class UserRepositoryImpl implements UserRepository {
                 "latitude = ?, longitude = ?, email_auth_enabled = ?, email_auth_code = ?, " +
                 "created_at = ?, failed_login_attempts = ?, lock_until = ? WHERE id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection conn = getValidConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
             setUserParameters(statement, user);
             statement.setInt(21, user.getId());
-            statement.executeUpdate();
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected == 0) {
+                System.err.println("No rows updated for user ID: " + user.getId() + ", email: " + user.getEmail());
+            }
             return user;
         } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
+            System.err.println("SQL Error updating user ID: " + user.getId() + ", email: " + user.getEmail() + ": " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Échec de la mise à jour : " + e.getMessage(), e);
         }
@@ -119,15 +164,22 @@ public class UserRepositoryImpl implements UserRepository {
         Connection connection = DataSource.getInstance().getConnection(); // ✅ Toujours ici
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, email);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return mapResultSetToUser(resultSet);
+                    User user = mapResultSetToUser(resultSet);
+                    if (user != null) {
+                        return user;
+                    }
+                    System.err.println("Failed to map user for email: " + email);
+                    return null;
                 }
                 return null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Échec de la recherche par email", e);
+            System.err.println("Error finding user by email: " + email + ", Error: " + e.getMessage());
+            return null;
         }
     }
 
@@ -135,27 +187,25 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM user WHERE roles LIKE '%ROLE_PATIENT%' OR roles LIKE '%ROLE_MEDECIN%' OR roles LIKE '%ROLE_BLOCKED%'";
-        try (PreparedStatement stmt = connection.prepareStatement(query);
+        String sql = "SELECT * FROM user";
+        try (Connection conn = getValidConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            System.out.println("Executing query: " + query);
             while (rs.next()) {
                 try {
                     User user = mapResultSetToUser(rs);
-                    System.out.println("User loaded: " + user.getEmail());
-                    users.add(user);
-                } catch (SQLException e) {
-                    System.err.println("Error mapping user: " + e.getMessage());
-                    System.err.println("Skipping user with ID: " + rs.getInt("id") + ", email: " + rs.getString("email"));
+                    if (user != null) {
+                        users.add(user);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error mapping user ID: " + rs.getInt("id") + ", email: " + rs.getString("email") + ": " + e.getMessage());
                 }
             }
             System.out.println("Total users loaded: " + users.size());
+            return users;
         } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to retrieve users: " + e.getMessage(), e);
+            throw new RuntimeException("Error fetching users: " + e.getMessage());
         }
-        return users;
     }
 
     @Override
@@ -165,6 +215,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
         String userType = resultSet.getString("user_type");
+        if (userType == null || !Arrays.asList("ADMIN", "PATIENT", "MEDECIN").contains(userType)) {
+            System.err.println("Invalid user_type for user ID: " + resultSet.getInt("id") + ", email: " + resultSet.getString("email") + ": " + userType);
+            return null; // Skip invalid userType
+        }
+
         User user;
         switch (userType) {
             case "ADMIN":
@@ -177,7 +232,8 @@ public class UserRepositoryImpl implements UserRepository {
                 user = new Medecin();
                 break;
             default:
-                throw new SQLException("Type d'utilisateur invalide : " + userType);
+                System.err.println("Unexpected user_type: " + userType);
+                return null;
         }
 
         user.setId(resultSet.getInt("id"));
@@ -189,21 +245,22 @@ public class UserRepositoryImpl implements UserRepository {
             String cleaned = rolesJson.replaceAll("[\\[\\]\"]", "").trim();
             if (!cleaned.isEmpty()) {
                 roles = Arrays.stream(cleaned.split(","))
-                        .map(role -> role.equals("BLOCKED") ? "ROLE_BLOCKED" : role) // Fix incorrect 'BLOCKED' role
+                        .map(String::trim)
+                        .map(role -> role.equals("BLOCKED") ? "ROLE_BLOCKED" : role)
                         .collect(Collectors.toList());
             }
         }
 
-        // Validate roles
+        // Allow ORIGINAL_ROLE_* roles
+        List<String> validRoles = Arrays.asList("ROLE_ADMIN", "ROLE_PATIENT", "ROLE_MEDECIN", "ROLE_BLOCKED",
+                "ORIGINAL_ROLE_PATIENT", "ORIGINAL_ROLE_MEDECIN");
+        roles = roles.stream()
+                .filter(role -> validRoles.contains(role))
+                .collect(Collectors.toList());
+
         if (roles.isEmpty()) {
             System.err.println("No valid roles for user ID: " + user.getId() + ", email: " + user.getEmail());
-            throw new SQLException("Rôles invalides pour l'utilisateur : aucun rôle défini");
-        }
-        for (String role : roles) {
-            if (!Arrays.asList("ROLE_ADMIN", "ROLE_PATIENT", "ROLE_MEDECIN", "ROLE_BLOCKED", "ORIGINAL_ROLE_ROLE_MEDECIN").contains(role)) {
-                System.err.println("Invalid role '" + role + "' for user ID: " + user.getId() + ", email: " + user.getEmail());
-                throw new SQLException("Rôle invalide pour l'utilisateur : " + role);
-            }
+            return null; // Skip users with no valid roles
         }
         user.setRoles(roles);
 

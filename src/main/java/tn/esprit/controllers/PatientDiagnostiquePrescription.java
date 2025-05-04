@@ -3,8 +3,10 @@ package tn.esprit.controllers;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -17,6 +19,10 @@ import tn.esprit.models.User;
 import tn.esprit.services.AuthService;
 import tn.esprit.utils.MyDataBase;
 import tn.esprit.utils.SceneManager;
+
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.layout.Style;
+
 
 import java.io.File;
 import java.sql.Connection;
@@ -254,40 +260,66 @@ public class PatientDiagnostiquePrescription {
         try {
             String userHome = System.getProperty("user.home");
             String downloadsPath = userHome + File.separator + "Downloads";
-
             String fileName = "Prescription_" + System.currentTimeMillis() + ".pdf";
-
             String dest = downloadsPath + File.separator + fileName;
 
             PdfWriter writer = new PdfWriter(dest);
-
             PdfDocument pdf = new PdfDocument(writer);
-
             Document document = new Document(pdf);
-            document.add(new Paragraph("Prescription Médicale")
-                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
+
+            // Styles
+            Style titleStyle = new Style()
+                    .setFontSize(22)
                     .setBold()
-                    .setFontSize(20));
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontColor(ColorConstants.BLUE);
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("ORDONNANCE MÉDICALE").setTextAlignment(TextAlignment.CENTER).setBold());
+            Style sectionHeader = new Style()
+                    .setFontSize(14)
+                    .setBold()
+                    .setFontColor(ColorConstants.BLACK)
+                    .setMarginTop(10)
+                    .setUnderline();
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Dr. Mohamed"));
-            document.add(new Paragraph("Contact: 25943666"));
+            Style contentStyle = new Style()
+                    .setFontSize(12)
+                    .setFontColor(ColorConstants.DARK_GRAY)
+                    .setMarginBottom(5);
 
-            document.add(new Paragraph("Titre: Teste"));
-            document.add(new Paragraph("Contenu: Teste"));
-            document.add(new Paragraph("Date: 23/02/2025"));
+            Style boxStyle = new Style()
+                    .setBorder(new SolidBorder(ColorConstants.LIGHT_GRAY, 1))
+                    .setPadding(10)
+                    .setMarginTop(10)
+                    .setWidth(UnitValue.createPercentValue(100));
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Signature du médecin: ___________________"));
+            // Title
+            document.add(new Paragraph("Prescription Médicale").addStyle(titleStyle));
+            document.add(new Paragraph("ORDONNANCE MÉDICALE").addStyle(titleStyle));
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Cette ordonnance est valable uniquement pour une durée limitée."));
+            // Doctor Info Box
+            Paragraph doctorInfo = new Paragraph()
+                    .add("Dr. Mohamed\n")
+                    .add("Contact: 25943666")
+                    .addStyle(boxStyle);
+            document.add(doctorInfo);
+
+            // Prescription Content
+            document.add(new Paragraph("Détails de l'ordonnance").addStyle(sectionHeader));
+            document.add(new Paragraph("Titre: Teste").addStyle(contentStyle));
+            document.add(new Paragraph("Contenu: Teste").addStyle(contentStyle));
+            document.add(new Paragraph("Date: 23/02/2025").addStyle(contentStyle));
+
+            // Signature
+            document.add(new Paragraph("\nSignature du médecin: ___________________").addStyle(contentStyle));
+
+            // Footer note
+            document.add(new Paragraph("\nCette ordonnance est valable uniquement pour une durée limitée.")
+                    .setItalic()
+                    .setFontSize(10)
+                    .setFontColor(ColorConstants.GRAY)
+                    .setTextAlignment(TextAlignment.CENTER));
 
             document.close();
-
             System.out.println("Prescription PDF created successfully: " + dest);
 
         } catch (Exception e) {

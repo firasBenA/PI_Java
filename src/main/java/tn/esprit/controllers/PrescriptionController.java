@@ -1,10 +1,25 @@
 package tn.esprit.controllers;
 
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.Style;
+import com.itextpdf.layout.borders.DashedBorder;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.Div;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.BorderRadius;
+import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -33,6 +48,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class PrescriptionController {
@@ -240,47 +256,84 @@ public class PrescriptionController {
         }
     }
 
+
     @FXML
     private void handleDownloadPrescription() {
         try {
             String userHome = System.getProperty("user.home");
             String downloadsPath = userHome + File.separator + "Downloads";
-
             String fileName = "Prescription_" + System.currentTimeMillis() + ".pdf";
-
             String dest = downloadsPath + File.separator + fileName;
 
             PdfWriter writer = new PdfWriter(dest);
-
             PdfDocument pdf = new PdfDocument(writer);
-
             Document document = new Document(pdf);
-            document.add(new Paragraph("Prescription Médicale")
-                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
-                    .setBold()
-                    .setFontSize(20));
+            document.setMargins(40, 40, 40, 40);
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("ORDONNANCE MÉDICALE").setTextAlignment(TextAlignment.CENTER).setBold());
+            // Fonts and colors
+            PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            Color lightGray = new DeviceRgb(245, 245, 245);
+            Color deepBlue = new DeviceRgb(0, 51, 102);
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Dr. Mohamed"));
-            document.add(new Paragraph("Contact: 25943666"));
+            // Header
+            String imagePath = Objects.requireNonNull(getClass().getResource("/icons/icon.png")).getPath();
+            Image logo = new Image(ImageDataFactory.create(imagePath));
+            logo.setWidth(60);
+            logo.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            document.add(logo);
 
-            document.add(new Paragraph("Titre: Teste"));
-            document.add(new Paragraph("Contenu: Teste"));
-            document.add(new Paragraph("Date: 23/02/2025"));
+            Paragraph title = new Paragraph("Ordonnance Médicale")
+                    .setFont(boldFont)
+                    .setFontSize(24)
+                    .setFontColor(deepBlue)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(20);
+            document.add(title);
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Signature du médecin: ___________________"));
+            // Doctor Info Box
+            Div doctorBox = new Div()
+                    .setBackgroundColor(lightGray)
+                    .setPadding(10)
+                    .setBorderRadius(new BorderRadius(5))
+                    .setMarginBottom(10);
+            doctorBox.add(new Paragraph("Dr. Mohamed").setFont(boldFont).setFontSize(14));
+            doctorBox.add(new Paragraph("Contact: 25943666").setFont(font));
+            document.add(doctorBox);
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Cette ordonnance est valable uniquement pour une durée limitée."));
+            // Prescription Details Box
+            Div prescBox = new Div()
+                    .setPadding(15)
+                    .setBorder(new DashedBorder(ColorConstants.GRAY, 1))
+                    .setMarginBottom(20)
+                    .setBackgroundColor(ColorConstants.WHITE);
+
+            prescBox.add(new Paragraph("Titre : Teste").setFont(boldFont).setFontSize(13));
+            prescBox.add(new Paragraph("Contenu : Teste").setFont(font).setFontSize(12).setMarginBottom(10));
+            prescBox.add(new Paragraph("Date : 23/02/2025").setFont(font).setFontSize(12));
+
+            document.add(prescBox);
+
+            // Signature
+            document.add(new Paragraph("Signature du médecin :")
+                    .setFont(boldFont)
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setMarginTop(40));
+            document.add(new Paragraph("___________________________")
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setMarginTop(5));
+
+            // Footer
+            Paragraph footer = new Paragraph("Cette ordonnance est valable uniquement pour une durée limitée.")
+                    .setFont(font)
+                    .setFontSize(10)
+                    .setFontColor(ColorConstants.GRAY)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginTop(30);
+            document.add(footer);
 
             document.close();
-
             System.out.println("Prescription PDF created successfully: " + dest);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
