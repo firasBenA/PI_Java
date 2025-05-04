@@ -1,8 +1,10 @@
 package tn.esprit.controllers;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -16,20 +18,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import tn.esprit.models.Diagnostique;
-import tn.esprit.models.Medecin;
 import tn.esprit.models.Prescription;
 import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServicePrescription;
-import tn.esprit.services.ServiceUser;
+import tn.esprit.utils.MyDataBase;
+import tn.esprit.utils.SceneManager;
 
-import java.io.IOException;
-
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import javafx.fxml.FXML;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,10 +34,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import tn.esprit.services.AuthService;
-import tn.esprit.utils.MyDataBase;
-import tn.esprit.utils.SceneManager;
 
 public class PrescriptionController {
 
@@ -365,16 +358,19 @@ public class PrescriptionController {
 
 
     private void updateDiagnostiqueCards() {
+        cardContainer.getChildren().clear();
 
         int start = currentDiagnostiquePage * ITEMS_PER_PAGE;
         int end = Math.min(start + ITEMS_PER_PAGE, diagnostiques.size());
 
-        for (int i = start; i < end; i++) {
+        List<Diagnostique> pageItems = diagnostiques.subList(start, end);
+
+        for (Diagnostique diag : pageItems) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Diagnostique.fxml"));
                 Node card = loader.load();
                 DiagnostiqueController cardController = loader.getController();
-                cardController.setData(diagnostiques.get(i));
+                cardController.setData(diag);
                 cardContainer.getChildren().add(card);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -386,17 +382,19 @@ public class PrescriptionController {
     }
 
     private void updatePrescriptionCards() {
+        prescriptionCardContainer.getChildren().clear();
 
         int start = currentPrescriptionPage * ITEMS_PER_PAGE;
         int end = Math.min(start + ITEMS_PER_PAGE, prescriptions.size());
 
-        for (int i = start; i < end; i++) {
+        List<Prescription> pageItems = prescriptions.subList(start, end);
+
+        for (Prescription prescription : pageItems) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Prescription.fxml"));
                 Node card = loader.load();
                 PrescriptionController cardController = loader.getController();
-
-                cardController.setData(prescriptions.get(i));
+                cardController.setData(prescription);
                 prescriptionCardContainer.getChildren().add(card);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -406,7 +404,6 @@ public class PrescriptionController {
         prevPrescriptionButton.setDisable(currentPrescriptionPage == 0);
         nextPrescriptionButton.setDisable(end >= prescriptions.size());
     }
-
 
     @FXML
     private void handlePrevDiagnostiquePage() {
@@ -439,5 +436,6 @@ public class PrescriptionController {
             updatePrescriptionCards();
         }
     }
+
 
 }

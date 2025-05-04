@@ -16,7 +16,6 @@
                 <!-- Navigation Buttons -->
                 <Button text="Accueil" onAction="#goHome" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Diagnostique" onAction="#goDiagnostique" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Medecin" onAction="#goGestionMedecin" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Patient Dashboard" onAction="#goGestionPatient" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reclamation" onAction="#goGestionReclamation" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reponse" onAction="#goGestionReponse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
@@ -24,11 +23,10 @@
                 <Button text="Gestion Evenements" onAction="#goGestionEvenements" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Articles" onAction="#goGestionArticles" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Mes Ordonnances et Diagnostique" onAction="#goPatientDiagnostique" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Déconnexion" onAction="#handleLogout" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                goPatientDiagnostique
+
                 <!-- Spacer -->
                 <VBox fx:id="spacer" VBox.vgrow="ALWAYS" />
-
+                <Button text="Mon Profile" onAction="#goGestionPatient" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <!-- Logout -->
                 <Button text="Déconnexion" onAction="#handleLogout"
                         style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
@@ -41,3 +39,4 @@
         <StackPane fx:id="contentArea" style="-fx-background-color: #f4f4f4;" />
     </center>
 </BorderPane>
+

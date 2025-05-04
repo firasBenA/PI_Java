@@ -45,7 +45,7 @@
                                 <Image url="@img/user.png" />
                             </image>
                         </ImageView>
-                        <Label fx:id="nomDocteur" contentDisplay="CENTER" prefHeight="56.0" prefWidth="67.0" text="Firas BA">
+                        <Label  fx:id="userNameLabel" onMouseClicked="#handleProfilUserClick" contentDisplay="CENTER" prefHeight="56.0" prefWidth="67.0" text="Firas BA">
                             <font>
                                 <Font name="Berlin Sans FB" size="18.0" />
                             </font>

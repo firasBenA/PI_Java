@@ -62,7 +62,7 @@ public class GestionDiagnostique {
     private final ObservableList<String> messages = FXCollections.observableArrayList();
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final String apiKey = "AIzaSyCAIyy3hwHeeRevuaAfipBrVSYHIcyuVAk";
+    private final String apiKey = "";
     private static final int MAX_RETRIES = 3;
     private static final long BASE_RETRY_DELAY_MS = 5000;
 
