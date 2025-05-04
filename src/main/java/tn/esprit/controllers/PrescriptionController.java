@@ -358,7 +358,7 @@ public class PrescriptionController {
 
 
     private void updateDiagnostiqueCards() {
-        cardContainer.getChildren().clear();
+        //cardContainer.getChildren().clear();
 
         int start = currentDiagnostiquePage * ITEMS_PER_PAGE;
         int end = Math.min(start + ITEMS_PER_PAGE, diagnostiques.size());
@@ -382,7 +382,7 @@ public class PrescriptionController {
     }
 
     private void updatePrescriptionCards() {
-        prescriptionCardContainer.getChildren().clear();
+        //prescriptionCardContainer.getChildren().clear();
 
         int start = currentPrescriptionPage * ITEMS_PER_PAGE;
         int end = Math.min(start + ITEMS_PER_PAGE, prescriptions.size());

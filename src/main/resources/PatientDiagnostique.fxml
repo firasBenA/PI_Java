@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.StackPane?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="tn.esprit.controllers.PrescriptionController"
+            fx:controller="tn.esprit.controllers.PatientDiagnostiquePrescription"
             fitToWidth="true" fitToHeight="true">
     <content>
         <StackPane alignment="CENTER">
