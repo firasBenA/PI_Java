@@ -76,7 +76,7 @@ public class GestionListeRdv implements Initializable {
 
     private void connectDB() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database-1", "root", "");
         } catch (SQLException e) {
             showAlert("Erreur", "Connexion à la base de données échouée", e.getMessage());
         }

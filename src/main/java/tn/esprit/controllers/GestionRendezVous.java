@@ -167,7 +167,7 @@ public class GestionRendezVous implements Initializable {
 
     private void connectDB() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database-1", "root", "");
             System.out.println("Connexion réussie !");
         } catch (SQLException e) {
             showAlert("Erreur", "Impossible de se connecter à la base de données");
@@ -177,7 +177,7 @@ public class GestionRendezVous implements Initializable {
 
     private void loadMedecins() {
         ObservableList<String> medecinsList = FXCollections.observableArrayList();
-        String query = "SELECT nom, prenom FROM user WHERE roles LIKE '%MEDECIN%'";
+        String query = "SELECT nom, prenom FROM user WHERE user_type = 'MEDECIN'";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -189,11 +189,10 @@ public class GestionRendezVous implements Initializable {
             medecin.setItems(medecinsList);
 
         } catch (SQLException e) {
-            showAlert("Erreur", "Impossible de charger la liste des médecins");
+            showAlert("Erreur", "Impossible de charger la liste des médecins : " + e.getMessage());
             e.printStackTrace();
         }
     }
-
     private String getDoctorName(int medecinId) {
         String doctorName = "Inconnu";
         try {

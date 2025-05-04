@@ -6,6 +6,7 @@ public class RendeVous {
     private int id;
     private int patient_id;
     private int medecin_id;
+    private Integer userId; // Added field for user_id, using Integer to allow null
     private LocalDate date;
     private String statut;
     private String type;
@@ -18,7 +19,7 @@ public class RendeVous {
     public RendeVous(int id, int idPatient, int idMedecin, LocalDate date,
                      String statut, String type, String cause) {
         this.id = id;
-        this.patient_id = patient_id;
+        this.patient_id = idPatient;
         this.medecin_id = idMedecin;
         this.date = date;
         this.statut = statut;
@@ -27,6 +28,12 @@ public class RendeVous {
     }
 
     public RendeVous(LocalDate selectedDate, String value, String text, Integer integer, Integer id, String enAttente) {
+        this.date = selectedDate;
+        this.type = value;
+        this.cause = text;
+        this.medecin_id = integer;
+        this.patient_id = id;
+        this.statut = enAttente;
     }
 
     // Getters et Setters
@@ -52,6 +59,14 @@ public class RendeVous {
 
     public void setIdMedecin(int medecin_id) {
         this.medecin_id = medecin_id;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public LocalDate getDate() {
@@ -92,6 +107,7 @@ public class RendeVous {
                 "id=" + id +
                 ", idPatient=" + patient_id +
                 ", idMedecin=" + medecin_id +
+                ", userId=" + userId +
                 ", date=" + date +
                 ", statut='" + statut + '\'' +
                 ", type='" + type + '\'' +
