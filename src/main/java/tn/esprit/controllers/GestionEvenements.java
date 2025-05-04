@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
 import tn.esprit.models.Evenement;
 import tn.esprit.models.User;
 import tn.esprit.services.ServiceEvenement;
@@ -124,14 +127,51 @@ public class GestionEvenements {
         HBox buttonBox = new HBox(10);
         Button participateButton = new Button("Participer");
         participateButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
+
+        // Check if the user has already participated
         if (serviceEvenement.hasParticipated(currentUser, evenement)) {
-            participateButton.setDisable(true);
-            participateButton.setText("Déjà inscrit");
+            participateButton.setText("Cancel Participation");
+            participateButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
         }
+
         participateButton.setOnAction(e -> {
-            serviceEvenement.participate(currentUser, evenement);
-            participateButton.setDisable(true);
-            participateButton.setText("Déjà inscrit");
+            if (serviceEvenement.hasParticipated(currentUser, evenement)) {
+                // Confirmation for canceling participation
+                Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmationAlert.setTitle("Confirmation d'annulation");
+                confirmationAlert.setHeaderText(null);
+                confirmationAlert.setContentText("Êtes-vous sûr de vouloir annuler votre participation à cet événement ?");
+
+                ButtonType buttonTypeYes = new ButtonType("Oui");
+                ButtonType buttonTypeCancel = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+                confirmationAlert.getButtonTypes().setAll(buttonTypeYes, buttonTypeCancel);
+
+                confirmationAlert.showAndWait().ifPresent(response -> {
+                    if (response == buttonTypeYes) {
+                        serviceEvenement.cancelParticipation(currentUser, evenement);
+                        participateButton.setText("Participer");
+                        participateButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
+                    }
+                });
+            } else {
+                // Confirmation for participating
+                Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmationAlert.setTitle("Confirmation de participation");
+                confirmationAlert.setHeaderText(null);
+                confirmationAlert.setContentText("Êtes-vous sûr de vouloir participer à cet événement ?");
+
+                ButtonType buttonTypeYes = new ButtonType("Oui");
+                ButtonType buttonTypeCancel = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+                confirmationAlert.getButtonTypes().setAll(buttonTypeYes, buttonTypeCancel);
+
+                confirmationAlert.showAndWait().ifPresent(response -> {
+                    if (response == buttonTypeYes) {
+                        serviceEvenement.participate(currentUser, evenement);
+                        participateButton.setText("Cancel Participation");
+                        participateButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+                    }
+                });
+            }
         });
 
         Button detailsButton = new Button("Voir Détails");
