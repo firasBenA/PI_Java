@@ -10,13 +10,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import tn.esprit.models.User;
 import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
+import tn.esprit.services.SessionManager;
 import tn.esprit.utils.SceneManager;
 
 import java.io.IOException;
@@ -53,7 +53,6 @@ public class LoginController {
     private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String GOOGLE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
-
     public void setAuthService(AuthService authService) {
         this.authService = authService;
         tryStartCallbackServer();
@@ -70,7 +69,7 @@ public class LoginController {
             return;
         }
         if (callbackServer != null) {
-            System.out.println("Callback server already running on port 8090");
+            System.out.println("Callback server already running on port 8092");
             return;
         }
         startCallbackServer();
@@ -182,8 +181,6 @@ public class LoginController {
             }
         }
         System.err.println("Failed to start callback server on port " + port + " after " + maxRetries + " attempts");
-        // Comment out the alert to prevent focus conflict
-        // Platform.runLater(() -> sceneManager.showAlert("Erreur", "Impossible de démarrer le serveur de callback: port " + port + " indisponible", Alert.AlertType.ERROR));
     }
 
     private void checkAndReleasePort(int port) {
@@ -220,12 +217,10 @@ public class LoginController {
 
     public void stop() {
         if (callbackServer != null) {
-            System.out.println("Stopping callback server on port 8090...");
+            System.out.println("Stopping callback server on port 8092...");
             try {
                 callbackServer.stop(0);
                 System.out.println("Callback server stopped successfully");
-                // Remove Thread.sleep to avoid blocking the UI thread
-                // Thread.sleep(5000);
             } catch (Exception e) {
                 System.err.println("Error stopping callback server: " + e.getMessage());
             }
@@ -278,7 +273,7 @@ public class LoginController {
                     .build();
             HttpResponse<String> userRes = client.send(userReq, HttpResponse.BodyHandlers.ofString());
             if (userRes.statusCode() != 200) {
-                throw new IOException("User info request failed: " + userRes.statusCode());
+                throw new IOException("User info request failed: " + tokenRes.statusCode());
             }
             String userJson = userRes.body();
             GoogleUserInfo userInfo = gson.fromJson(userJson, GoogleUserInfo.class);
@@ -294,6 +289,7 @@ public class LoginController {
                     existingUser.setSocialProvider("google");
                     existingUser.setSocialAccessToken(tokenResponse.access_token);
                     authService.updateUser(existingUser);
+                    SessionManager.saveSession(userInfo.email); // Save session after Google login
                     handleSocialLogin(existingUser);
                 } catch (AuthException e) {
                     sceneManager.showAlert("Erreur", e.getMessage(), Alert.AlertType.ERROR);
@@ -487,7 +483,6 @@ public class LoginController {
                     if (!emailErrorLabel.getText().isEmpty()) return;
 
                     try {
-                        // Verify email existence
                         User existingUser = authService.getUserByEmail(email);
                         if (existingUser == null) {
                             errorLabel.setText("Aucun compte trouvé avec cet email");
@@ -517,7 +512,6 @@ public class LoginController {
     private void showResetPasswordDialog(String email, Stage parentStage) {
         Platform.runLater(() -> {
             try {
-                // Create components
                 TextField codeField = new TextField();
                 codeField.setPromptText("Code de réinitialisation");
                 PasswordField newPasswordField = new PasswordField();
@@ -539,7 +533,6 @@ public class LoginController {
                 Label errorLabel = new Label();
                 errorLabel.getStyleClass().add("error-message");
 
-                // Layout
                 VBox resetDialogVBox = new VBox(10,
                         codeLabel, codeField, codeErrorLabel,
                         newPasswordLabel, newPasswordField, passwordErrorLabel,
@@ -549,21 +542,18 @@ public class LoginController {
                 resetDialogVBox.setAlignment(Pos.CENTER);
                 resetDialogVBox.getStyleClass().add("form-container");
 
-                // Create scene
                 Scene dialogScene = new Scene(resetDialogVBox, 350, 400);
                 URL cssUrl = getClass().getResource("/css/login.css");
                 if (cssUrl != null) {
                     dialogScene.getStylesheets().add(cssUrl.toExternalForm());
                 }
 
-                // Configure dialog
                 Stage resetDialog = new Stage();
                 resetDialog.initModality(Modality.APPLICATION_MODAL);
                 resetDialog.initOwner(parentStage);
                 resetDialog.setTitle("Réinitialisation du mot de passe");
                 resetDialog.setScene(dialogScene);
 
-                // Input validation
                 codeField.textProperty().addListener((obs, oldVal, newVal) -> {
                     String code = newVal.trim();
                     if (code.isEmpty()) {
@@ -591,7 +581,6 @@ public class LoginController {
                         passwordErrorLabel.setText("");
                         passwordErrorLabel.setVisible(false);
                     }
-                    // Re-validate confirm password when new password changes
                     if (!confirmPassword.isEmpty()) {
                         if (!confirmPassword.equals(password)) {
                             confirmPasswordErrorLabel.setText("Les mots de passe ne correspondent pas");
@@ -675,7 +664,6 @@ public class LoginController {
             }
         });
     }
-
 
     private void handleAuthError(AuthException e) {
         String message = e.getMessage();

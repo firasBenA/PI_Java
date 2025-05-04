@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import org.apache.commons.mail.SimpleEmail;
 import tn.esprit.models.User;
 import tn.esprit.repository.UserRepository;
+import tn.esprit.services.SessionManager;
 
 import javax.imageio.ImageIO;
 import javax.mail.*;
@@ -35,6 +36,7 @@ public class AuthService {
     private static final String SMTP_PASSWORD = "a2828ad5ae1705";
     private static final String FROM_EMAIL = "no-reply@yourapp.com";
     private User currentUser;
+
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -49,8 +51,6 @@ public class AuthService {
         }
         return instance;
     }
-
-
 
     public void register(User user) throws AuthException {
         if (isEmpty(user.getEmail())) {
@@ -82,7 +82,6 @@ public class AuthService {
             throw new AuthException("Le rôle est requis.");
         }
 
-        // Infer userType from roles if not provided
         if (isEmpty(user.getUserType())) {
             String inferredUserType = inferUserTypeFromRoles(user.getRoles());
             if (inferredUserType == null) {
@@ -92,7 +91,6 @@ public class AuthService {
             System.out.println("Inferred userType: " + inferredUserType + " for user with email: " + user.getEmail());
         }
 
-        // Validate that the roles match the userType
         String expectedRole = switch (user.getUserType()) {
             case "ADMIN" -> "ROLE_ADMIN";
             case "PATIENT" -> "ROLE_PATIENT";
@@ -146,7 +144,6 @@ public class AuthService {
         return null;
     }
 
-
     private String generateVerificationCode() {
         Random random = new Random();
         return String.format("%06d", random.nextInt(1000000));
@@ -159,14 +156,12 @@ public class AuthService {
         }
 
         try {
-            // Initialize JavaFX toolkit (optional, kept for potential future FXML use)
             CountDownLatch latch = new CountDownLatch(1);
             if (!Platform.isFxApplicationThread() && !Platform.isImplicitExit()) {
                 Platform.startup(latch::countDown);
                 latch.await();
             }
 
-            // Prepare email content
             String userName = user.getPrenom() + " " + user.getNom();
             String htmlContent = String.format("""
                 <!DOCTYPE html>
@@ -180,13 +175,13 @@ public class AuthService {
                     <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; margin: 40px auto;">
                         <tr>
                             <td style="padding: 20px 0; text-align: center; background-color: #007bff; border-radius: 8px 8px 0 0;">
-                                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Verification  Email</h1>
+                                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Verification Email</h1>
                             </td>
                         </tr>
                         <tr>
                             <td style="padding: 20px;">
                                 <p style="font-size: 16px; color: #333333;">Salut %s,</p>
-                                <p style="font-size: 16px; color: #333333;">Merci de vous être inscrit sur notre site ! Veuillez utiliser le code de vérification ci-dessous pour compléter la vérification  :</p>
+                                <p style="font-size: 16px; color: #333333;">Merci de vous être inscrit sur notre site ! Veuillez utiliser le code de vérification ci-dessous pour compléter la vérification :</p>
                                 <div style="text-align: center; margin: 20px 0;">
                                     <span style="display: inline-block; padding: 15px 25px; font-size: 18px; font-weight: bold; color: #ffffff; background-color: #28a745; border-radius: 5px;">%s</span>
                                 </div>
@@ -203,7 +198,6 @@ public class AuthService {
                 </html>
                 """, userName, code);
 
-            // Mail server properties
             Properties properties = new Properties();
             properties.put("mail.smtp.auth", "true");
             properties.put("mail.smtp.starttls.enable", "true");
@@ -213,7 +207,6 @@ public class AuthService {
             properties.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
             properties.put("mail.smtp.ssl.trust", SMTP_HOST);
 
-            // Create session
             Session session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -221,16 +214,13 @@ public class AuthService {
                 }
             });
 
-            // Create email
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(FROM_EMAIL));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
             message.setSubject("Code de vérification de votre compte");
 
-            // Set HTML content
             message.setContent(htmlContent, "text/html; charset=utf-8");
 
-            // Send email
             Transport.send(message);
             System.out.println("Verification email sent to: " + email + " with code: " + code);
 
@@ -313,18 +303,20 @@ public class AuthService {
         user.setLockUntil(null);
         userRepository.save(user);
 
-        // Save session after successful login
-        SessionManager.saveSession(user.getEmail());
+        SessionManager.saveSession(email);
+        currentUser = user;
+        System.out.println("Login successful for user: " + email);
         return user;
     }
 
     public void logout() {
-        // Clear the session
         SessionManager.clearSession();
+        currentUser = null;
     }
 
     public User getCurrentUser() {
         String email = SessionManager.loadSession();
+        System.out.println("AuthService.getCurrentUser: Session email = " + email);
         if (email == null) {
             System.out.println("No session found in SessionManager");
             currentUser = null;
@@ -346,8 +338,10 @@ public class AuthService {
         this.currentUser = user;
         if (user != null) {
             SessionManager.saveSession(user.getEmail());
+            System.out.println("Current user set: " + user.getEmail());
         } else {
             SessionManager.clearSession();
+            System.out.println("Current user cleared");
         }
     }
 
@@ -395,6 +389,7 @@ public class AuthService {
 
         try {
             userRepository.save(user);
+            SessionManager.saveSession(user.getEmail());
         } catch (Exception e) {
             throw new AuthException("Échec de la mise à jour de l'utilisateur : " + e.getMessage());
         }
@@ -409,6 +404,9 @@ public class AuthService {
             throw new AuthException("Utilisateur non trouvé.");
         }
         userRepository.delete(userId);
+        if (currentUser != null && currentUser.getId().equals(userId)) {
+            logout();
+        }
     }
 
     public List<User> getAllUsers() throws AuthException {
@@ -473,6 +471,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
+
     public void registerSocial(User user, String provider, String accessToken) throws AuthException {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new AuthException("Email non fourni par " + provider);
@@ -482,12 +481,14 @@ public class AuthService {
             existingUser.setSocialProvider(provider);
             existingUser.setSocialAccessToken(accessToken);
             userRepository.save(existingUser);
+            SessionManager.saveSession(existingUser.getEmail());
             return;
         }
         user.hashPassword(generateRandomPassword());
         user.setSocialProvider(provider);
         user.setSocialAccessToken(accessToken);
         userRepository.save(user);
+        SessionManager.saveSession(user.getEmail());
     }
 
     private String generateRandomPassword() {
@@ -603,7 +604,6 @@ public class AuthService {
         return true;
     }
 
-
     public void resetPassword(String email, String code, String newPassword) throws AuthException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
@@ -621,6 +621,4 @@ public class AuthService {
         userRepository.save(user);
         System.out.println("Password reset for user " + email + ", email_auth_code cleared.");
     }
-
-
 }

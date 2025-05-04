@@ -63,8 +63,6 @@ public class MedecinDashboardController {
         if (user instanceof Medecin) {
             this.currentUser = (Medecin) user;
             loadUserData();
-        } else {
-            showAlert("Erreur", "Utilisateur invalide pour le tableau de bord Médecin", Alert.AlertType.ERROR);
         }
     }
 
@@ -204,15 +202,9 @@ public class MedecinDashboardController {
     }
 
     @FXML
+
     public void handleDeconnexion() {
-        try {
-            sceneManager.showLoginScene();
-            showAlert("Succès", "Déconnexion réussie", Alert.AlertType.INFORMATION);
-        } catch (Exception e) {
-            messageLabel.setText("Erreur lors de la déconnexion");
-            messageLabel.setStyle("-fx-text-fill: red;");
-            e.printStackTrace();
-        }
+        sceneManager.logout();
     }
 
     @FXML
