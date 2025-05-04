@@ -2,6 +2,9 @@ package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.control.Alert;
@@ -37,6 +40,7 @@ public class GestionEvenements {
     @FXML
     private Label pageLabel;
 
+
     private ServiceEvenement serviceEvenement;
     private User currentUser;
     private List<Evenement> allEvents;
@@ -47,13 +51,14 @@ public class GestionEvenements {
     @FXML
     public void initialize() {
         serviceEvenement = new ServiceEvenement();
-        currentUser = new User(1, "patient1");
+        currentUser = new User(1, "patient1"); // Static user
 
-        typeFilter.getItems().addAll("Tous les types", "Conference", "Workshop", "Seminar"); // Add your event types
+        typeFilter.getItems().addAll("Tous les types", "Conference", "Workshop", "Seminar");
         typeFilter.setValue("Tous les types");
 
         loadEvents();
         displayEvents();
+
     }
 
     private void loadEvents() {
@@ -128,7 +133,6 @@ public class GestionEvenements {
         Button participateButton = new Button("Participer");
         participateButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
 
-        // Check if the user has already participated
         if (serviceEvenement.hasParticipated(currentUser, evenement)) {
             participateButton.setText("Cancel Participation");
             participateButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
@@ -136,7 +140,6 @@ public class GestionEvenements {
 
         participateButton.setOnAction(e -> {
             if (serviceEvenement.hasParticipated(currentUser, evenement)) {
-                // Confirmation for canceling participation
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirmation d'annulation");
                 confirmationAlert.setHeaderText(null);
@@ -151,10 +154,10 @@ public class GestionEvenements {
                         serviceEvenement.cancelParticipation(currentUser, evenement);
                         participateButton.setText("Participer");
                         participateButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
+                        buttonBox.getChildren().removeIf(node -> node instanceof Button && ((Button) node).getText().equals("Receive Details by Email"));
                     }
                 });
             } else {
-                // Confirmation for participating
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmationAlert.setTitle("Confirmation de participation");
                 confirmationAlert.setHeaderText(null);
@@ -169,6 +172,10 @@ public class GestionEvenements {
                         serviceEvenement.participate(currentUser, evenement);
                         participateButton.setText("Cancel Participation");
                         participateButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+                        Button emailButton = new Button("Receive Details by Email");
+                        emailButton.setStyle("-fx-background-color: #f1c40f; -fx-text-fill: white;");
+                        emailButton.setOnAction(ev -> sendEventDetailsEmail(currentUser, evenement));
+                        buttonBox.getChildren().add(emailButton);
                     }
                 });
             }
@@ -177,6 +184,13 @@ public class GestionEvenements {
         Button detailsButton = new Button("Voir Détails");
         detailsButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
         detailsButton.setOnAction(e -> showEventDetails(evenement));
+
+        if (serviceEvenement.hasParticipated(currentUser, evenement)) {
+            Button emailButton = new Button("Receive Details by Email");
+            emailButton.setStyle("-fx-background-color: #f1c40f; -fx-text-fill: white;");
+            emailButton.setOnAction(e -> sendEventDetailsEmail(currentUser, evenement));
+            buttonBox.getChildren().add(emailButton);
+        }
 
         buttonBox.getChildren().addAll(participateButton, detailsButton);
         eventBox.getChildren().addAll(nomLabel, contenueLabel, typeLabel, statutLabel, lieuxLabel, dateLabel, buttonBox);
@@ -253,4 +267,59 @@ public class GestionEvenements {
             contentVBox.getChildren().addAll(errorLabel, backButton);
         }
     }
+    private void sendEventDetailsEmail(User user, Evenement evenement) {
+        final String username = "esprit.recover.plus@gmail.com";
+        final String password = "jxsdekiolyggrpjj";
+        final String recipientEmail = "houssem.jamei1899@gmail.com"; // Replace with real email
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
+            message.setSubject("Event Details: " + evenement.getNom());
+
+            String emailContent = "Dear " + user.getPrenom() + ",\n\n" +
+                    "Thank you for participating in the following event:\n\n" +
+                    "Event Name: " + evenement.getNom() + "\n" +
+                    "Content: " + evenement.getContenue() + "\n" +
+                    "Type: " + evenement.getType() + "\n" +
+                    "Status: " + evenement.getStatut() + "\n" +
+                    "Location: " + evenement.getLieuxEvent() + "\n" +
+                    "Date: " + evenement.getDateEvent().toString() + "\n\n" +
+                    "We look forward to seeing you there!\n\n" +
+                    "Best regards,\nEvent Team";
+
+            message.setText(emailContent);
+
+            Transport.send(message);
+
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            successAlert.setTitle("Email Sent");
+            successAlert.setHeaderText(null);
+            successAlert.setContentText("Event details have been sent to " + recipientEmail);
+            successAlert.showAndWait();
+
+        } catch (MessagingException e) {
+            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+            errorAlert.setTitle("Email Error");
+            errorAlert.setHeaderText(null);
+            errorAlert.setContentText("Failed to send email: " + e.getMessage());
+            errorAlert.showAndWait();
+            e.printStackTrace();
+        }
+    }
+
 }

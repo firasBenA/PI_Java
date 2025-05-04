@@ -68,6 +68,7 @@ tn\esprit\services\AuthException.class
 tn\esprit\controllers\EventDetailsController.class
 tn\esprit\services\ServicePrescription.class
 tn\esprit\controllers\LoginController.class
+tn\esprit\controllers\GestionEvenements$1.class
 tn\esprit\controllers\ListeConsultationsController$2.class
 tn\esprit\controllers\GestionPrescription.class
 tn\esprit\models\Consultation.class
