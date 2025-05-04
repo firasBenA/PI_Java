@@ -1,9 +1,11 @@
 package tn.esprit.controllers;
 
 import javafx.animation.PauseTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,7 +15,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceAddRdv;
+import tn.esprit.utils.SceneManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,9 +31,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GestionListeRdv implements Initializable {
+public class GestionListeRdv {
 
-    // Composants FXML
     @FXML
     private VBox rdvContainer;
     @FXML
@@ -42,11 +46,12 @@ public class GestionListeRdv implements Initializable {
     @FXML
     private Button notificationButton;
 
-    // Services et données
     private final ServiceAddRdv serviceRendezVous = new ServiceAddRdv();
-    private int currentUserId = -1; // ID de l'utilisateur connecté
-    private final List<String> notificationHistory = new ArrayList<>();
+    private final ObservableList<String> notificationHistory = FXCollections.observableArrayList();
     private Connection connection;
+    private AuthService authService;
+    private SceneManager sceneManager;
+    private User currentUser;
 
     // Pagination
     private int currentPage = 1;
@@ -54,27 +59,31 @@ public class GestionListeRdv implements Initializable {
     private List<RendeVous> allRdvs = new ArrayList<>();
     private List<RendeVous> filteredRdvs = new ArrayList<>();
 
-    // Sujet Firebase pour les notifications
-    private static final String FIREBASE_TOPIC = "appointments";
-
-    // Setter pour injecter l'ID de l'utilisateur connecté
-    public void setCurrentUserId(int userId) {
-        this.currentUserId = userId;
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+        System.out.println("Current user set in GestionListeRdv: " + (user != null ? user.getNom() : "null"));
+        initialize();
+    }
+
+    @FXML
+    public void initialize() {
         try {
-            // Initialiser Firebase
             connectDB();
             setupStatusFilter();
             loadAllRdvs();
             setupPagination();
 
-            // Envoyer une notification de test au démarrage
             addNotification("Application démarrée à " + LocalDateTime.now());
         } catch (Exception e) {
-            showAlert("Erreur", "Initialisation Firebase échouée", e.getMessage());
+            showAlert("Erreur", "Initialisation échouée", e.getMessage());
         }
     }
 
@@ -93,11 +102,11 @@ public class GestionListeRdv implements Initializable {
     }
 
     private void loadAllRdvs() {
-        if (currentUserId == -1) {
+        if (currentUser == null) {
             showAlert("Erreur", "Aucun utilisateur connecté", "Veuillez vous connecter pour voir vos rendez-vous.");
             return;
         }
-        allRdvs = serviceRendezVous.findByPatientId(currentUserId);
+        allRdvs = serviceRendezVous.findByPatientId(currentUser.getId());
         filterRdvs();
     }
 
@@ -228,44 +237,34 @@ public class GestionListeRdv implements Initializable {
             serviceRendezVous.delete(rdv);
             String doctorName = getDoctorName(rdv.getIdMedecin());
             String message = String.format("Rendez-vous avec Dr %s du %s supprimé", doctorName, rdv.getDate());
-
-            // Ajouter à l'historique et envoyer notification
             addNotification(message);
             loadAllRdvs();
         }
     }
 
+    // Dans GestionListeRdv.java
     @FXML
-    private void addNewRDV() {
+    private void addNewRDV(ActionEvent event) {
         try {
-            if (currentUserId == -1) {
-                showAlert("Erreur", "Aucun utilisateur connecté", "Veuillez vous connecter pour ajouter un rendez-vous.");
-                return;
-            }
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/addrendezvous.fxml"));
             Parent root = loader.load();
 
             GestionRendezVous controller = loader.getController();
-            controller.setCurrentUserId(currentUserId); // Passer l'ID de l'utilisateur connecté
-            controller.setNotificationListener(message -> {
-                addNotification(message);
-            });
+            controller.setCurrentUser(currentUser);
+            controller.setNotificationListener(this::addNotification);
 
             Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Nouveau Rendez-vous");
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
             stage.showAndWait();
 
-            loadAllRdvs();
+            loadAllRdvs(); // Rafraîchir la liste après fermeture
         } catch (IOException e) {
-            showAlert("Erreur", "Impossible d'ouvrir le formulaire d'ajout", e.getMessage());
+            showAlert("Erreur", "Impossible d'ouvrir le formulaire");
         }
     }
-
     @FXML
-    private void showNotificationHistory() {
+    private void showNotificationHistory(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/notificationHistorique.fxml"));
             Parent root = loader.load();

@@ -2,11 +2,13 @@ package tn.esprit.services;
 
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Consultation;
+import tn.esprit.models.Medecin;
+import tn.esprit.models.Patient;
 import tn.esprit.models.RendeVous;
+import tn.esprit.models.User;
 import tn.esprit.utils.MyDataBase;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +26,24 @@ public class ServiceAddRdv implements IService<RendeVous> {
 
     public void add(RendeVous rdv, int currentUserId) {
         boolean autoCommit = false;
+
         try {
             autoCommit = cnx.getAutoCommit();
             cnx.setAutoCommit(false);
+
+            ServiceUser serviceUser = new ServiceUser();
+
+            // Vérifier que le patient existe et est bien un Patient
+            User patient = serviceUser.getUserById(rdv.getIdPatient());
+            if (!(patient instanceof Patient)) {
+                throw new IllegalArgumentException("L'utilisateur avec l'ID " + rdv.getIdPatient() + " n'est pas un patient.");
+            }
+
+            // Vérifier que le médecin existe et est bien un Medecin
+            User medecin = serviceUser.getUserById(rdv.getIdMedecin());
+            if (!(medecin instanceof Medecin)) {
+                throw new IllegalArgumentException("L'utilisateur avec l'ID " + rdv.getIdMedecin() + " n'est pas un médecin.");
+            }
 
             // 1. Insérer le rendez-vous
             String rdvQuery = "INSERT INTO `rendez_vous`(`patient_id`, `medecin_id`, `date`, `statut`, `type_rdv`, `cause`) VALUES (?,?,?,?,?,?)";
@@ -44,7 +61,6 @@ public class ServiceAddRdv implements IService<RendeVous> {
                     throw new SQLException("Échec de l'insertion du rendez-vous");
                 }
 
-                // Récupérer l'ID généré
                 try (ResultSet generatedKeys = pstRdv.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         rdv.setId(generatedKeys.getInt(1));
@@ -54,15 +70,15 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 }
             }
 
-            // 2. Créer la consultation associée
+            // 2. Insérer la consultation
             Consultation consultation = new Consultation();
             consultation.setRendez_vous_id(rdv.getId());
             consultation.setPatient_id(rdv.getIdPatient());
             consultation.setMedecin_id(rdv.getIdMedecin());
             consultation.setDate(rdv.getDate());
-            consultation.setPrix(0); // Prix par défaut
+            consultation.setPrix(0);
             consultation.setType_consultation(rdv.getType());
-            consultation.setUser_id(currentUserId); // Utiliser l'ID de l'utilisateur connecté
+            consultation.setUser_id(currentUserId);
 
             String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_idme_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?,?,?,?,?,?,?)";
 
@@ -81,7 +97,6 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 }
             }
 
-            // Valider la transaction
             cnx.commit();
             System.out.println("Rendez-vous et consultation créés avec succès. ID RDV: " + rdv.getId());
 
@@ -153,14 +168,12 @@ public class ServiceAddRdv implements IService<RendeVous> {
             autoCommit = cnx.getAutoCommit();
             cnx.setAutoCommit(false);
 
-            // 1. D'abord supprimer la consultation associée
             String deleteConsultQuery = "DELETE FROM `consultation` WHERE `rendez_vous_id`=?";
             try (PreparedStatement pstConsult = cnx.prepareStatement(deleteConsultQuery)) {
                 pstConsult.setInt(1, rdv.getId());
                 pstConsult.executeUpdate();
             }
 
-            // 2. Ensuite supprimer le rendez-vous
             String deleteRdvQuery = "DELETE FROM `rendez_vous` WHERE `id`=?";
             try (PreparedStatement pstRdv = cnx.prepareStatement(deleteRdvQuery)) {
                 pstRdv.setInt(1, rdv.getId());
