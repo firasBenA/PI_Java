@@ -1,40 +1,57 @@
 package tn.esprit.test;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import tn.esprit.controllers.MainController;
+import tn.esprit.models.User;
+import tn.esprit.repository.UserRepository;
 import tn.esprit.repository.UserRepositoryImpl;
+import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
 import tn.esprit.utils.SceneManager;
 
 public class MainFX extends Application {
 
+    private SceneManager sceneManager;
+    private AuthService authService;
+
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        // Initialize AuthService
-        AuthService authService = new AuthService(new UserRepositoryImpl());
+    public void start(Stage primaryStage) {
+        // Initialize dependencies
+        UserRepository userRepository = new UserRepositoryImpl();
+        authService = new AuthService(userRepository);
+        sceneManager = new SceneManager(primaryStage, authService);
 
-        // Initialize SceneManager
-        SceneManager sceneManager = new SceneManager(primaryStage, authService);
+        // Set the stage title
+        primaryStage.setTitle("Medical Application");
 
-        // Load Main.fxml and initialize MainController
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
-        Parent root = loader.load();
-
-        // Initialize MainController with dependencies
-        MainController controller = loader.getController();
-        if (controller == null) {
-            throw new IllegalStateException("MainController is null. Check Main.fxml controller binding.");
+        // Check for existing session
+        try {
+            User currentUser = authService.getCurrentUser();
+            if (currentUser != null) {
+                System.out.println("Existing session found for user: " + currentUser.getEmail());
+                // Navigate to the appropriate dashboard based on user type
+                switch (currentUser.getUserType()) {
+                    case "ADMIN":
+                        sceneManager.showAdminDashboard(currentUser);
+                        break;
+                    case "MEDECIN":
+                        sceneManager.showMedecinDashboard(currentUser);
+                        break;
+                    case "PATIENT":
+                        sceneManager.showPatientDashboard(currentUser);
+                        break;
+                    default:
+                        System.err.println("Unknown user type: " + currentUser.getUserType());
+                        sceneManager.showLoginScene();
+                }
+            } else {
+                // No session exists, show login scene
+                sceneManager.showLoginScene();
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking session: " + e.getMessage());
+            sceneManager.showLoginScene();
         }
-        controller.setAuthService(authService);
-        controller.setSceneManager(sceneManager);
-
-        primaryStage.setTitle("Ajouter Réclamation");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
     }
 
     public static void main(String[] args) {

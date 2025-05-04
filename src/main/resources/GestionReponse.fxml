@@ -1,64 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="tn.esprit.controllers.GestionReponse"
-            prefHeight="600.0" prefWidth="800.0"
-            styleClass="root-pane"
-            stylesheets="@/styles.css">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="root-pane" stylesheets="styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionReponse">
 
-    <!-- Main container with padding -->
-    <VBox spacing="15" alignment="CENTER" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0">
+    <VBox alignment="CENTER" spacing="20" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
 
-        <!-- Title -->
-        <Text text="Gestion des Réponses" styleClass="title"/>
+        <Text styleClass="title" text="Gestion des Réponses" />
 
-        <!-- Split layout: ListView on the left, Response form on the right -->
-        <HBox spacing="20" alignment="CENTER" VBox.vgrow="ALWAYS">
+        <!-- Filter by Etat -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label styleClass="label" text="Filtrer par état :" />
+            <ComboBox fx:id="filterEtatComboBox" prefWidth="150.0" styleClass="combo-box" />
+        </HBox>
 
-            <!-- Left: ListView for Reclamations -->
-            <VBox spacing="10" alignment="TOP_CENTER" prefWidth="400.0">
-                <Text text="Liste des Réclamations" styleClass="label"/>
-                <!-- Filter by Etat -->
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label text="Filtrer par état :" styleClass="label"/>
-                    <ComboBox fx:id="filterEtatComboBox" prefWidth="150.0" styleClass="combo-box"/>
-                </HBox>
-                <ListView fx:id="listViewReclamations" prefHeight="400" styleClass="list-view" VBox.vgrow="ALWAYS"/>
-            </VBox>
+        <!-- ScrollPane containing the CardPane (HBox for horizontal cards) -->
+        <ScrollPane fx:id="scrollPane" fitToHeight="true" hbarPolicy="ALWAYS" prefHeight="306.0" prefWidth="760.0" styleClass="scroll-pane" vbarPolicy="NEVER">
+            <HBox fx:id="cardPane" spacing="20" styleClass="card-container" />
+        </ScrollPane>
 
-            <!-- Right: Form to Add Response -->
-            <VBox spacing="15" alignment="TOP_CENTER" prefWidth="400.0">
-                <Text text="Ajouter une Réponse" styleClass="label"/>
+        <!-- Pagination Controls -->
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="prevButton" onAction="#goToPreviousPage" styleClass="button-secondary" text="Précédent" />
+            <Label fx:id="pageLabel" styleClass="label" text="Page 1 of 1" />
+            <Button fx:id="nextButton" onAction="#goToNextPage" styleClass="button-primary" text="Suivant" />
+        </HBox>
 
-                <!-- Grid for Response Form -->
-                <GridPane hgap="10" vgap="10" alignment="CENTER">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="150.0"/>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" prefWidth="250.0"/>
-                    </columnConstraints>
+        <!-- Form to Add Response -->
+        <VBox spacing="15" alignment="TOP_CENTER">
+            <Text styleClass="label" text="Ajouter une Réponse" />
+            <Text styleClass="label" text="Contenu :" />
+            <TextArea fx:id="TAContenu" promptText="Écrire votre réponse ici..." prefHeight="100.0" prefWidth="400.0" styleClass="text-area" wrapText="true" />
+        </VBox>
 
-                    <Text text="Réclamation ID :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label"/>
-                    <TextField fx:id="TFReclamationId" promptText="ID (Auto rempli)" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="text-field"/>
-
-                    <Text text="Sujet :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label"/>
-                    <TextField fx:id="TFReclamationSujet" promptText="Sujet (Auto rempli)" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="text-field"/>
-
-                    <Text text="Contenu :" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="label"/>
-                    <TextArea fx:id="TAContenu" promptText="Écrire votre réponse ici..." prefHeight="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="text-area"/>
-                </GridPane>
-
-                <!-- Buttons -->
-                <HBox spacing="15" alignment="CENTER">
-                    <Button text="Ajouter Réponse" onAction="#Save" styleClass="button-primary"/>
-                    <Button text="Download Excel" onAction="#downloadExcel" styleClass="button-secondary"/>
-                </HBox>
-            </VBox>
+        <!-- Buttons -->
+        <HBox alignment="CENTER" spacing="20">
+            <Button onAction="#Save" styleClass="button-primary" text="Ajouter Réponse" />
+            <Button onAction="#downloadExcel" styleClass="button-secondary" text="Download Excel" />
         </HBox>
     </VBox>
 </AnchorPane>

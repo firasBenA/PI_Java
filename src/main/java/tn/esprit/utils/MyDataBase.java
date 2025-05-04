@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class MyDataBase {
 
     private static MyDataBase instance;
-    private final String URL = "jdbc:mysql://127.0.0.1:3306/ehealth_database";
+    private final String URL = "jdbc:mysql://127.0.0.1:3310/ehealth_database4";
     private final String USERNAME = "root";
     private final String PASSWORD = "";
     private Connection cnx;
@@ -22,7 +22,7 @@ public class MyDataBase {
     }
 
     public static MyDataBase getInstance() {
-        if (instance == null)
+        if (instance == null)// aandek l hak taaml instance wahda (sainglotant)
             instance = new MyDataBase();
 
         return instance;

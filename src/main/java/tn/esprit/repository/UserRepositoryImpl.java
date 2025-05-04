@@ -4,6 +4,7 @@ import tn.esprit.models.Admin;
 import tn.esprit.models.Medecin;
 import tn.esprit.models.Patient;
 import tn.esprit.models.User;
+import tn.esprit.utils.DataSource;
 import tn.esprit.utils.MyDataBase;
 
 import java.sql.*;
@@ -115,6 +116,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByEmail(String email) {
         String sql = "SELECT * FROM user WHERE email = ?";
+        Connection connection = DataSource.getInstance().getConnection(); // ✅ Toujours ici
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
@@ -128,6 +130,7 @@ public class UserRepositoryImpl implements UserRepository {
             throw new RuntimeException("Échec de la recherche par email", e);
         }
     }
+
 
     @Override
     public List<User> getAllUsers() {
