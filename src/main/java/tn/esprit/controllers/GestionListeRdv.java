@@ -14,7 +14,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
-import tn.esprit.services.FirebaseNotificationService;
 import tn.esprit.services.ServiceAddRdv;
 
 import java.io.IOException;

@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>${firebase.version}</version>
+            <version>9.3.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>

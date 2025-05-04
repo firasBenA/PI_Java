@@ -252,23 +252,6 @@ public class GestionRendezVous implements Initializable {
                 loadRendezVousForMedecin();
 
                 // Redirection vers listrdv.fxml
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/listrdv.fxml"));
-                    Parent root = loader.load();
-
-                    // Get the current stage
-                    Stage stage = (Stage) notificationLabel.getScene().getWindow();
-
-                    // Set the new scene
-                    Scene scene = new Scene(root);
-                    stage.setScene(scene);
-                    stage.show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    showAlert("Erreur", "Impossible de charger la page des rendez-vous. Vérifiez que listrdv.fxml existe dans /tn/esprit/views/.");
-                }
-
-                clearFields();
 
             } catch (Exception e) {
                 showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");
