@@ -63,6 +63,9 @@ public class PatientDashboardController {
 
     @FXML
     public void initialize() {
+
+        System.out.println(currentUser);
+
         configureButtonActions();
         disableFields();
         initializeComboBoxes();

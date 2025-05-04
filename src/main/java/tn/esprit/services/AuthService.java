@@ -1,19 +1,44 @@
 package tn.esprit.services;
 
+import org.apache.commons.mail.SimpleEmail;
 import tn.esprit.models.User;
 import tn.esprit.repository.UserRepository;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class AuthService {
     private final UserRepository userRepository;
+    private static final String SMTP_HOST = "smtp.mailtrap.io";
+    private static final String SMTP_PORT = "587";
+    private static final String SMTP_USERNAME = "b05bc95cf579cf";
+    private static final String SMTP_PASSWORD = "a2828ad5ae1705";
+    private static final String FROM_EMAIL = "no-reply@yourapp.com";
 
+    private static AuthService instance;
+    private User currentUser;
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public static AuthService getInstance(UserRepository userRepository) {
+        if (instance == null) {
+            instance = new AuthService(userRepository);
+        }
+        return instance;
+    }
+    public User getCurrentUser() {
+        System.out.println("Current User in PatientDashboard: " + currentUser.getNom());
+        return currentUser;
+    }
+
+    // Setter for the current logged-in user
+    public void setCurrentUser(User user) {
+        this.currentUser = user;  // Set the current user
     }
 
     private boolean isEmpty(String value) {
@@ -21,7 +46,6 @@ public class AuthService {
     }
 
     public void register(User user) throws AuthException {
-        // Validate NOT NULL fields
         if (isEmpty(user.getEmail())) {
             throw new AuthException("L'email est requis.");
         }
@@ -50,7 +74,6 @@ public class AuthService {
             throw new AuthException("Le type d'utilisateur doit être ADMIN, PATIENT ou MEDECIN.");
         }
 
-        // Validate roles
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             throw new AuthException("Le rôle est requis.");
         }
@@ -64,7 +87,6 @@ public class AuthService {
             throw new AuthException("Le rôle " + expectedRole + " est requis pour " + user.getUserType() + ".");
         }
 
-        // Validate Medecin-specific fields
         if ("MEDECIN".equals(user.getUserType())) {
             if (isEmpty(user.getSpecialite())) {
                 throw new AuthException("Spécialité requise pour les médecins.");
@@ -74,17 +96,69 @@ public class AuthService {
             }
         }
 
-        // Check for existing email
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new AuthException("Il existe déjà un compte avec cet email.");
         }
 
-        // Set created_at if not set
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());
         }
 
+        String verificationCode = generateVerificationCode();
+        user.setEmailAuthCode(verificationCode);
+        user.setEmailAuthEnabled(false);
+        System.out.println("Generated email_auth_code for user " + user.getEmail() + ": " + verificationCode);
+
         userRepository.save(user);
+        System.out.println("User saved with email_auth_code: " + user.getEmailAuthCode() + " for email: " + user.getEmail());
+
+        try {
+            sendVerificationEmail(user.getEmail(), verificationCode);
+        } catch (AuthException e) {
+            System.err.println("Failed to send verification email: " + e.getMessage());
+        }
+    }
+
+    private String generateVerificationCode() {
+        Random random = new Random();
+        return String.format("%06d", random.nextInt(1000000));
+    }
+
+    private void sendVerificationEmail(String email, String code) throws AuthException {
+        try {
+            SimpleEmail simpleEmail = new SimpleEmail();
+            simpleEmail.setHostName("sandbox.smtp.mailtrap.io");
+            simpleEmail.setSmtpPort(587);
+            simpleEmail.setAuthenticator(new org.apache.commons.mail.DefaultAuthenticator(
+                    "b05bc95cf579cf", "a2828ad5ae1705"
+            ));
+            simpleEmail.setStartTLSEnabled(true);
+            simpleEmail.setFrom("no-reply@yourapp.com");
+            simpleEmail.setSubject("Code de vérification de votre compte");
+            simpleEmail.setMsg("Votre code de vérification est : " + code);
+            simpleEmail.addTo(email);
+            simpleEmail.setDebug(true);
+            simpleEmail.send();
+            System.out.println("Verification email sent to: " + email + " with code: " + code);
+        } catch (Exception e) {
+            throw new AuthException("Échec de l'envoi de l'email de vérification : " + e.getMessage());
+        }
+    }
+
+    public boolean verifyEmailCode(String email, String code) throws AuthException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new AuthException("Utilisateur non trouvé.");
+        }
+        System.out.println("Retrieved email_auth_code for user " + email + ": " + user.getEmailAuthCode());
+        if (user.getEmailAuthCode() == null || !user.getEmailAuthCode().equals(code)) {
+            return false;
+        }
+        user.setEmailAuthEnabled(true);
+        user.setEmailAuthCode(null);
+        userRepository.save(user);
+        System.out.println("Email verified for user " + email + ", email_auth_code cleared.");
+        return true;
     }
 
     public User login(String email, String password) throws AuthException {
@@ -100,7 +174,10 @@ public class AuthService {
             throw new AuthException("Aucun compte trouvé avec cet email.");
         }
 
-        // Check if user is blocked by admin
+        if (!user.getEmailAuthEnabled()) {
+            throw new AuthException("Veuillez vérifier votre adresse email avant de vous connecter.");
+        }
+
         if (user.getRoles().contains("ROLE_BLOCKED")) {
             String message = "Votre compte est bloqué par l'administrateur." +
                     (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now()) ?
@@ -108,13 +185,11 @@ public class AuthService {
             throw new AuthException(message);
         }
 
-        // Check if account is locked due to failed attempts
         if (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now())) {
             throw new AuthException("Compte verrouillé. Réessayez après " +
                     user.getLockUntil().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         }
 
-        // Validate role matches userType
         String expectedRole = switch (user.getUserType()) {
             case "ADMIN" -> "ROLE_ADMIN";
             case "MEDECIN" -> "ROLE_MEDECIN";
@@ -125,7 +200,6 @@ public class AuthService {
             throw new AuthException("Rôle invalide pour " + user.getUserType() + " : " + user.getRoles());
         }
 
-        // Verify password
         if (user.getPassword() == null || !user.checkPassword(password)) {
             int attempts = user.getFailedLoginAttempts() != null ? user.getFailedLoginAttempts() : 0;
             user.setFailedLoginAttempts(attempts + 1);
@@ -140,10 +214,13 @@ public class AuthService {
             throw new AuthException("Mot de passe incorrect.");
         }
 
-        // Reset login attempts on successful login
         user.setFailedLoginAttempts(0);
         user.setLockUntil(null);
         userRepository.save(user);
+
+        // Set the logged-in user in the AuthService instance
+        AuthService.getInstance(userRepository).setCurrentUser(user);
+
         return user;
     }
 
@@ -174,7 +251,6 @@ public class AuthService {
             throw new AuthException("Le type d'utilisateur doit être ADMIN, PATIENT ou MEDECIN.");
         }
 
-        // Validate Medecin-specific fields
         if ("MEDECIN".equals(user.getUserType())) {
             if (isEmpty(user.getSpecialite())) {
                 throw new AuthException("Spécialité requise pour les médecins.");
@@ -184,7 +260,6 @@ public class AuthService {
             }
         }
 
-        // Check if email is taken by another user
         User existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser != null && !existingUser.getId().equals(user.getId())) {
             throw new AuthException("Cet email est déjà utilisé par un autre compte.");
@@ -210,13 +285,11 @@ public class AuthService {
             List<User> validUsers = new ArrayList<>();
             for (User user : users) {
                 try {
-                    // Validate mandatory fields
                     if (isEmpty(user.getEmail()) || isEmpty(user.getNom()) || isEmpty(user.getPrenom()) ||
                             isEmpty(user.getAdresse()) || isEmpty(user.getSexe()) || isEmpty(user.getTelephone())) {
                         System.err.println("Skipping invalid user ID: " + user.getId() + ", email: " + user.getEmail());
                         continue;
                     }
-                    // Validate doctor-specific fields
                     if ("MEDECIN".equals(user.getUserType()) && (isEmpty(user.getSpecialite()) || isEmpty(user.getCertificat()))) {
                         System.err.println("Skipping doctor with missing specialite or certificat ID: " + user.getId() + ", email: " + user.getEmail());
                         continue;
@@ -239,15 +312,12 @@ public class AuthService {
         }
 
         if (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now())) {
-            // Unblock: Clear lock_until
             user.setLockUntil(null);
         } else {
-            // Block: Set lock_until to 24 hours from now
             user.setLockUntil(LocalDateTime.now().plusHours(24));
         }
         userRepository.save(user);
     }
-
 
     public void registerSocial(User user, String provider, String accessToken) throws AuthException {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
@@ -255,13 +325,11 @@ public class AuthService {
         }
         User existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser != null) {
-            // Link social account
             existingUser.setSocialProvider(provider);
             existingUser.setSocialAccessToken(accessToken);
             userRepository.save(existingUser);
             return;
         }
-        // Set a random password for social users
         user.hashPassword(generateRandomPassword());
         user.setSocialProvider(provider);
         user.setSocialAccessToken(accessToken);
@@ -271,4 +339,95 @@ public class AuthService {
     private String generateRandomPassword() {
         return java.util.UUID.randomUUID().toString().substring(0, 12);
     }
+
+    public User getUserByEmail(String email) throws AuthException {
+        if (isEmpty(email)) {
+            throw new AuthException("L'email est requis.");
+        }
+        return userRepository.findByEmail(email);
+    }
+
+    public void sendPasswordResetCode(String email) throws AuthException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new AuthException("Aucun compte trouvé avec cet email.");
+        }
+
+        // Generate a 6-digit reset code
+        String resetCode = String.format("%06d", new Random().nextInt(999999));
+        System.out.println("Generated password reset code for " + email + ": " + resetCode);
+
+        // Store the reset code in the user's emailAuthCode field
+        user.setEmailAuthCode(resetCode);
+        userRepository.save(user);
+        System.out.println("Stored reset code in database for " + email + ": " + user.getEmailAuthCode());
+
+        // Set up mail server properties
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", SMTP_HOST);
+        properties.put("mail.smtp.port", SMTP_PORT);
+        properties.put("mail.debug", "true");
+        properties.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
+        properties.put("mail.smtp.ssl.trust", SMTP_HOST);
+
+        // Create a session with an authenticator
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(SMTP_USERNAME, SMTP_PASSWORD);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(FROM_EMAIL));
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+            message.setSubject("Code de réinitialisation du mot de passe");
+            message.setText("Votre code de réinitialisation du mot de passe est le suivant : " + resetCode);
+            System.out.println("Préparation de l'envoi du code de réinitialisation à " + email + " code: " + resetCode);
+
+            // Send the email
+            Transport.send(message);
+            System.out.println("Code de réinitialisation du mot de passe envoyé avec succès à " + email + "  code: " + resetCode);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new AuthException("Failed to send password reset email: " + e.getMessage());
+        }
+    }
+
+    public boolean verifyPasswordResetCode(String email, String code) throws AuthException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new AuthException("Utilisateur non trouvé.");
+        }
+        System.out.println("Verifying reset code for " + email + ": stored=" + user.getEmailAuthCode() + ", provided=" + code);
+        if (user.getEmailAuthCode() == null || !user.getEmailAuthCode().equals(code)) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public void resetPassword(String email, String code, String newPassword) throws AuthException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new AuthException("Utilisateur non trouvé.");
+        }
+        if (user.getEmailAuthCode() == null || !user.getEmailAuthCode().equals(code)) {
+            throw new AuthException("Code de réinitialisation invalide.");
+        }
+        if (isEmpty(newPassword) || newPassword.length() < 6) {
+            throw new AuthException("Le nouveau mot de passe doit avoir au moins 6 caractères.");
+        }
+
+        user.hashPassword(newPassword);
+        user.setEmailAuthCode(null);
+        userRepository.save(user);
+        System.out.println("Password reset for user " + email + ", email_auth_code cleared.");
+    }
+
+
 }

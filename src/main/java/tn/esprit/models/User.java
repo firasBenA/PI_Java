@@ -38,11 +38,11 @@ public class User {
         this.userType = determineUserType();
     }
 
-    protected String determineUserType() {
+    public String determineUserType() {
         if (this instanceof Admin) return "ADMIN";
         if (this instanceof Patient) return "PATIENT";
         if (this instanceof Medecin) return "MEDECIN";
-        throw new IllegalStateException("Type d'utilisateur invalide : instance de User non autorisée.");
+        return "UNKNOWN";
     }
 
     public String getUserType() { return userType; }

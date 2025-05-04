@@ -55,4 +55,35 @@ public class ServiceStatistiques {
 
         return new Statistiques(totalCount, enAttenteCount, traiteCount);
     }
+
+    // Fetch the total count of diagnostiques
+    public int getDiagnostiqueCount() {
+        int totalDiagnostiques = 0;
+        String query = "SELECT COUNT(*) FROM diagnostique";
+        try (PreparedStatement pstm = cnx.prepareStatement(query);
+             ResultSet rs = pstm.executeQuery()) {
+            if (rs.next()) {
+                totalDiagnostiques = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors du comptage total des diagnostiques : " + e.getMessage());
+        }
+        return totalDiagnostiques;
+    }
+
+    // Fetch the count of diagnostiques based on their status (0 = pending, 1 = treated)
+    public int getDiagnostiqueCountByStatus(int status) {
+        int count = 0;
+        String query = "SELECT COUNT(*) FROM diagnostique WHERE statut = ?";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setInt(1, status);
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors du comptage des diagnostiques par statut : " + e.getMessage());
+        }
+        return count;
+    }
 }

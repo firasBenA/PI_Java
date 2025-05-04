@@ -1,5 +1,7 @@
 package tn.esprit.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,14 +11,21 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import okhttp3.*;
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Diagnostique;
+import tn.esprit.models.Medecin;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceDiagnostique;
+import tn.esprit.models.User;
+import tn.esprit.services.ServiceUser;
+import tn.esprit.utils.SceneManager;
 
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GestionDiagnostique {
@@ -44,63 +53,58 @@ public class GestionDiagnostique {
     private ObservableList<String> selectedSymptoms = FXCollections.observableArrayList();
     private Map<String, Integer> symptomsDict = new HashMap<>();
     private Map<String, Integer> doctorIdMap = new HashMap<>();
-    ////
 
-    @FXML
-    public void ajouterDiagnostique(ActionEvent actionEvent) {
-        Diagnostique d = new Diagnostique();
-        d.setDossierMedicalId(1);
-        d.setPatientId(1);
-        d.setMedecinId(3);
-        d.setDateDiagnostique(Date.valueOf(dateDiagnostique.getValue()));
-        d.setNom("Allergy");
-        d.setDescription("test java");
-        d.setZoneCorps(zoneCorps.getText());
-        d.setDateSymptomes(Date.valueOf(dateDiagnostique.getValue()));
-        d.setStatus(0);
+    ///////chatbot///////////
 
-        String selected = String.join(",", selectedSymptoms);
-        d.setSelectedSymptoms(selected);
+    @FXML private ListView<String> chatListView;
+    @FXML private TextField userInputField;
+    @FXML private Button sendButton;
+    private final ObservableList<String> messages = FXCollections.observableArrayList();
+    private final OkHttpClient client = new OkHttpClient();
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final String apiKey = "AIzaSyCAIyy3hwHeeRevuaAfipBrVSYHIcyuVAk";
+    private static final int MAX_RETRIES = 3;
+    private static final long BASE_RETRY_DELAY_MS = 5000;
 
-        diag.add(d);
-    }
-
-    @FXML
-    public void modifierDiagnostique(ActionEvent actionEvent) {
-        int id = Integer.parseInt(idDiagnostique.getText()); // Get the ID from the UI
-
-        Diagnostique d = new Diagnostique();
-        d.setId(id); // Set the ID to update the correct record
-        d.setDossierMedicalId(1);
-        d.setPatientId(1);
-        d.setMedecinId(3);
-        d.setDateDiagnostique(Date.valueOf(dateDiagnostique.getValue()));
-        d.setNom(nom.getText()); // Use input field
-        d.setDescription("Mise à jour depuis JavaFX");
-        d.setZoneCorps(zoneCorps.getText());
-        d.setDateSymptomes(Date.valueOf(dateDiagnostique.getValue()));
-        d.setStatus(1); // Status updated (example)
-
-        String selected = String.join(",", selectedSymptoms);
-        d.setSelectedSymptoms(selected);
-
-        diag.update(d); // Calls the update method
-    }
     //////
 
+    private AuthService authService;
+    private SceneManager sceneManager;
+    private User currentUser;
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+        System.out.println("Current user set in GestionDiagnostique: " + (user != null ? user.getNom() : "null"));
+    }
+
     public void initialize() {
-        // Initialize symptoms list
         initSymptoms();
 
-        // Fetch doctors from database and populate combo box
         doctorIdMap = ServiceDiagnostique.getDoctors();
         doctorComboBox.getItems().addAll(doctorIdMap.keySet());
 
-        // Handle select symptom button
         selectSymptomButton.setOnAction(e -> handleSelectSymptom());
+
+        chatListView.setItems(messages);
+        System.out.println("GestionDiagnostiqueController initialized (currentUser may be null)");
+        initUserData();
     }
 
-    // Initialize symptoms list
+    private void initUserData() {
+        if (currentUser != null) {
+            System.out.println("Initializing user data for " + currentUser.getNom());
+        }
+    }
+
     private void initSymptoms() {
         ObservableList<String> symptoms = FXCollections.observableArrayList(
                 "itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", "shivering", "chills",
@@ -152,82 +156,184 @@ public class GestionDiagnostique {
 
     @FXML
     private void handleDiagnose() {
-        String selectedDoctor = doctorComboBox.getValue();
-        String selectedZoneCorps = zoneCorps.getText();
 
         if (selectedSymptoms.isEmpty()) {
             resultLabel.setText("❌ Veuillez sélectionner au moins un symptôme.");
             return;
         }
 
-        if (selectedDoctor == null || selectedDoctor.trim().isEmpty()) {
-            resultLabel.setText("❌ Veuillez sélectionner un médecin.");
-            return;
-        }
-
-        if (selectedZoneCorps == null || selectedZoneCorps.trim().isEmpty()) {
-            resultLabel.setText("❌ Veuillez spécifier une zone du corps.");
-            return;
-        }
-
-        if (selectedSymptomsArea.getText().length() > 1000) {
-            resultLabel.setText("❌ Trop de texte sélectionné pour les symptômes.");
-            return;
-        }
-
-        Tooltip errorTooltip = new Tooltip("Sélection requise !");
-        Tooltip.install(doctorComboBox, errorTooltip);
-
-        // Call the service to diagnose
         Map<String, String> result = ServiceDiagnostique.diagnose(selectedSymptoms);
-
         String disease = result.getOrDefault("disease", "Inconnu");
-        String description = result.getOrDefault("description", "Pas de description");
 
-        // Display diagnosis result
-        resultLabel.setText("Maladie: " + disease + "\nDescription: " + description);
+        List<User> matchingDoctors = ServiceUser.findMedecinsBySpecialite(disease);
 
-        // Prepare all required data
-        int doctorId = doctorIdMap.get(selectedDoctor);
-        Date currentDate = new Date(System.currentTimeMillis()); // dateDiagnostique
-
-        Diagnostique diag = new Diagnostique();
-        diag.setNom(disease);
-        diag.setDescription(description);
-        diag.setSelectedSymptoms(selectedSymptoms.toString());
-        diag.setMedecinId(doctorId);
-        diag.setPatientId(1);
-        diag.setDossierMedicalId(1);
-        diag.setZoneCorps(selectedZoneCorps);
-        diag.setDateSymptomes(Date.valueOf(LocalDate.now()));
-        diag.setStatus(0);
-
-        // Save the diagnosis
-        ServiceDiagnostique.saveDiagnosis(diag);
-
-        // Show an alert and wait for user to click OK before navigating to the home screen
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Diagnostic effectué");
-        alert.setHeaderText(null);
-        alert.setContentText("Le diagnostic a été effectué avec succès !");
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                // Now, navigate to the home screen
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
-                    Parent root = loader.load();
-                    Stage stage = (Stage) resultLabel.getScene().getWindow(); // Get the current stage
-                    stage.setScene(new Scene(root)); // Set the home scene
-                    stage.show(); // Show the home screen
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    resultLabel.setText("❌ Une erreur est survenue lors du changement de page.");
-                }
+        if (!matchingDoctors.isEmpty()) {
+            ObservableList<String> doctorNames = FXCollections.observableArrayList();
+            for (User doctor : matchingDoctors) {
+                doctorNames.add(doctor.getNom());
             }
-        });
+            doctorComboBox.setItems(doctorNames);
+            resultLabel.setText("Maladie: " + disease);
+        } else {
+            resultLabel.setText(resultLabel.getText() + "\n\nAucun médecin trouvé avec cette spécialité : " + disease);
+        }
     }
 
+        /*int doctorId = doctorIdMap.get(selectedDoctor);
+        Date currentDate = new Date(System.currentTimeMillis());
+        */
+        @FXML
+        private void handleSaveDiagnostique(ActionEvent event) {
 
+            if (currentUser == null) {
+                System.out.println("Current user is NULL!");
+                return;
+            }
+
+            System.out.println("Current user roles: " + currentUser.getRoles() + currentUser.getNom());
+
+            try {
+                String disease = resultLabel.getText();
+                String description = "Diagnostic généré par le système.";
+                String selectedSymptoms = selectedSymptomsArea.getText();
+                String selectedZoneCorps = zoneCorps.getText();
+                String selectedDoctorName = doctorComboBox.getValue();
+                int doctorId = ServiceUser.findDoctorIdByName(selectedDoctorName);
+
+                System.out.println(selectedDoctorName);
+                System.out.println(doctorId);
+                System.out.println(selectedSymptoms);
+                System.out.println(disease);
+
+                if (doctorId == -1 || selectedSymptoms.isEmpty() || disease.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Données manquantes");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Veuillez remplir toutes les informations nécessaires avant de sauvegarder.");
+                    alert.show();
+                    return;
+                }
+
+                Diagnostique diag = new Diagnostique();
+                diag.setNom(disease);
+                diag.setDescription(description);
+                diag.setSelectedSymptoms(selectedSymptoms);
+                diag.setMedecinId(doctorId);
+                diag.setPatientId(currentUser.getId());
+                diag.setDossierMedicalId(1);
+                diag.setZoneCorps(selectedZoneCorps);
+                diag.setDateSymptomes(Date.valueOf(LocalDate.now()));
+                diag.setStatus(0);
+
+                ServiceDiagnostique.saveDiagnosis(diag);
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Diagnostic effectué");
+                alert.setHeaderText(null);
+                alert.setContentText("Le diagnostic a été effectué avec succès !");
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        System.out.println("ok pressssed");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur");
+                alert.setHeaderText(null);
+                alert.setContentText("Une erreur est survenue lors de l'enregistrement du diagnostic.");
+                alert.show();
+            }
+        }
 
     //////
+
+    @FXML
+    public void sendMessage() {
+        String userMessage = userInputField.getText().trim();
+        if (userMessage.isEmpty()) return;
+
+        sendButton.setDisable(true);
+        messages.add("You: " + userMessage);
+        userInputField.clear();
+
+        new Thread(() -> {
+            try {
+                String response = getChatbotResponse(userMessage);
+                System.out.println("Bot response: " + response);
+                Platform.runLater(() -> messages.add("Bot: " + response));
+            } catch (IOException e) {
+                System.out.println("Error: " + e.getMessage());
+                Platform.runLater(() -> messages.add("Bot: Error: " + e.getMessage()));
+            } finally {
+                Platform.runLater(() -> sendButton.setDisable(false));
+            }
+        }).start();
+
+        chatListView.scrollTo(messages.size() - 1);
+    }
+    private String getChatbotResponse(String userMessage) throws IOException {
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new IOException("La clé API n'est pas configurée. Merci de définir la variable d'environnement 'apikey'.");
+        }
+
+        String instructionSysteme = "Tu es un chatbot médical qui parle français. "
+                + "Tu dois répondre uniquement aux questions médicales en français. "
+                + "Si la question n'est pas liée à la médecine, réponds poliment : "
+                + "'Désolé, je ne peux répondre qu'aux questions médicales.'";
+
+        String promptComplet = instructionSysteme + "\n\nQuestion de l'utilisateur : " + userMessage;
+
+        String jsonBody = """
+        {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": "%s"}
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "maxOutputTokens": 300
+            }
+        }
+        """.formatted(promptComplet.replace("\"", "\\\""));
+
+        RequestBody body = RequestBody.create(jsonBody, MediaType.get("application/json"));
+        Request request = new Request.Builder()
+                .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey)
+                .post(body)
+                .build();
+
+        int attempt = 0;
+        while (attempt < MAX_RETRIES) {
+            try (Response response = client.newCall(request).execute()) {
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+                    return mapper.readTree(responseBody)
+                            .get("candidates").get(0)
+                            .get("content").get("parts").get(0)
+                            .get("text").asText().trim();
+                } else if (response.code() == 429) {
+                    attempt++;
+                    String errorBody = response.body() != null ? response.body().string() : "Pas de corps de réponse";
+                    String retryAfter = response.header("Retry-After");
+                    long delayMs = retryAfter != null ? Long.parseLong(retryAfter) * 1000 : BASE_RETRY_DELAY_MS * attempt;
+                    System.out.println("Trop de requêtes : " + errorBody + ". Nouvel essai après " + delayMs + "ms (Essai " + attempt + "/" + MAX_RETRIES + ")");
+                    if (attempt >= MAX_RETRIES) {
+                        throw new IOException("Limite atteinte après " + MAX_RETRIES + " essais : " + errorBody);
+                    }
+                    Thread.sleep(delayMs);
+                } else {
+                    String errorBody = response.body() != null ? response.body().string() : "Pas de corps de réponse";
+                    throw new IOException("Code inattendu " + response.code() + " : " + errorBody);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interruption pendant l'attente entre les essais : " + e.getMessage());
+            }
+        }
+        throw new IOException("Échec après " + MAX_RETRIES + " tentatives");
+    }
+
 }

@@ -5,6 +5,8 @@ public class Statistiques {
     private int enAttenteCount;
     private int traiteCount;
 
+    public Statistiques(){}
+
     public Statistiques(int totalCount, int enAttenteCount, int traiteCount) {
         this.totalCount = totalCount;
         this.enAttenteCount = enAttenteCount;

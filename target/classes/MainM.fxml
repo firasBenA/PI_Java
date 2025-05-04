@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="rootPane" prefHeight="780.0" prefWidth="1000.0" styleClass="white-background" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.MainMController">
+
+    <top>
+        <HBox prefHeight="60.0" prefWidth="200.0" stylesheets="@CSS/style.css" BorderPane.alignment="CENTER">
+            <children>
+                <Label contentDisplay="CENTER" prefHeight="57.0" prefWidth="98.0" stylesheets="@styles.css" text="Welcome Dr.">
+                    <font>
+                        <Font name="Monotype Corsiva" size="48.0" />
+                    </font>
+                    <padding>
+                        <Insets left="12.0" />
+                    </padding>
+                    <HBox.margin>
+                        <Insets left="48.0" />
+                    </HBox.margin>
+                </Label>
+                <Label contentDisplay="CENTER" prefHeight="57.0" prefWidth="51.0" stylesheets="@styles.css" text="Firas">
+                    <font>
+                        <Font name="Monotype Corsiva" size="48.0" />
+                    </font>
+                </Label>
+                <Pane prefHeight="77.0" prefWidth="490.0" stylesheets="@CSS/style.css" HBox.hgrow="ALWAYS" />
+                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="121.0" stylesheets="@main/resources/CSS/style.css">
+                    <children>
+                        <ImageView fitHeight="49.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@img/user.png" />
+                            </image>
+                        </ImageView>
+                        <Label fx:id="nomDocteur" contentDisplay="CENTER" prefHeight="56.0" prefWidth="67.0" text="Firas BA">
+                            <font>
+                                <Font name="Berlin Sans FB" size="18.0" />
+                            </font>
+                        </Label>
+                    </children>
+                    <HBox.margin>
+                        <Insets right="12.0" />
+                    </HBox.margin>
+                    <styleClass>
+                        <String fx:value="white-background" />
+                        <String fx:value="user-border" />
+                    </styleClass>
+                </HBox>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="20.0" top="20.0" />
+            </BorderPane.margin>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox prefHeight="720.0" prefWidth="211.0" styleClass="border" stylesheets="@CSS/style.css" BorderPane.alignment="CENTER">
+            <children>
+                <VBox prefHeight="248.0" prefWidth="211.0">
+                    <children>
+                        <Label contentDisplay="CENTER" prefHeight="43.0" prefWidth="111.0" text="Medecin" textAlignment="CENTER">
+                            <font>
+                                <Font name="Berlin Sans FB" size="18.0" />
+                            </font>
+                            <padding>
+                                <Insets left="10.0" />
+                            </padding>
+                        </Label>
+                        <HBox alignment="CENTER" onMouseClicked="#handlePrescriptionClick" prefHeight="42.0" prefWidth="211.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@main/resources/CSS/style.css">
+                            <children>
+                                <Label fx:id="prescriptionLabel" contentDisplay="CENTER" prefHeight="43.0" prefWidth="105.0"  stylesheets="@CSS/style.css" text="Prescription" textAlignment="CENTER">
+                                    <font>
+                                        <Font name="Berlin Sans FB" size="18.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox fx:id="diagnostiqueNav" alignment="CENTER" onMouseClicked="#handleDiagnostiqueClick" prefHeight="42.0" prefWidth="211.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@main/resources/CSS/style.css">
+                            <children>
+                                <Label fx:id="diagnostiqueLabel" contentDisplay="CENTER" prefHeight="43.0" prefWidth="105.0" text="Diagnostique" textAlignment="CENTER">
+                                    <font>
+                                        <Font name="Berlin Sans FB" size="18.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="white-background" stylesheets="@CSS/style.css" BorderPane.alignment="CENTER">
+            <children>
+                <ScrollPane prefHeight="720.0" prefWidth="803.0" stylesheets="@CSS/style.css" VBox.vgrow="ALWAYS">
+                    <content>
+                        <GridPane fx:id="Container" prefHeight="0.0" prefWidth="2.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                        </GridPane>
+                    </content>
+                    <VBox.margin>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                    </VBox.margin>
+                    <styleClass>
+                        <String fx:value="white-background" />
+                        <String fx:value="grey-background" />
+                        <String fx:value="border" />
+                    </styleClass>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </center>
+    <stylesheets>
+        <URL value="@CSS/style.css" />
+        <URL value="@CSS/style.css" />
+    </stylesheets>
+
+</BorderPane>

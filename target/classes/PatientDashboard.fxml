@@ -47,7 +47,6 @@
             <Button fx:id="changeImageBtn" onAction="#handleChangeImage" styleClass="edit-profile-btn" text="Modifier" StackPane.alignment="BOTTOM_CENTER" />
         </StackPane>
 
-        <!-- Welcome Message -->
         <VBox spacing="5">
             <Text styleClass="dashboard-title" text="Tableau de Bord Patient" />
             <Label fx:id="welcomeLabel" styleClass="welcome-label" />

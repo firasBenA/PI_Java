@@ -23,5 +23,10 @@ public class Medecin extends User {
         super.setCertificat(certificat);
     }
 
+    @Override
+    public String determineUserType() {
+        return "MEDECIN";
+    }
+
 
 }

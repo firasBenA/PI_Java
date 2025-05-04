@@ -121,7 +121,7 @@
                     <Label fx:id="imageError" style="-fx-text-fill: #e53e3e; -fx-font-size: 12;" visible="false"/>
                 </VBox>
 
-                <!-- Google Sign-In Button -->
+                <!-- Google Sign-In Button
                 <Button fx:id="googleLoginButton" text="Connexion avec Google" onAction="#handleGoogleLogin" style="-fx-background-color: #ffffff; -fx-border-color: #cbd5e0; -fx-border-radius: 4; -fx-text-fill: #4a5568; -fx-font-weight: bold; -fx-padding: 10 20;">
                     <graphic>
                         <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
@@ -129,7 +129,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-
+-->
                 <!-- Submit Button -->
                 <Button text="Créer un compte" onAction="#handleRegister" style="-fx-background-color: #805ad5; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 4; -fx-padding: 10 20;"/>
 

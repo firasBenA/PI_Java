@@ -39,52 +39,42 @@ public class GestionPrescription {
 //////////////
 @FXML
 public void ajouterPrescription(ActionEvent actionEvent) {
-    // Input Validation
     String errorMessage = "";
 
-    // Check if titre is empty
     if (titre.getText().isEmpty()) {
         errorMessage += "Le titre est requis.\n";
     }
 
-    // Check if contenu is empty
     if (contenue.getText().isEmpty()) {
         errorMessage += "Le contenu est requis.\n";
     }
 
-    // Check if datePrescription is selected
     if (datePrescription.getValue() == null) {
         errorMessage += "La date de prescription est requise.\n";
     }
 
-    // If there are any errors, display the error message
     if (!errorMessage.isEmpty()) {
         lbPrescription.setText(errorMessage);
         lbPrescription.setTextFill(javafx.scene.paint.Color.RED); // Set error color
     } else {
-        // If validation passes, create the Prescription object and add it to the service
         Prescription p = new Prescription();
-        p.setDossier_medical_id(1); // Assuming this is set correctly
-        p.setDiagnostique_id(20);   // Assuming this is set correctly
-        p.setMedecin_id(3);         // Assuming this is set correctly
-        p.setPatient_id(1);         // Assuming this is set correctly
+        p.setDossier_medical_id(1);
+        p.setDiagnostique_id(20);
+        p.setMedecin_id(3);
+        p.setPatient_id(1);
         p.setDate_prescription(Date.valueOf(datePrescription.getValue()));
         p.setTitre(titre.getText());
         p.setContenue(contenue.getText());
 
-        // Add prescription to the service (and database)
         presc.add(p);
 
-        // Optionally, clear the fields after successful submission
         titre.clear();
         contenue.clear();
         datePrescription.setValue(null);
 
-        // Update the table with the new prescription
         List<Prescription> prescriptions = presc.getAll();
         prescriptionTable.getItems().setAll(prescriptions);
 
-        // Display success message
         lbPrescription.setText("Prescription ajoutée avec succès!");
         lbPrescription.setTextFill(javafx.scene.paint.Color.GREEN); // Success color
     }
@@ -102,7 +92,7 @@ public void ajouterPrescription(ActionEvent actionEvent) {
         contenueCol.setCellValueFactory(new PropertyValueFactory<>("contenue"));
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date_prescription"));
 
-        addActionButtonsToTable(); // Buttons for Modify / Delete
+        addActionButtonsToTable();
 
         List<Prescription> prescriptions = presc.getAll();
         prescriptionTable.getItems().setAll(prescriptions);
@@ -118,7 +108,6 @@ public void ajouterPrescription(ActionEvent actionEvent) {
             {
                 modifyBtn.setOnAction(event -> {
                     Prescription selected = getTableView().getItems().get(getIndex());
-                    //openModifierPage(selected);
                 });
 
                 deleteBtn.setOnAction(event -> {
