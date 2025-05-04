@@ -109,12 +109,6 @@ public class MainController {
     public void goPatientDiagnostique() {
         loadUI("PatientDiagnostique");
     }
-    public void goGestionEvenements() {
-        loadUI("Statistiques");
-    }
-    public void goGestionArticles() {
-        loadUI("Statistiques");
-    }
 
 
     public void handleLogout() {

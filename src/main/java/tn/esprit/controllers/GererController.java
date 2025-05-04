@@ -7,8 +7,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import tn.esprit.models.Evenement;
 import tn.esprit.models.Article;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceEvenement;
 import tn.esprit.services.ServiceArticle;
+import tn.esprit.utils.SceneManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +64,28 @@ public class GererController {
     private List<Evenement> tempEvenementList;
     private String uploadedImagePath;
 
+    private AuthService authService;
+    private SceneManager sceneManager;
+    private User currentUser;
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
+    public void setCurrentUser(User user) {
+        if (user instanceof User) {
+            this.currentUser = (User) user;
+            System.out.println(user);
+
+        } else {
+            System.out.println("Erreur Utilisateur invalide pour le tableau de bord Médecin");
+        }
+    }
+
     @FXML
     public void initialize() {
         serviceEvenement = new ServiceEvenement();
@@ -106,13 +131,25 @@ public class GererController {
 
     private void loadEvenements() {
         evenementContainer.getChildren().clear();
-        List<Evenement> evenements = serviceEvenement.getAll();
-        for (Evenement evenement : evenements) {
-            HBox card = createEvenementCard(evenement);
-            evenementContainer.getChildren().add(card);
+
+        if (currentUser == null) {
+            System.out.println("No user logged in.");
+            return;
         }
-        updateEvenementCombo();
+
+        List<Evenement> allEvenements = serviceEvenement.getAll();
+
+        for (Evenement evenement : allEvenements) {
+            // Assuming Evenement has a getUser() or getOrganisateur() method
+            if (evenement.getUser() != null && evenement.getUser().getId() == currentUser.getId()) {
+                HBox card = createEvenementCard(evenement);
+                evenementContainer.getChildren().add(card);
+            }
+        }
+
+        updateEvenementCombo(); // optionally, also filter this method if needed
     }
+
 
     private HBox createEvenementCard(Evenement evenement) {
         HBox card = new HBox(15);

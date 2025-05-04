@@ -1,88 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
-<TabPane xmlns:fx="http://javafx.com/fxml" fx:controller="tn.esprit.controllers.GererController" style="-fx-background-color: #f4f6f9;">
+<TabPane style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GererController">
     <tabs>
-        <Tab text="Événements" closable="false">
+        <Tab closable="false" text="Événements">
             <content>
                 <AnchorPane style="-fx-background-color: #f4f6f9;">
-                    <ScrollPane layoutX="10" layoutY="10" prefWidth="780" prefHeight="300" style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                    <ScrollPane layoutX="10" layoutY="10" prefHeight="250.0" prefWidth="780" style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
                         <content>
                             <VBox fx:id="evenementContainer" spacing="15" style="-fx-padding: 15;" />
                         </content>
                     </ScrollPane>
-                    <VBox layoutX="10" layoutY="320" spacing="20" prefWidth="780">
+                    <VBox layoutX="10" layoutY="320" prefWidth="780" spacing="20">
                         <padding>
-                            <Insets top="15" right="15" bottom="15" left="15" />
+                            <Insets bottom="15" left="15" right="15" top="15" />
                         </padding>
-                        <Label text="Ajouter/Modifier Événement" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Arial';" />
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Arial';" text="Ajouter/Modifier Événement" />
                         <HBox spacing="15">
-                            <VBox spacing="8" prefWidth="380">
-                                <Label text="Nom" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <TextField fx:id="evenementNomField" promptText="Nom" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
-                                <Label text="Contenu" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <TextArea fx:id="evenementContenueField" promptText="Contenu" prefHeight="80" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
-                                <Label text="Type" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <TextField fx:id="evenementTypeField" promptText="Type" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                            <VBox prefWidth="380" spacing="8">
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Nom" />
+                                <TextField fx:id="evenementNomField" prefWidth="380" promptText="Nom" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Contenu" />
+                                <TextArea fx:id="evenementContenueField" prefHeight="80" prefWidth="380" promptText="Contenu" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Type" />
+                                <TextField fx:id="evenementTypeField" prefWidth="380" promptText="Type" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
                             </VBox>
-                            <VBox spacing="8" prefWidth="380">
-                                <Label text="Statut" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <TextField fx:id="evenementStatutField" promptText="Statut" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
-                                <Label text="Lieu" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <TextField fx:id="evenementLieuxField" promptText="Lieu" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
-                                <Label text="Date" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <DatePicker fx:id="evenementDateField" promptText="Date" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                            <VBox prefWidth="380" spacing="8">
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Statut" />
+                                <TextField fx:id="evenementStatutField" prefWidth="380" promptText="Statut" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Lieu" />
+                                <TextField fx:id="evenementLieuxField" prefWidth="380" promptText="Lieu" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Date" />
+                                <DatePicker fx:id="evenementDateField" prefWidth="380" promptText="Date" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                                <Label fx:id="evenementErrorLabel" text="" style="-fx-text-fill: red; -fx-font-size: 13px; -fx-font-family: 'Arial';" />
                             </VBox>
                         </HBox>
-                        <Label fx:id="evenementErrorLabel" style="-fx-font-size: 13px; -fx-font-family: 'Arial';" />
-                        <HBox spacing="15" alignment="CENTER">
-                            <Button text="Ajouter" onAction="#addEvenement" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
-                            <Button text="Modifier" onAction="#updateEvenement" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
-                            <Button text="Supprimer" onAction="#deleteEvenement" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
-                            <Button text="Effacer" onAction="#clearEvenementFields" style="-fx-background-color: #bdc3c7; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
+                        <HBox alignment="CENTER" spacing="15">
+                            <Button onAction="#addEvenement" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Ajouter" />
+                            <Button onAction="#updateEvenement" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Modifier" />
+                            <Button onAction="#deleteEvenement" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Supprimer" />
+                            <Button onAction="#clearEvenementFields" style="-fx-background-color: #bdc3c7; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Effacer" />
                         </HBox>
                     </VBox>
                 </AnchorPane>
             </content>
         </Tab>
-        <Tab text="Articles" closable="false">
+        <Tab closable="false" text="Articles">
             <content>
                 <AnchorPane style="-fx-background-color: #f4f6f9;">
-                    <ScrollPane layoutX="10" layoutY="10" prefWidth="780" prefHeight="300" style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
+                    <ScrollPane layoutX="10" layoutY="10" prefHeight="300" prefWidth="780" style="-fx-background-color: #ffffff; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-background-radius: 8;">
                         <content>
                             <VBox fx:id="articleContainer" spacing="15" style="-fx-padding: 15;" />
                         </content>
                     </ScrollPane>
-                    <VBox layoutX="10" layoutY="320" spacing="20" prefWidth="780">
+                    <VBox layoutX="10" layoutY="320" prefWidth="780" spacing="20">
                         <padding>
-                            <Insets top="15" right="15" bottom="15" left="15" />
+                            <Insets bottom="15" left="15" right="15" top="15" />
                         </padding>
-                        <Label text="Ajouter/Modifier Article" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Arial';" />
+                        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Arial';" text="Ajouter/Modifier Article" />
                         <HBox spacing="15">
-                            <VBox spacing="8" prefWidth="380">
-                                <Label text="Titre" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <TextField fx:id="articleTitreField" promptText="Titre" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
-                                <Label text="Contenu" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <TextArea fx:id="articleContenueField" promptText="Contenu" prefHeight="80" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                            <VBox prefWidth="380" spacing="8">
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Titre" />
+                                <TextField fx:id="articleTitreField" prefWidth="380" promptText="Titre" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Contenu" />
+                                <TextArea fx:id="articleContenueField" prefHeight="80" prefWidth="380" promptText="Contenu" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
                             </VBox>
-                            <VBox spacing="8" prefWidth="380">
-                                <Label text="Image" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
+                            <VBox prefWidth="380" spacing="8">
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Image" />
                                 <HBox spacing="10">
-                                    <Button fx:id="articleImageButton" text="Choisir une image" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
-                                    <Label fx:id="articleImageLabel" text="Image: Aucune" style="-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
+                                    <Button fx:id="articleImageButton" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Choisir une image" />
+                                    <Label fx:id="articleImageLabel" style="-fx-font-size: 13px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Image: Aucune" />
                                 </HBox>
-                                <Label text="Événements Associés" style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" />
-                                <ComboBox fx:id="articleEvenementCombo" promptText="Sélectionner des événements" prefWidth="380" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
+                                <Label style="-fx-font-size: 14px; -fx-text-fill: #34495e; -fx-font-family: 'Arial';" text="Événements Associés" />
+                                <ComboBox fx:id="articleEvenementCombo" prefWidth="380" promptText="Sélectionner des événements" style="-fx-font-size: 14px; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: #ffffff; -fx-font-family: 'Arial';" />
                             </VBox>
                         </HBox>
-                        <Label fx:id="articleErrorLabel" style="-fx-font-size: 13px; -fx-font-family: 'Arial';" />
-                        <HBox spacing="15" alignment="CENTER">
-                            <Button text="Ajouter" onAction="#addArticle" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
-                            <Button text="Modifier" onAction="#updateArticle" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
-                            <Button text="Supprimer" onAction="#deleteArticle" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
-                            <Button text="Effacer" onAction="#clearArticleFields" style="-fx-background-color: #bdc3c7; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" />
+                        <HBox alignment="CENTER" spacing="15">
+                            <Button onAction="#addArticle" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Ajouter" />
+                            <Button onAction="#updateArticle" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Modifier" />
+                            <Button onAction="#deleteArticle" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Supprimer" />
+                            <Button onAction="#clearArticleFields" style="-fx-background-color: #bdc3c7; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-family: 'Arial';" text="Effacer" />
                         </HBox>
                     </VBox>
                 </AnchorPane>

@@ -2,6 +2,7 @@ package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -31,6 +32,8 @@ public class MainMController {
 
     @FXML
     private Label prescriptionLabel;
+    @FXML
+    private Label evenementLabel;
 
     @FXML
     private Label userNameLabel;
@@ -113,18 +116,28 @@ public class MainMController {
     public void setCenterContent(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Pane newLoadedPane = loader.load();
-            rootPane.setCenter(newLoadedPane);
+            Node newLoadedNode = loader.load(); // ✅ Use Node instead of Pane
+            rootPane.setCenter(newLoadedNode);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     @FXML
     public void handlePrescriptionClick(MouseEvent event) {
         setCenterContent("/PrescriptionM.fxml");
 
         prescriptionLabel.getStyleClass().add("selected");
+
+        diagnostiqueLabel.getStyleClass().remove("selected");
+    }
+
+    @FXML
+    public void handleEvenementClick(MouseEvent event) {
+        setCenterContent("/Gerer.fxml");
+
+        evenementLabel.getStyleClass().add("selected");
 
         diagnostiqueLabel.getStyleClass().remove("selected");
     }

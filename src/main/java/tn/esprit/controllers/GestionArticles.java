@@ -5,14 +5,17 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import tn.esprit.models.Article;
 import tn.esprit.models.User;
+import tn.esprit.repository.UserRepository;
+import tn.esprit.repository.UserRepositoryImpl;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceArticle;
 import javafx.scene.text.Text;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import java.io.File;
-import java.net.URI;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,17 +47,46 @@ public class GestionArticles {
     private int currentPage = 1;
     private final int articlesPerPage = 4;
 
+    private AuthService authService;
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
     @FXML
     public void initialize() {
         serviceArticle = new ServiceArticle();
-        currentUser = new User(1, "patient1");
+
+        // Initialize AuthService if not already done
+        if (authService == null) {
+            try {
+                UserRepository userRepository = new UserRepositoryImpl();
+                authService = AuthService.getInstance(userRepository);
+                currentUser = authService.getCurrentUser();
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "Impossible d'initialiser le service d'authentification", Alert.AlertType.ERROR);
+            }
+        }
+
         refreshArticles();
         displayArticles();
         setupSearchListener();
     }
 
     private void refreshArticles() {
-        allArticles = serviceArticle.getAll();
+        if (currentUser == null) {
+            System.out.println("No user logged in.");
+            showAlert("Erreur", "Aucun utilisateur connecté", Alert.AlertType.WARNING);
+            allArticles = new ArrayList<>();
+        } else {
+            allArticles = serviceArticle.getAll();
+        }
+
         filteredArticles = allArticles;
         updatePagination();
     }
@@ -82,6 +114,14 @@ public class GestionArticles {
             contentVBox.getChildren().remove(4, contentVBox.getChildren().size());
         }
         articlesGrid.getChildren().clear();
+
+        if (currentUser == null) {
+            Label noUserLabel = new Label("Veuillez vous connecter pour voir les articles.");
+            noUserLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #7f8c8d; -fx-font-family: 'Arial';");
+            VBox.setMargin(noUserLabel, new Insets(20, 0, 0, 0));
+            contentVBox.getChildren().add(noUserLabel);
+            return;
+        }
 
         if (filteredArticles.isEmpty()) {
             Label noArticlesLabel = new Label("Aucun article trouvé.");
@@ -220,5 +260,19 @@ public class GestionArticles {
 
     private int getTotalPages() {
         return (int) Math.ceil((double) filteredArticles.size() / articlesPerPage);
+    }
+
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    // Method to refresh the display of articles
+    public void refreshDisplay() {
+        refreshArticles();
+        displayArticles();
     }
 }
