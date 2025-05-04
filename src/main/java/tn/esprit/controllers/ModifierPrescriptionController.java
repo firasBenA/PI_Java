@@ -1,7 +1,10 @@
 package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import tn.esprit.models.Prescription;
 import tn.esprit.services.ServicePrescription;
@@ -19,15 +22,19 @@ public class ModifierPrescriptionController {
     private final ServicePrescription servicePrescription = new ServicePrescription();
 
     public void setPrescription(Prescription prescription) {
+        if (prescription == null) {
+            errorLabel.setText("La prescription est introuvable !");
+            return;
+        }
         this.prescription = prescription;
 
-        // Populate the fields with existing data
         titreField.setText(prescription.getTitre());
         contenueField.setText(prescription.getContenue());
         if (prescription.getDate_prescription() != null) {
             datePicker.setValue(prescription.getDate_prescription().toLocalDate());
         }
     }
+
 
     @FXML
     public void modifierPrescription() {
@@ -40,15 +47,12 @@ public class ModifierPrescriptionController {
             return;
         }
 
-        // Update the prescription object
         prescription.setTitre(titre);
         prescription.setContenue(contenue);
         prescription.setDate_prescription(date);
 
-        // Call your existing service method
-        servicePrescription.update(prescription); // No need to check return value
+        servicePrescription.update(prescription);
 
-        // Close the modification window
         Stage stage = (Stage) titreField.getScene().getWindow();
         stage.close();
     }

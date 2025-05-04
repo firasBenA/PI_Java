@@ -2,21 +2,19 @@ package tn.esprit.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import tn.esprit.models.Diagnostique;
+import tn.esprit.models.Medecin;
 import tn.esprit.models.Prescription;
-import tn.esprit.services.ServiceDiagnostique;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServicePrescription;
+import tn.esprit.utils.SceneManager;
 
-import java.sql.Date;
-
-
-import java.sql.Connection;      // For the database connection
-import java.sql.DriverManager;   // To connect to the database
-import java.sql.PreparedStatement; // For executing parameterized SQL queries
-import java.sql.SQLException;    // To handle SQL exceptions
-import java.sql.Date;           // For date handling
+import java.sql.*;
 import java.time.LocalDate;
 
 
@@ -35,17 +33,37 @@ public class AjouterPrescriptionDepuisDiag {
     private Label errorLabel;
 
     @FXML
-    private Label diagnostiqueIdLabel;  // Add this label to display the Diagnostique ID
+    private Label diagnostiqueIdLabel;
 
     private Diagnostique diagnostique;
 
     private final ServicePrescription servicePrescription = new ServicePrescription();
 
+
+    private AuthService authService;
+    private SceneManager sceneManager;
+    private Medecin currentUser;
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
+    public void setCurrentUser(User user) {
+        if (user instanceof Medecin) {
+            this.currentUser = (Medecin) user;
+        } else {
+            System.out.println("Erreur Utilisateur invalide pour le tableau de bord Médecin");
+        }
+    }
     public void setDiagnostique(Diagnostique diagnostique) {
         this.diagnostique = diagnostique;
-        // Set the diagnostique ID to the label
         diagnostiqueIdLabel.setText("Diagnostique ID: " + diagnostique.getId());
     }
+
 
     public void ajouterPrescription(ActionEvent event) {
         String titre = titreField.getText();
@@ -89,7 +107,15 @@ public class AjouterPrescriptionDepuisDiag {
         p.setPatient_id(diagnostique.getPatientId());
         p.setDossier_medical_id(diagnostique.getDossierMedicalId());
 
-        p.setMedecin_id(3);  // Replace with the actual doctor's ID if necessary
+
+        if (currentUser == null) {
+            System.out.println("Current user is NULL!");
+            return;
+        }
+
+        System.out.println("Current user roles: " + currentUser.getRoles());
+
+        p.setMedecin_id(currentUser.getId());
 
         // Create a connection (assuming you have a valid connection instance)
         Connection connection = null;

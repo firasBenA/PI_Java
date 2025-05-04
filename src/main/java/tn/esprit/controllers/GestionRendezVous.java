@@ -46,9 +46,15 @@ public class GestionRendezVous implements Initializable {
     private final ServiceAddRdv serviceAddRdv = new ServiceAddRdv();
     private Map<LocalDate, Integer> rdvCountByDate = new HashMap<>();
     private int currentMedecinId = -1;
+    private int currentUserId = -1; // ID de l'utilisateur connecté
     private Consumer<String> notificationListener;
     private final List<String> notificationHistory = new ArrayList<>();
     private LocalDate selectedDate;
+
+    // Setter pour injecter l'ID de l'utilisateur connecté
+    public void setCurrentUserId(int userId) {
+        this.currentUserId = userId;
+    }
 
     public void setNotificationListener(Consumer<String> listener) {
         this.notificationListener = listener;
@@ -224,17 +230,23 @@ public class GestionRendezVous implements Initializable {
                     return;
                 }
 
+                // Vérifier si l'utilisateur est connecté
+                if (currentUserId == -1) {
+                    showAlert("Erreur", "Aucun utilisateur connecté");
+                    return;
+                }
+
                 // Création et sauvegarde du rendez-vous
                 RendeVous rdv = new RendeVous();
                 rdv.setDate(selectedDate);
                 rdv.setType(type_rdv.getValue());
                 rdv.setCause(cause.getText());
                 rdv.setIdMedecin(currentMedecinId);
-                rdv.setIdPatient(1); // À remplacer par l'ID du patient connecté
+                rdv.setIdPatient(currentUserId); // Utiliser l'ID de l'utilisateur connecté comme patient
                 rdv.setStatut("en_attente"); // Statut par défaut
 
-                // Utilisation de ServiceAddRdv pour ajouter le rendez-vous
-                serviceAddRdv.add(rdv);
+                // Utilisation de ServiceAddRdv pour ajouter le rendez-vous avec l'ID utilisateur
+                serviceAddRdv.add(rdv, currentUserId);
 
                 // Afficher la notification
                 showNotification("Rendez-vous enregistré avec succès !");
@@ -251,7 +263,8 @@ public class GestionRendezVous implements Initializable {
                 // Mettre à jour le calendrier après l'ajout
                 loadRendezVousForMedecin();
 
-                // Redirection vers listrdv.fxml
+                // Redirection vers listrdv.fxml (commenté car non implémenté)
+                // clearFields();
 
             } catch (Exception e) {
                 showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");

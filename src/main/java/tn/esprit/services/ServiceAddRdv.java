@@ -19,6 +19,10 @@ public class ServiceAddRdv implements IService<RendeVous> {
 
     @Override
     public void add(RendeVous rdv) {
+        throw new UnsupportedOperationException("Use add(RendeVous rdv, int currentUserId) instead");
+    }
+
+    public void add(RendeVous rdv, int currentUserId) {
         boolean autoCommit = false;
         try {
             autoCommit = cnx.getAutoCommit();
@@ -58,9 +62,9 @@ public class ServiceAddRdv implements IService<RendeVous> {
             consultation.setDate(rdv.getDate());
             consultation.setPrix(0); // Prix par défaut
             consultation.setType_consultation(rdv.getType());
-            consultation.setUser_id(1); // À remplacer par l'ID de l'utilisateur connecté
+            consultation.setUser_id(currentUserId); // Utiliser l'ID de l'utilisateur connecté
 
-            String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?,?,?,?,?,?,?)";
+            String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_idme_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?,?,?,?,?,?,?)";
 
             try (PreparedStatement pstConsult = cnx.prepareStatement(consultationQuery)) {
                 pstConsult.setInt(1, consultation.getRendez_vous_id());
