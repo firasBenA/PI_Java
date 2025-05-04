@@ -29,7 +29,7 @@ public class TestMain extends Application {
         controller.setAuthService(authService);
         controller.setSceneManager(sceneManager);
 
-        primaryStage.setTitle("Ajouter Réclamation");
+        primaryStage.setTitle("Recover Plus");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }

@@ -126,4 +126,16 @@ public class ServiceEvenement implements IService<Evenement> {
         }
         return false;
     }
+    public void cancelParticipation(User user, Evenement evenement) {
+        String query = "DELETE FROM `user_evenement` WHERE `user_id` = ? AND `evenement_id` = ?";
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(query);
+            pstm.setInt(1, user.getId());
+            pstm.setInt(2, evenement.getId());
+            pstm.executeUpdate();
+            System.out.println("User " + user.getPrenom() + " canceled participation in event " + evenement.getNom());
+        } catch (SQLException e) {
+            System.out.println("Error while canceling participation: " + e.getMessage());
+        }
+    }
 }

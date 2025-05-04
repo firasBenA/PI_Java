@@ -37,6 +37,12 @@ public class User {
     private String socialProvider; // e.g., "google"
     private String socialAccessToken;
 
+
+    public User(int id, String username) {
+        this.id = id;
+        this.nom = nom;
+    }
+
     public User() {
 
         if (this.getClass() == User.class) {
