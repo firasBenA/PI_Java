@@ -2,10 +2,7 @@ package tn.esprit.services;
 
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Consultation;
-import tn.esprit.models.Medecin;
-import tn.esprit.models.Patient;
 import tn.esprit.models.RendeVous;
-import tn.esprit.models.User;
 import tn.esprit.utils.MyDataBase;
 
 import java.sql.*;
@@ -30,20 +27,6 @@ public class ServiceAddRdv implements IService<RendeVous> {
         try {
             autoCommit = cnx.getAutoCommit();
             cnx.setAutoCommit(false);
-
-            ServiceUser serviceUser = new ServiceUser();
-
-            // Vérifier que le patient existe et est bien un Patient
-            User patient = serviceUser.getUserById(rdv.getIdPatient());
-            if (!(patient instanceof Patient)) {
-                throw new IllegalArgumentException("L'utilisateur avec l'ID " + rdv.getIdPatient() + " n'est pas un patient.");
-            }
-
-            // Vérifier que le médecin existe et est bien un Medecin
-            User medecin = serviceUser.getUserById(rdv.getIdMedecin());
-            if (!(medecin instanceof Medecin)) {
-                throw new IllegalArgumentException("L'utilisateur avec l'ID " + rdv.getIdMedecin() + " n'est pas un médecin.");
-            }
 
             // 1. Insérer le rendez-vous
             String rdvQuery = "INSERT INTO `rendez_vous`(`patient_id`, `medecin_id`, `date`, `statut`, `type_rdv`, `cause`) VALUES (?,?,?,?,?,?)";
@@ -78,9 +61,8 @@ public class ServiceAddRdv implements IService<RendeVous> {
             consultation.setDate(rdv.getDate());
             consultation.setPrix(0);
             consultation.setType_consultation(rdv.getType());
-            consultation.setUser_id(currentUserId);
 
-            String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_idme_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?,?,?,?,?,?,?)";
+            String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_id`, `date`, `prix`, `type_consultation`) VALUES (?,?,?,?,?,?)";
 
             try (PreparedStatement pstConsult = cnx.prepareStatement(consultationQuery)) {
                 pstConsult.setInt(1, consultation.getRendez_vous_id());
@@ -89,7 +71,6 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 pstConsult.setDate(4, Date.valueOf(consultation.getDate()));
                 pstConsult.setDouble(5, consultation.getPrix());
                 pstConsult.setString(6, consultation.getType_consultation());
-                pstConsult.setInt(7, consultation.getUser_id());
 
                 int consultAffected = pstConsult.executeUpdate();
                 if (consultAffected == 0) {
@@ -131,7 +112,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération des rendez-vous: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erreur lors de la récupération des rendez-vous", e);
         }
 
         return rendezVousList;
@@ -157,7 +138,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
             System.out.println("Rendez-vous mis à jour avec succès. ID: " + rdv.getId());
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise à jour du rendez-vous: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erreur lors de la mise à jour du rendez-vous", e);
         }
     }
 
@@ -218,7 +199,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la recherche des RDV du patient: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erreur lors de la recherche des RDV du patient", e);
         }
 
         return rendezVousList;
