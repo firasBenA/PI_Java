@@ -165,11 +165,11 @@ public class GestionDiagnostique {
         Map<String, String> result = ServiceDiagnostique.diagnose(selectedSymptoms);
         String disease = result.getOrDefault("disease", "Inconnu");
 
-        List<User> matchingDoctors = ServiceUser.findMedecinsBySpecialite(disease);
+        List<Medecin> matchingDoctors = ServiceUser.findMedecinsBySpecialite(disease);
 
         if (!matchingDoctors.isEmpty()) {
             ObservableList<String> doctorNames = FXCollections.observableArrayList();
-            for (User doctor : matchingDoctors) {
+            for (Medecin doctor : matchingDoctors) {
                 doctorNames.add(doctor.getNom());
             }
             doctorComboBox.setItems(doctorNames);

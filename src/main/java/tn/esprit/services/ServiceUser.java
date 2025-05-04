@@ -1,5 +1,8 @@
 package tn.esprit.services;
 
+import tn.esprit.models.Admin;
+import tn.esprit.models.Medecin;
+import tn.esprit.models.Patient;
 import tn.esprit.models.User;
 import tn.esprit.utils.MyDataBase;
 
@@ -22,17 +25,42 @@ public class ServiceUser {
         User user = null;
         String query = "SELECT * FROM user WHERE id = ?";
 
-        try {
-            PreparedStatement ps = connection.prepareStatement(query);
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
 
-            if (rs.next()) {
-                user = new User();
-                user.setId(rs.getInt("id"));
+                if (rs.next()) {
+                    // Récupération du rôle de l'utilisateur
+                    String roles = rs.getString("roles");
 
+                    // Création de l'objet utilisateur selon le rôle
+                    switch (roles) {
+                        case "ROLE_MEDECIN":
+                            user = new Medecin();
+                            user.setId(rs.getInt("id"));
+                            // Ajouter d'autres attributs spécifiques au médecin si nécessaire
+                            break;
+
+                        case "ROLE_PATIENT":
+                            user = new Patient();
+                            user.setId(rs.getInt("id"));
+                            // Ajouter d'autres attributs spécifiques au patient si nécessaire
+                            break;
+
+                        case "ROLE_ADMIN":
+                            user = new Admin();
+                            user.setId(rs.getInt("id"));
+                            // Ajouter d'autres attributs spécifiques à l'admin si nécessaire
+                            break;
+
+                        default:
+                            throw new IllegalArgumentException("Role inconnu : " + roles);
+                    }
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -40,8 +68,9 @@ public class ServiceUser {
         return user;
     }
 
-    public static List<User> findMedecinsBySpecialite(String specialite) {
-        List<User> medecins = new ArrayList<>();
+
+    public static List<Medecin> findMedecinsBySpecialite(String specialite) {
+        List<Medecin> medecins = new ArrayList<>();
         try {
             Connection conn = MyDataBase.getInstance().getCnx();
             String sql = "SELECT * FROM user WHERE specialite = ?";
@@ -49,19 +78,20 @@ public class ServiceUser {
             stmt.setString(1, specialite);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                User u = new User();
-                u.setId(rs.getInt("id"));
-                u.setNom(rs.getString("nom"));
-                u.setPrenom(rs.getString("prenom"));
-                u.setSpecialite(rs.getString("specialite"));
-                // Fill other fields if needed
-                medecins.add(u);
+                Medecin medecin = new Medecin();  // Instantiate Medecin, not User
+                medecin.setId(rs.getInt("id"));
+                medecin.setNom(rs.getString("nom"));
+                medecin.setPrenom(rs.getString("prenom"));
+                medecin.setSpecialite(rs.getString("specialite"));
+                // Fill other fields specific to Medecin if needed
+                medecins.add(medecin);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return medecins;
     }
+
 
     public static int findDoctorIdByName(String name) {
         int id = -1;
