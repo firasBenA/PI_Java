@@ -51,7 +51,7 @@ public class GestionEvenements {
     @FXML
     public void initialize() {
         serviceEvenement = new ServiceEvenement();
-        currentUser = new User(1, "patient1"); // Static user
+        currentUser = new User(1, "patient1");
 
         typeFilter.getItems().addAll("Tous les types", "Conference", "Workshop", "Seminar");
         typeFilter.setValue("Tous les types");
