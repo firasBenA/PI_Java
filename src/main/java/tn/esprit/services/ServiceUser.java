@@ -79,6 +79,8 @@ public class ServiceUser {
         return medecins;
     }
 
+
+
     public static int findDoctorIdByName(String name) {
         int id = -1;
         try {

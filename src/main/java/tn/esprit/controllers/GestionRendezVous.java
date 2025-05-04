@@ -14,14 +14,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
-import tn.esprit.models.User;
-import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceAddRdv;
-import tn.esprit.services.ServiceUser;
-import tn.esprit.utils.SceneManager;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +29,7 @@ import java.util.function.Consumer;
 
 public class GestionRendezVous implements Initializable {
 
-    @FXML private DatePicker datePicker;
+    @FXML private CalendarView calendarView;
     @FXML private ComboBox<String> type_rdv;
     @FXML private ComboBox<String> medecin;
     @FXML private TextArea cause;
@@ -45,26 +42,13 @@ public class GestionRendezVous implements Initializable {
     @FXML private Label medecinError;
     @FXML private Label causeError;
 
+    private Connection connection;
     private final ServiceAddRdv serviceAddRdv = new ServiceAddRdv();
-    private Map<String, Integer> doctorIdMap = new HashMap<>();
+    private Map<LocalDate, Integer> rdvCountByDate = new HashMap<>();
+    private int currentMedecinId = -1;
     private Consumer<String> notificationListener;
     private final List<String> notificationHistory = new ArrayList<>();
-    private AuthService authService;
-    private SceneManager sceneManager;
-    private User currentUser;
-
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
-    }
-
-    public void setSceneManager(SceneManager sceneManager) {
-        this.sceneManager = sceneManager;
-    }
-
-    public void setCurrentUser(User user) {
-        this.currentUser = user;
-        System.out.println("Current user set in GestionRendezVous: " + (user != null ? user.getNom() : "null"));
-    }
+    private LocalDate selectedDate;
 
     public void setNotificationListener(Consumer<String> listener) {
         this.notificationListener = listener;
@@ -75,85 +59,188 @@ public class GestionRendezVous implements Initializable {
         // Initialisation des types de rendez-vous
         type_rdv.setItems(FXCollections.observableArrayList("consultation", "suivi", "urgence"));
 
+        // Connexion à la base de données
+        connectDB();
+
         // Chargement des médecins
         loadMedecins();
 
+        // Configurer le CalendarView
+        configureCalendarView();
+
         // Effacer les messages d'erreur lorsqu'on modifie les champs
         type_rdv.valueProperty().addListener((obs, oldVal, newVal) -> typeError.setText(""));
-        medecin.valueProperty().addListener((obs, oldVal, newVal) -> medecinError.setText(""));
+        medecin.valueProperty().addListener((obs, oldVal, newVal) -> {
+            medecinError.setText("");
+            if (newVal != null && !newVal.isEmpty()) {
+                updateMedecinSelection();
+            }
+        });
         cause.textProperty().addListener((obs, oldVal, newVal) -> causeError.setText(""));
-        datePicker.valueProperty().addListener((obs, oldVal, newVal) -> dateError.setText(""));
-
-        System.out.println("GestionRendezVous initialized (currentUser may be null)");
-        initUserData();
     }
 
-    private void initUserData() {
-        if (currentUser != null) {
-            System.out.println("Initializing user data for " + currentUser.getNom());
+    private void configureCalendarView() {
+        calendarView.setOnDateSelected(date -> {
+            this.selectedDate = date;
+            dateError.setText("");
+            updateCalendarAppearance();
+        });
+    }
+
+    private void updateCalendarAppearance() {
+        if (currentMedecinId != -1) {
+            calendarView.getCalendarDays().forEach(day -> {
+                LocalDate date = day.getDate();
+                int count = rdvCountByDate.getOrDefault(date, 0);
+
+                if (date.equals(selectedDate)) {
+                    day.setSelected(true);
+                }
+
+                if (count >= 3) {
+                    day.setStyle("-fx-background-color: #ffcccc;");
+                } else if (count == 2) {
+                    day.setStyle("-fx-background-color: #ffebcc;");
+                } else if (count <= 1 && !date.isBefore(LocalDate.now())) {
+                    day.setStyle("-fx-background-color: #ccffcc;");
+                }
+
+                if (date.isBefore(LocalDate.now())) {
+                    day.setDisable(true);
+                }
+            });
+        }
+    }
+
+    private void updateMedecinSelection() {
+        String[] nomPrenom = medecin.getValue().split(" ");
+        if (nomPrenom.length < 2) {
+            medecinError.setText("Format du médecin invalide");
+            return;
+        }
+
+        String prenom = nomPrenom[0];
+        String nom = nomPrenom[1];
+
+        try {
+            String medecinQuery = "SELECT id FROM user WHERE nom = ? AND prenom = ?";
+            try (PreparedStatement psMedecin = connection.prepareStatement(medecinQuery)) {
+                psMedecin.setString(1, nom);
+                psMedecin.setString(2, prenom);
+                ResultSet rs = psMedecin.executeQuery();
+                if (rs.next()) {
+                    currentMedecinId = rs.getInt("id");
+                    loadRendezVousForMedecin();
+                } else {
+                    medecinError.setText("Médecin non trouvé");
+                }
+            }
+        } catch (SQLException e) {
+            showAlert("Erreur", "Problème lors de la sélection du médecin");
+            e.printStackTrace();
+        }
+    }
+
+    private void loadRendezVousForMedecin() {
+        rdvCountByDate.clear();
+
+        if (currentMedecinId == -1) return;
+
+        String query = "SELECT date, COUNT(*) as count FROM rendez_vous WHERE medecin_id = ? GROUP BY date";
+
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setInt(1, currentMedecinId);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                LocalDate date = rs.getDate("date").toLocalDate();
+                int count = rs.getInt("count");
+                rdvCountByDate.put(date, count);
+            }
+
+            updateCalendarAppearance();
+        } catch (SQLException e) {
+            showAlert("Erreur", "Erreur lors du chargement des rendez-vous");
+            e.printStackTrace();
+        }
+    }
+
+    private void connectDB() {
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
+            System.out.println("Connexion réussie !");
+        } catch (SQLException e) {
+            showAlert("Erreur", "Impossible de se connecter à la base de données");
+            e.printStackTrace();
         }
     }
 
     private void loadMedecins() {
         ObservableList<String> medecinsList = FXCollections.observableArrayList();
-        try {
-            List<User> medecins = new ServiceUser().findMedecinsBySpecialite(null); // Fetch all doctors
-            for (User medecin : medecins) {
-                String nomComplet = medecin.getPrenom() + " " + medecin.getNom();
+        String query = "SELECT nom, prenom FROM user WHERE roles LIKE '%MEDECIN%'";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String nomComplet = rs.getString("prenom") + " " + rs.getString("nom");
                 medecinsList.add(nomComplet);
-                doctorIdMap.put(nomComplet, medecin.getId());
             }
             medecin.setItems(medecinsList);
-        } catch (Exception e) {
+
+        } catch (SQLException e) {
             showAlert("Erreur", "Impossible de charger la liste des médecins");
             e.printStackTrace();
         }
     }
 
     private String getDoctorName(int medecinId) {
-        ServiceUser serviceUser = new ServiceUser();
-        User doctor = serviceUser.getUserById(medecinId);
-        if (doctor != null) {
-            return doctor.getPrenom() + " " + doctor.getNom();
+        String doctorName = "Inconnu";
+        try {
+            String query = "SELECT prenom, nom FROM user WHERE id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setInt(1, medecinId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    String prenom = rs.getString("prenom");
+                    String nom = rs.getString("nom");
+                    doctorName = prenom + " " + nom;
+                }
+            }
+        } catch (SQLException e) {
+            showAlert("Erreur", "Impossible de récupérer le nom du médecin");
+            e.printStackTrace();
         }
-        return "Inconnu";
+        return doctorName;
     }
 
     @FXML
     void save(ActionEvent event) {
         if (validerFormulaire()) {
             try {
-                // Vérifier si l'utilisateur est connecté
-                if (currentUser == null) {
-                    showAlert("Erreur", "Aucun utilisateur connecté");
-                    return;
-                }
-
-                // Récupérer l'ID du médecin sélectionné
-                String selectedDoctorName = medecin.getValue();
-                Integer doctorId = doctorIdMap.get(selectedDoctorName);
-                if (doctorId == null) {
-                    medecinError.setText("Médecin invalide");
+                // Vérifier si le médecin est sélectionné
+                if (currentMedecinId == -1) {
+                    medecinError.setText("Veuillez sélectionner un médecin");
                     return;
                 }
 
                 // Création et sauvegarde du rendez-vous
                 RendeVous rdv = new RendeVous();
-                rdv.setDate(datePicker.getValue());
+                rdv.setDate(selectedDate);
                 rdv.setType(type_rdv.getValue());
                 rdv.setCause(cause.getText());
-                rdv.setIdMedecin(doctorId);
-                rdv.setIdPatient(currentUser.getId());
-                rdv.setStatut("en_attente");
+                rdv.setIdMedecin(currentMedecinId);
+                rdv.setIdPatient(1); // À remplacer par l'ID du patient connecté
+                rdv.setStatut("en_attente"); // Statut par défaut
 
                 // Utilisation de ServiceAddRdv pour ajouter le rendez-vous
-                serviceAddRdv.add(rdv, currentUser.getId());
+                serviceAddRdv.add(rdv);
 
                 // Afficher la notification
                 showNotification("Rendez-vous enregistré avec succès !");
 
                 // Envoyer la notification à l'historique
-                String doctorName = getDoctorName(doctorId);
+                String doctorName = getDoctorName(currentMedecinId);
                 String notificationMessage = String.format("Rendez-vous avec Dr %s ajouté pour le %s. Veuillez attendre la réponse du médecin.",
                         doctorName, rdv.getDate());
                 addNotification(notificationMessage);
@@ -161,8 +248,10 @@ public class GestionRendezVous implements Initializable {
                     notificationListener.accept(notificationMessage);
                 }
 
-                // Réinitialiser les champs
-                clearFields();
+                // Mettre à jour le calendrier après l'ajout
+                loadRendezVousForMedecin();
+
+                // Redirection vers listrdv.fxml
 
             } catch (Exception e) {
                 showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");
@@ -194,11 +283,10 @@ public class GestionRendezVous implements Initializable {
         medecinError.setText("");
         causeError.setText("");
 
-        // Validation de la date
-        if (datePicker.getValue() == null) {
+        if (selectedDate == null) {
             dateError.setText("La date est obligatoire");
             isValid = false;
-        } else if (datePicker.getValue().isBefore(LocalDate.now())) {
+        } else if (selectedDate.isBefore(LocalDate.now())) {
             dateError.setText("La date ne peut pas être dans le passé");
             isValid = false;
         }
@@ -225,9 +313,9 @@ public class GestionRendezVous implements Initializable {
     }
 
     private void clearFields() {
-        datePicker.setValue(null);
+        calendarView.setSelectedDate(null);
+        selectedDate = null;
         type_rdv.getSelectionModel().clearSelection();
-        medecin.getSelectionModel().clearSelection();
         cause.clear();
     }
 

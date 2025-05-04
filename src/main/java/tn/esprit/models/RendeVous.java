@@ -26,6 +26,9 @@ public class RendeVous {
         this.cause = cause;
     }
 
+    public RendeVous(LocalDate selectedDate, String value, String text, Integer integer, Integer id, String enAttente) {
+    }
+
     // Getters et Setters
     public int getId() {
         return id;
