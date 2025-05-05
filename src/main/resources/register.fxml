@@ -16,10 +16,11 @@
         <!-- Center the content (image and form) -->
         <HBox alignment="CENTER" spacing="40">
             <!-- Image -->
-            <ImageView fitWidth="400" fitHeight="950" preserveRatio="true">
-                <Image url="@/images/create-account-office.jpeg"/>
+            <ImageView fx:id="backgroundImage" fitWidth="400" fitHeight="300">
+                <image>
+                    <Image url="@images/create-account-office.jpeg"/>
+                </image>
             </ImageView>
-
 
             <!-- Form -->
             <VBox alignment="CENTER" spacing="10" style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8;" prefHeight="600">

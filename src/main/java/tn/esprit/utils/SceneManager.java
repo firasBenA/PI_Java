@@ -3,6 +3,7 @@ package tn.esprit.utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import tn.esprit.controllers.*;
 import tn.esprit.models.User;
@@ -172,22 +173,26 @@ public class SceneManager {
 
     public void showMedecinProfile(User user) {
         try {
+            // Load the FXML file for the Medecin Dashboard
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/MedecinDashboard.fxml"));
             Parent root = loader.load();
 
+            // Get the controller of the loaded FXML
             MedecinDashboardController controller = loader.getController();
             controller.setCurrentUser(user);
             controller.setAuthService(this.authService);
             controller.setSceneManager(this);
 
-            Scene scene = new Scene(root);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("Tableau de Bord Médecin");
-            primaryStage.show();
+            // Replace the center content with the new content
+            BorderPane rootPane = (BorderPane) primaryStage.getScene().getRoot();
+            rootPane.setCenter(root); // Set the new content in the center section
+
         } catch (Exception e) {
             showAlert("Erreur", "Impossible de charger le tableau de bord médecin: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
-        }    }
+        }
+    }
+
 
     public void showHomePage(User user) {
         if (user == null || !validateSession()) {

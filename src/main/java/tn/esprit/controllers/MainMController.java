@@ -2,6 +2,7 @@ package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -31,6 +32,8 @@ public class MainMController {
 
     @FXML
     private Label prescriptionLabel;
+    @FXML
+    private Label evenementLabel;
 
     @FXML
     private Label userNameLabel;
@@ -89,8 +92,11 @@ public class MainMController {
     public void setCurrentUser(User user) {
         if (user instanceof Medecin) {
             this.currentUser = (Medecin) user;
-            userNameLabel.setText(currentUser.getNom() + " " + currentUser.getPrenom());
-            setCenterContent("/MedecinDashboard.fxml"); // Load dashboard on login
+            if (userNameLabel != null) {
+                userNameLabel.setText(currentUser.getNom() + " " + currentUser.getPrenom());
+            }
+        } else {
+            System.out.println("Erreur Utilisateur invalide pour le tableau de bord Médecin");
         }
     }
 
@@ -110,26 +116,28 @@ public class MainMController {
     public void setCenterContent(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Pane newLoadedPane = loader.load();
-
-            // Always set dependencies, even when reloading
-            if (loader.getController() instanceof MedecinDashboardController) {
-                MedecinDashboardController controller = loader.getController();
-                controller.setAuthService(this.authService); // Ensure this is not null
-                controller.setSceneManager(this.sceneManager);
-                controller.setCurrentUser(this.currentUser);
-            }
-
-            rootPane.setCenter(newLoadedPane);
+            Node newLoadedNode = loader.load(); // ✅ Use Node instead of Pane
+            rootPane.setCenter(newLoadedNode);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
     @FXML
     public void handlePrescriptionClick(MouseEvent event) {
         setCenterContent("/PrescriptionM.fxml");
 
         prescriptionLabel.getStyleClass().add("selected");
+
+        diagnostiqueLabel.getStyleClass().remove("selected");
+    }
+
+    @FXML
+    public void handleEvenementClick(MouseEvent event) {
+        setCenterContent("/Gerer.fxml");
+
+        evenementLabel.getStyleClass().add("selected");
 
         diagnostiqueLabel.getStyleClass().remove("selected");
     }
@@ -140,8 +148,6 @@ public class MainMController {
         if (rootPane == null) {
             System.out.println("Error: rootPane is null at initialize.");
         }
-        // Removed setCenterContent call from here to prevent premature loading
-        System.out.println("MainMController initialized. Waiting for setCurrentUser...");
     }
 
 
@@ -421,7 +427,12 @@ public class MainMController {
 
     @FXML
     private void handleProfilUserClick() {
-        setCenterContent("/MedecinDashboard.fxml");
+        User currentUser = authService.getCurrentUser();
+        if (currentUser != null) {
+            sceneManager.showMedecinProfile(currentUser);
+        } else {
+            System.err.println("No user is logged in!");
+        }
     }
 
 

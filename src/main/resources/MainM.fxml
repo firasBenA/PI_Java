@@ -97,6 +97,15 @@
                                 </Label>
                             </children>
                         </HBox>
+                        <HBox fx:id="evenementNav" alignment="CENTER" onMouseClicked="#handleEvenementClick" prefHeight="42.0" prefWidth="211.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@main/resources/CSS/style.css">
+                            <children>
+                                <Label fx:id="evenementLabel" contentDisplay="CENTER" prefHeight="43.0" prefWidth="105.0" text="evenement et article" textAlignment="CENTER">
+                                    <font>
+                                        <Font name="Berlin Sans FB" size="18.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
                     </children>
                 </VBox>
             </children>
