@@ -120,7 +120,7 @@ public class PatientDashboardController {
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{8,15}$");
     private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z\\s-]{2,50}$");
     private static final long MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 Mo
-    private static final String STRIPE_SECRET_KEY = "";
+    private static final String STRIPE_SECRET_KEY = "sk_test_51RIiu5FL5nArcCfbIkZMXqjjuwAFxqzHlQ1Pol1ew0qtdSHwmWqiVS0qc5l06BLGSjBVgsjpdK6R23vlnpLTuyXa00GBmkkPmi";
 
     @FXML
     public void initialize() {
