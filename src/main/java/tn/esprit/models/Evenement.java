@@ -12,6 +12,7 @@ public class Evenement {
     private String statut;
     private String lieuxEvent;
     private LocalDate dateEvent;
+    private User user; // or private User organisateur;
 
     private List<Article> articles = new ArrayList<>();
     private List<Integer> participants = new ArrayList<>();
@@ -51,6 +52,8 @@ public class Evenement {
     public String getContenue() {
         return contenue;
     }
+
+    public User getUser() { return user; }
 
     public void setContenue(String contenue) {
         this.contenue = contenue;

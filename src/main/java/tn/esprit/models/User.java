@@ -5,8 +5,12 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class User {
+
+    private static final Logger logger = Logger.getLogger(User.class.getName());
 
     private Integer id;
     private String email;
@@ -40,14 +44,21 @@ public class User {
     }
 
     public User() {
+
+        if (this.getClass() == User.class) {
+            throw new IllegalStateException("Cannot instantiate User directly.");
+        }
+
         this.createdAt = LocalDateTime.now();
         this.userType = determineUserType();
     }
+
 
     protected String determineUserType() {
         if (this instanceof Admin) return "ADMIN";
         if (this instanceof Patient) return "PATIENT";
         if (this instanceof Medecin) return "MEDECIN";
+        logger.log(Level.SEVERE, "Invalid user type: instance of User not allowed.");
         throw new IllegalStateException("Type d'utilisateur invalide : instance de User non autorisée.");
     }
 

@@ -56,6 +56,9 @@ public class PatientDashboardController {
     private SceneManager sceneManager;
     private File selectedImageFile;
 
+
+
+
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^[0-9]{8,15}$");
     private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z\\s-]{2,50}$");

@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tn.esprit.controllers.LoginController;
 import tn.esprit.controllers.MainController;
 import tn.esprit.repository.UserRepositoryImpl;
 import tn.esprit.services.AuthService;
@@ -21,10 +22,10 @@ public class TestMain extends Application {
         SceneManager sceneManager = new SceneManager(primaryStage, authService);
 
         // Load Main.fxml and initialize MainController
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
         Parent root = loader.load();
 
-        MainController controller = loader.getController();
+        LoginController controller = loader.getController();
         controller.setAuthService(authService);
         controller.setSceneManager(sceneManager);
 

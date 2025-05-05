@@ -11,9 +11,15 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ButtonBar;
 import tn.esprit.models.Evenement;
+import tn.esprit.models.Patient;
 import tn.esprit.models.User;
+import tn.esprit.repository.UserRepository;
+import tn.esprit.repository.UserRepositoryImpl;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceEvenement;
+import tn.esprit.utils.SceneManager;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,26 +48,57 @@ public class GestionEvenements {
 
 
     private ServiceEvenement serviceEvenement;
-    private User currentUser;
     private List<Evenement> allEvents;
     private List<Evenement> filteredEvents;
     private int currentPage = 1;
     private final int eventsPerPage = 3;
 
+    private AuthService authService;
+    private SceneManager sceneManager;
+    private User currentUser;
+
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
     @FXML
     public void initialize() {
         serviceEvenement = new ServiceEvenement();
-        currentUser = new User(1, "patient1");
+
+        // Initialize AuthService if not already done
+        if (authService == null) {
+            try {
+                UserRepository userRepository = new UserRepositoryImpl();
+                authService = AuthService.getInstance(userRepository);
+                currentUser = authService.getCurrentUser();
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "Impossible d'initialiser le service d'authentification", Alert.AlertType.ERROR);
+            }
+        }
 
         typeFilter.getItems().addAll("Tous les types", "Conference", "Workshop", "Seminar");
         typeFilter.setValue("Tous les types");
-
         loadEvents();
         displayEvents();
-
     }
 
     private void loadEvents() {
+        if (currentUser == null) {
+            System.out.println("No user logged in.");
+            showAlert("Erreur", "Aucun utilisateur connecté", Alert.AlertType.WARNING);
+            return;
+        }
+
         allEvents = serviceEvenement.getAll();
         filteredEvents = allEvents;
         updatePagination();
@@ -267,10 +304,13 @@ public class GestionEvenements {
             contentVBox.getChildren().addAll(errorLabel, backButton);
         }
     }
+
     private void sendEventDetailsEmail(User user, Evenement evenement) {
         final String username = "esprit.recover.plus@gmail.com";
         final String password = "jxsdekiolyggrpjj";
-        final String recipientEmail = "houssem.jamei1899@gmail.com"; // Replace with real email
+
+        // Use the user's actual email if available
+        final String recipientEmail = user.getEmail() != null ? user.getEmail() : "houssem.jamei1899@gmail.com";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -350,5 +390,11 @@ public class GestionEvenements {
         }
     }
 
-
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

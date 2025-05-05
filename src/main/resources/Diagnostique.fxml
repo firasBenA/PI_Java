@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="290.0" prefWidth="220.0" stylesheets="@CSS/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.DiagnostiqueController">
+   <children>
+      <HBox prefHeight="66.0" prefWidth="220.0">
+         <children>
+            <!--<ImageView fx:id="userImg" fitHeight="51.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@img/diagnostique.png" />
+               </image>
+               <HBox.margin>
+                  <Insets bottom="10.0" left="8.0" right="10.0" top="10.0" />
+               </HBox.margin>
+            </ImageView>-->
+            <VBox alignment="CENTER_LEFT" prefHeight="71.0" prefWidth="151.0">
+               <children>
+                  <HBox prefHeight="27.0" prefWidth="205.0">
+                     <children>
+                        <Label fx:id="nom" alignment="CENTER" text="Ben Achour">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="prenom" alignment="CENTER" text="Firas">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Label fx:id="dateDiagnostique" text="2024-04-13" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
+      </HBox>
+      <Label fx:id="nomDiagnostique" alignment="CENTER" prefHeight="71.0" prefWidth="204.0" text="DRUG REACTION" textFill="#3c83a4">
+         <font>
+            <Font name="Berlin Sans FB" size="26.0" />
+         </font>
+         <padding>
+            <Insets bottom="25.0" top="25.0" />
+         </padding>
+      </Label>
+      <HBox prefHeight="23.0" prefWidth="204.0">
+         <children>
+            <Label text="Zone :">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </Label>
+            <Label fx:id="zoneCorps" text="Bras">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <padding>
+                  <Insets bottom="10.0" right="10.0" top="10.0" />
+               </padding>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+      <VBox prefHeight="59.0" prefWidth="198.0">
+         <children>
+            <Label text="Symptomes :">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+               <padding>
+                  <Insets left="10.0" right="10.0" />
+               </padding>
+            </Label>
+            <Label fx:id="selectedSymptomes" alignment="TOP_LEFT" prefHeight="42.0" prefWidth="198.0" text="lorem epsom lorem epsom lorem lorem epsom&#10;lorem epsom lorem epsom lorem epsom lorem lorem epsom&#10;&#10;">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" />
+               </padding>
+            </Label>
+         </children>
+      </VBox>
+      <Button fx:id="addBtn" mnemonicParsing="false" onAction="#handleAddPrescription" prefHeight="25.0" prefWidth="193.0" text="Créer une Ordonnance" visible="false" />
+   </children>
+   <padding>
+      <Insets bottom="8.0" left="8.0" right="8.0" top="10.0" />
+   </padding>
+   <styleClass>
+      <String fx:value="white-background" />
+      <String fx:value="shadow" />
+      <String fx:value="diagnostiqueCard" />
+   </styleClass>
+</VBox>

@@ -4,10 +4,8 @@ import tn.esprit.interfaces.IService;
 import tn.esprit.models.Prescription;
 import tn.esprit.utils.MyDataBase;
 
-import java.io.File;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class ServicePrescription implements IService<Prescription> {
             pstm.setInt(4,1);
             pstm.setString(5,prescription.getTitre());
             pstm.setString(6,prescription.getContenue());
-            pstm.setDate(7, java.sql.Date.valueOf(LocalDate.now()));
+            pstm.setDate(7, Date.valueOf(LocalDate.now()));
 
 
             pstm.executeUpdate();
@@ -37,6 +35,7 @@ public class ServicePrescription implements IService<Prescription> {
             System.out.println(e.getMessage());
         }
     }
+
 
     @Override
     public List<Prescription> getAll() {
@@ -58,7 +57,7 @@ public class ServicePrescription implements IService<Prescription> {
                 p.setPatient_id(rs.getInt("patient_id"));
 
                 ///date convertion
-                java.sql.Date sqlDate = rs.getDate("date_prescription");
+                Date sqlDate = rs.getDate("date_prescription");
                 Date utilDate = new Date(sqlDate.getTime());
                 p.setDate_prescription(utilDate);
 
@@ -102,11 +101,49 @@ public class ServicePrescription implements IService<Prescription> {
     public void delete(Prescription prescription) {
         String qry = "DELETE FROM `prescription` WHERE `id` = ?";
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
-            pstm.setInt(1, prescription.getId());  // Use prescription.getId() instead of id
+            pstm.setInt(1, prescription.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error while deleting prescription: " + e.getMessage());
         }
+    }
+
+    public boolean deletePrescriptionById(int id) {
+        String qry = "DELETE FROM prescription WHERE id = ?";
+        try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
+            pstm.setInt(1, id);
+            return pstm.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public List<Prescription> getPrescriptionsByDoctorId(int medecin_Id) {
+        List<Prescription> prescriptions = new ArrayList<>();
+        String qry = "SELECT * FROM prescription WHERE medecin_id = 11 ";
+
+        try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
+
+            ResultSet resultSet = pstm.executeQuery();
+
+            while (resultSet.next()) {
+                Prescription prescription = new Prescription();
+                prescription.setId(resultSet.getInt("id"));
+                prescription.setTitre(resultSet.getString("titre"));
+                prescription.setContenue(resultSet.getString("contenue"));
+                prescription.setDate_prescription(resultSet.getDate("date_prescription"));
+                prescription.setPatient_id(resultSet.getInt("patient_id"));
+                prescription.setMedecin_id(resultSet.getInt("medecin_id"));
+                // Add other fields if needed
+                prescriptions.add(prescription);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return prescriptions;
     }
 
 }

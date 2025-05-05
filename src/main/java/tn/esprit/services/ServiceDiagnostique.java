@@ -1,18 +1,15 @@
 package tn.esprit.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import tn.esprit.interfaces.IService;
 import tn.esprit.models.Diagnostique;
 import tn.esprit.utils.MyDataBase;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +46,39 @@ public class ServiceDiagnostique implements IService<Diagnostique> {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public List<Diagnostique> getPendingDiagnostiques() {
+        List<Diagnostique> diagnostiques = new ArrayList<>();
+
+        String qry = "SELECT * FROM diagnostique WHERE status = 0";
+
+        try {
+            Statement stm = cnx.createStatement();
+            ResultSet rs = stm.executeQuery(qry);
+
+            while (rs.next()) {
+                Diagnostique d = new Diagnostique();
+                d.setId(rs.getInt("id"));
+                d.setDossierMedicalId(rs.getInt("dossier_medical_id"));
+                d.setPatientId(rs.getInt("patient_id"));
+                d.setMedecinId(rs.getInt("medecin_id"));
+                d.setDateDiagnostique(rs.getDate("date_diagnostique"));
+                d.setNom(rs.getString("nom"));
+                d.setDescription(rs.getString("description"));
+                d.setZoneCorps(rs.getString("zone_corps"));
+                d.setDateSymptomes(rs.getDate("date_symptomes"));
+                d.setStatus(rs.getInt("status"));
+                d.setSelectedSymptoms(rs.getString("selected_symptoms"));
+
+                diagnostiques.add(d);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return diagnostiques;
     }
 
     @Override
@@ -125,7 +155,7 @@ public class ServiceDiagnostique implements IService<Diagnostique> {
 
     /////
     public static Map<String, String> diagnose(List<String> symptoms) {
-        final String flaskApiUrl = "http://127.0.0.1:5000/predict"; // Flask API URL
+        final String flaskApiUrl = "http://127.0.0.1:5000/predict";
 
         try {
             // Create JSON payload
@@ -223,5 +253,6 @@ public class ServiceDiagnostique implements IService<Diagnostique> {
         }
         return false;
     }
+
 
 }

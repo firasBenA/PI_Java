@@ -7,8 +7,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import tn.esprit.models.Evenement;
 import tn.esprit.models.Article;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceEvenement;
 import tn.esprit.services.ServiceArticle;
+import tn.esprit.utils.SceneManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +63,28 @@ public class GererController {
     private Article selectedArticle;
     private List<Evenement> tempEvenementList;
     private String uploadedImagePath;
+
+    private AuthService authService;
+    private SceneManager sceneManager;
+    private User currentUser;
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public void setSceneManager(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
+
+    public void setCurrentUser(User user) {
+        if (user instanceof User) {
+            this.currentUser = (User) user;
+            System.out.println(user);
+
+        } else {
+            System.out.println("Erreur Utilisateur invalide pour le tableau de bord Médecin");
+        }
+    }
 
     @FXML
     public void initialize() {
@@ -113,6 +138,7 @@ public class GererController {
         }
         updateEvenementCombo();
     }
+
 
     private HBox createEvenementCard(Evenement evenement) {
         HBox card = new HBox(15);

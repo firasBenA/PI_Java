@@ -15,6 +15,8 @@ import java.io.IOException;
 public class SceneManager {
     private final Stage primaryStage;
     private final AuthService authService;
+    private User currentUser;
+
 
     public SceneManager(Stage primaryStage, AuthService authService) {
         this.primaryStage = primaryStage;
@@ -55,6 +57,7 @@ public class SceneManager {
             e.printStackTrace();
         }
     }
+
 
     public void showRegisterScene() {
         try {
@@ -97,12 +100,44 @@ public class SceneManager {
         }
     }
 
-    public void showMedecinDashboard(User user) {
+    public void showPatientDashboard(User user) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/MedecinDashboard.fxml"));
+            if (user == null) {
+                System.err.println("User is null when attempting to show Patient Dashboard");
+            } else {
+                System.out.println("Showing Patient Dashboard for user: " + user.getNom());
+            }
+
+            System.out.println("Current user in showPatientDashboard: " + user.getNom());
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
             Parent root = loader.load();
 
-            MedecinDashboardController controller = loader.getController();
+            MainController controller = loader.getController();
+            controller.setCurrentUser(user);
+            controller.setAuthService(this.authService);
+            controller.setSceneManager(this);
+
+            controller.initUserData();
+
+            this.currentUser = user;
+            Scene scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Tableau de Bord Patient");
+            primaryStage.show();
+        } catch (Exception e) {
+            showAlert("Erreur", "Impossible de charger le tableau de bord patient: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
+        }
+    }
+
+
+    public void showMedecinDashboard(User user) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainM.fxml"));
+            Parent root = loader.load();
+
+            MainMController controller = loader.getController();
             controller.setCurrentUser(user);
             controller.setAuthService(this.authService);
             controller.setSceneManager(this);
@@ -117,22 +152,25 @@ public class SceneManager {
         }
     }
 
-    public void showPatientDashboard(User user) {
+
+    public void showMedecinProfile(User user) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/PatientDashboard.fxml"));
+            // Load the FXML for MainM.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/MedecinDashboard.fxml"));
             Parent root = loader.load();
 
-            PatientDashboardController controller = loader.getController();
+            MedecinDashboardController controller = loader.getController();
             controller.setCurrentUser(user);
             controller.setAuthService(this.authService);
             controller.setSceneManager(this);
 
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
-            primaryStage.setTitle("Tableau de Bord Patient");
+            primaryStage.setTitle("Tableau de Bord Médecin");
             primaryStage.show();
         } catch (Exception e) {
-            showAlert("Erreur", "Impossible de charger le tableau de bord patient: " + e.getMessage(), Alert.AlertType.ERROR);
+            // If an error occurs while loading the FXML, display an alert
+            showAlert("Erreur", "Impossible de charger le tableau de bord médecin: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
