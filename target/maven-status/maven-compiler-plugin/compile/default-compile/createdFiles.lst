@@ -20,6 +20,7 @@ tn\esprit\services\AuthService.class
 tn\esprit\models\Diagnostique.class
 tn\esprit\models\Personne.class
 tn\esprit\repository\UserRepositoryImpl.class
+tn\esprit\utils\DataSource.class
 tn\esprit\controllers\GestionListeRdv$1.class
 tn\esprit\utils\SceneManager.class
 tn\esprit\controllers\ListeConsultationsController.class

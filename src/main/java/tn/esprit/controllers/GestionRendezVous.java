@@ -151,7 +151,7 @@ public class GestionRendezVous implements Initializable {
 
     private void connectDB() {
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database2", "root", "");
             System.out.println("Connexion réussie !");
         } catch (SQLException e) {
             System.err.println("Erreur de connexion à la base de données : " + e.getMessage());
