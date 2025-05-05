@@ -55,7 +55,7 @@ public class GestionReclamation {
             }
         });
 
-        // Écoute de sélection pour affichage automatique
+
         listViewReclamations.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, selected) -> {
             if (selected != null) {
                 TFid.setText(String.valueOf(selected.getId()));

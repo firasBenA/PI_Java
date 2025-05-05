@@ -33,7 +33,6 @@ public class Reponse {
         this.reclamationId = reclamationId;
         setRating(rating); // Validate rating during construction
     }
-
     public int getId() { return id; }
     public String getContenu() { return contenu; }
     public LocalDate getDateReponse() { return dateReponse; }

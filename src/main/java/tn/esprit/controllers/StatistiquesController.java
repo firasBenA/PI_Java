@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.*;
+import javafx.scene.control.Label;
 import tn.esprit.models.Statistiques;
 import tn.esprit.services.ServiceStatistiques;
 
@@ -16,10 +17,10 @@ public class StatistiquesController {
     private BarChart<String, Number> barChart;
 
     @FXML
-    private PieChart diagnostiquePieChart; // PieChart for Diagnostique
+    private PieChart ratingPieChart; // PieChart for client satisfaction
 
     @FXML
-    private BarChart<String, Number> diagnostiqueBarChart; // BarChart for Diagnostique
+    private Label ratingTotalLabel;
 
     private final ServiceStatistiques serviceStatistiques = new ServiceStatistiques();
 
@@ -34,13 +35,12 @@ public class StatistiquesController {
     }
 
     private void updateCharts() {
-        // Fetch and update Reclamation statistics
         Statistiques stats = serviceStatistiques.getReclamationStatistics();
         int total = stats.getTotalCount();
         int enAttente = stats.getEnAttenteCount();
         int traite = stats.getTraiteCount();
 
-        // Update PieChart for Reclamation
+        // Update Status PieChart
         double enAttentePercent = total > 0 ? (enAttente * 100.0 / total) : 0;
         double traitePercent = total > 0 ? (traite * 100.0 / total) : 0;
 
@@ -51,7 +51,7 @@ public class StatistiquesController {
         pieChart.setData(pieChartData);
         pieChart.setTitle("Répartition par État");
 
-        // Update BarChart for Reclamation
+        // Update BarChart
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Nombre de Réclamations");
         series.getData().add(new XYChart.Data<>("Tous", total));
@@ -62,31 +62,28 @@ public class StatistiquesController {
         barChart.getData().add(series);
         barChart.setTitle("Nombre par État");
 
-        // Fetch and update Diagnostique statistics based on status (0 = pending, 1 = treated)
-        int diagnostiqueTotal = serviceStatistiques.getDiagnostiqueCount(); // Total diagnostiques
-        int diagnostiquePending = serviceStatistiques.getDiagnostiqueCountByStatus(0); // Pending (status = 0)
-        int diagnostiqueTreated = serviceStatistiques.getDiagnostiqueCountByStatus(1); // Treated (status = 1)
+        // Update Rating PieChart
+        int high = stats.getHighSatisfactionCount();
+        int moderate = stats.getModerateSatisfactionCount();
+        int low = stats.getLowSatisfactionCount();
+        int unrated = stats.getUnratedCount();
+        int totalRatings = high + moderate + low + unrated;
 
-        // Update PieChart for Diagnostique
-        double diagnostiquePendingPercent = diagnostiqueTotal > 0 ? (diagnostiquePending * 100.0 / diagnostiqueTotal) : 0;
-        double diagnostiqueTreatedPercent = diagnostiqueTotal > 0 ? (diagnostiqueTreated * 100.0 / diagnostiqueTotal) : 0;
+        double highPercent = totalRatings > 0 ? (high * 100.0 / totalRatings) : 0;
+        double moderatePercent = totalRatings > 0 ? (moderate * 100.0 / totalRatings) : 0;
+        double lowPercent = totalRatings > 0 ? (low * 100.0 / totalRatings) : 0;
+        double unratedPercent = totalRatings > 0 ? (unrated * 100.0 / totalRatings) : 0;
 
-        ObservableList<PieChart.Data> diagnostiquePieChartData = FXCollections.observableArrayList(
-                new PieChart.Data(String.format("En Attente: %d (%.1f%%)", diagnostiquePending, diagnostiquePendingPercent), diagnostiquePending),
-                new PieChart.Data(String.format("Traité: %d (%.1f%%)", diagnostiqueTreated, diagnostiqueTreatedPercent), diagnostiqueTreated)
+        ObservableList<PieChart.Data> ratingPieChartData = FXCollections.observableArrayList(
+                new PieChart.Data(String.format("Élevé (4-5): %d (%.1f%%)", high, highPercent), high),
+                new PieChart.Data(String.format("Modéré (2-3): %d (%.1f%%)", moderate, moderatePercent), moderate),
+                new PieChart.Data(String.format("Faible (1): %d (%.1f%%)", low, lowPercent), low),
+                new PieChart.Data(String.format("Non noté: %d (%.1f%%)", unrated, unratedPercent), unrated)
         );
-        diagnostiquePieChart.setData(diagnostiquePieChartData);
-        diagnostiquePieChart.setTitle("Répartition Diagnostiques");
+        ratingPieChart.setData(ratingPieChartData);
+        ratingPieChart.setTitle("Satisfaction Client (Évaluations)");
 
-        // Update BarChart for Diagnostique
-        XYChart.Series<String, Number> diagnostiqueSeries = new XYChart.Series<>();
-        diagnostiqueSeries.setName("Nombre de Diagnostiques");
-        diagnostiqueSeries.getData().add(new XYChart.Data<>("Tous", diagnostiqueTotal));
-        diagnostiqueSeries.getData().add(new XYChart.Data<>("En Attente", diagnostiquePending));
-        diagnostiqueSeries.getData().add(new XYChart.Data<>("Traité", diagnostiqueTreated));
-
-        diagnostiqueBarChart.getData().clear();
-        diagnostiqueBarChart.getData().add(diagnostiqueSeries);
-        diagnostiqueBarChart.setTitle("Nombre par État (Diagnostiques)");
+        // Update total ratings label
+        ratingTotalLabel.setText("Total: " + totalRatings);
     }
 }

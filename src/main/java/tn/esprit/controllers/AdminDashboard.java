@@ -1,8 +1,10 @@
 package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -13,6 +15,10 @@ import tn.esprit.models.User;
 import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
 import tn.esprit.utils.SceneManager;
+
+import javafx.scene.Node;
+import javafx.event.ActionEvent;
+import javafx.stage.Stage;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -579,6 +585,28 @@ public class AdminDashboard {
             showAlert("Erreur", "Erreur lors de la déconnexion: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
+
+    public void goReponse(ActionEvent event) {
+        try {
+            // Load the FXML file for GestionReponse screen
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GestionReponse.fxml"));
+            AnchorPane root = loader.load();
+
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow(); // Get the current stage
+
+            // Create a new scene with the loaded FXML
+            Scene newScene = new Scene(root);
+
+            // Set the scene for the current stage
+            currentStage.setScene(newScene);
+            currentStage.show();  // Show the new scene
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     private void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);

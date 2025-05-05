@@ -10,19 +10,19 @@ public class Reclamation {
     private String etat;
     private int userId;
 
-    // Constructeur par défaut
+
     public Reclamation() {}
 
-    // Constructeur pour l'ajout (sans ID, avec etat par défaut)
+
     public Reclamation(String sujet, String description, LocalDate dateDebut, int userId) {
         this.sujet = sujet;
         this.description = description;
         this.dateDebut = dateDebut;
-        this.etat = "En Attente"; // Default to "EnAttente" for new reclamations
+        this.etat = "En Attente";
         this.userId = userId;
     }
 
-    // Constructeur complet (pour update ou affichage)
+
     public Reclamation(int id, String sujet, String description, LocalDate dateDebut, String etat, int userId) {
         this.id = id;
         this.sujet = sujet;
@@ -37,11 +37,11 @@ public class Reclamation {
         this.sujet = sujet;
         this.description = description;
         this.dateDebut = dateDebut;
-        this.etat = "En Attente"; // Always set to "EnAttente" for new reclamations
+        this.etat = "En Attente";
         this.userId = userId;
     }
 
-    // Constructor for deletion (only ID needed)
+
     public Reclamation(int id) {
         this.id = id;
     }

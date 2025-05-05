@@ -7,8 +7,8 @@ import java.util.Set;
 public class BadWordsFilter {
     // Liste statique des mots interdits (à personnaliser selon vos besoins)
     private static final Set<String> BAD_WORDS = new HashSet<>(Arrays.asList(
-            "idiot", "stupide", "insulte", "grossier", "mauvais", "merde", // Exemples en français
-            "fuck", "shit", "damn" // Exemples en anglais, selon votre public
+            "idiot", "stupide", "insulte", "grossier", "mauvais", "merde",
+            "fuck", "shit", "damn"
     ));
 
     /**

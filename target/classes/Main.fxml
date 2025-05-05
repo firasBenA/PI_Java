@@ -18,7 +18,6 @@
                 <Button text="Diagnostique" onAction="#goDiagnostique" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Patient Dashboard" onAction="#goGestionPatient" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reclamation" onAction="#goGestionReclamation" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Reponse" onAction="#goGestionReponse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Statistiques" onAction="#goStatistiques" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Evenements" onAction="#goGestionEvenements" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Articles" onAction="#goGestionArticles" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
