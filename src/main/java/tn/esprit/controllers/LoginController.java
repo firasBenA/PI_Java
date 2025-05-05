@@ -50,7 +50,7 @@ public class LoginController {
     private final Gson gson = new Gson();
     private static final String GOOGLE_CLIENT_ID = "909960585216-pgbfhj9u9mhf0afbgu6uqqepqhjp6u86.apps.googleusercontent.com";
     private static final String GOOGLE_CLIENT_SECRET = "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";
-    private static final String GOOGLE_REDIRECT_URI = "http://localhost:8094/auth/google/callback";
+    private static final String GOOGLE_REDIRECT_URI = "http://localhost:8093/auth/google/callback";
     private static final String GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
     private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String GOOGLE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
@@ -110,7 +110,7 @@ public class LoginController {
     }
 
     private void startCallbackServer() {
-        int port = 8094;
+        int port = 8093;
         int maxRetries = 3;
         int retryDelayMs = 2000;
 
@@ -145,12 +145,12 @@ public class LoginController {
 
     public void stop() {
         if (callbackServer != null) {
-            System.out.println("Stopping callback server on port 8094...");
+            System.out.println("Stopping callback server on port 8093...");
             try {
                 callbackServer.stop(1); // Allow 1 second for connections to close
                 System.out.println("Callback server stopped successfully");
                 // Verify port is free after stopping
-                checkAndReleasePort(8094);
+                checkAndReleasePort(8093);
             } catch (Exception e) {
                 System.err.println("Error stopping callback server: " + e.getMessage());
             } finally {
