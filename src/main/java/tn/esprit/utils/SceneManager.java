@@ -185,7 +185,7 @@ public class SceneManager {
 
             // Replace the center content with the new content
             BorderPane rootPane = (BorderPane) primaryStage.getScene().getRoot();
-            rootPane.setCenter(root); // Set the new content in the center section
+            rootPane.setCenter(root);
 
         } catch (Exception e) {
             showAlert("Erreur", "Impossible de charger le tableau de bord médecin: " + e.getMessage(), Alert.AlertType.ERROR);
