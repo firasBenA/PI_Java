@@ -131,23 +131,12 @@ public class GererController {
 
     private void loadEvenements() {
         evenementContainer.getChildren().clear();
-
-        if (currentUser == null) {
-            System.out.println("No user logged in.");
-            return;
+        List<Evenement> evenements = serviceEvenement.getAll();
+        for (Evenement evenement : evenements) {
+            HBox card = createEvenementCard(evenement);
+            evenementContainer.getChildren().add(card);
         }
-
-        List<Evenement> allEvenements = serviceEvenement.getAll();
-
-        for (Evenement evenement : allEvenements) {
-            // Assuming Evenement has a getUser() or getOrganisateur() method
-            if (evenement.getUser() != null && evenement.getUser().getId() == currentUser.getId()) {
-                HBox card = createEvenementCard(evenement);
-                evenementContainer.getChildren().add(card);
-            }
-        }
-
-        updateEvenementCombo(); // optionally, also filter this method if needed
+        updateEvenementCombo();
     }
 
 

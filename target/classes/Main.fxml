@@ -20,10 +20,8 @@
                 <Button text="Patient Dashboard" onAction="#goGestionPatient" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reclamation" onAction="#goGestionReclamation" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reponse" onAction="#goGestionReponse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Evenements" onAction="#goGestionEvenements" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Articles" onAction="#goGestionArticles" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gerer" onAction="#goGererEvenements" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-
+                <Button text="Tous Les Evenements" onAction="#goGestionEvenements" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
+                <Button text="Tous Les Articles" onAction="#goGestionArticles" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <!-- Spacer -->
                 <VBox fx:id="spacer" VBox.vgrow="ALWAYS" />
 
