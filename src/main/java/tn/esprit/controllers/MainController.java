@@ -113,6 +113,9 @@ public class MainController {
     public void goStatistiques() {
         loadUI("Statistiques");
     }
+    public void goDoctorStats() {
+        loadUI("DoctorStats.fxml");
+    }
 
     public void goPatientDiagnostique() {
         loadUI("PatientDiagnostique");

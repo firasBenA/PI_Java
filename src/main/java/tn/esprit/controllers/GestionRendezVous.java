@@ -146,7 +146,7 @@ public class GestionRendezVous implements Initializable {
 
         if (currentMedecinId == -1) return;
 
-        String query = "SELECT date, COUNT(*) as count FROM rendez_vous WHERE medecin_id = ? GROUP BY date";
+        String query = "SELECT date, COUNT(*) as count FROM rendez_vous WHERE user_id = ? GROUP BY date";
 
         try (PreparedStatement pst = connection.prepareStatement(query)) {
             pst.setInt(1, currentMedecinId);

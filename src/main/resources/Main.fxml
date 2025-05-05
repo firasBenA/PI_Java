@@ -16,9 +16,9 @@
                 <!-- Navigation Buttons -->
                 <Button text="Accueil" onAction="#goHome" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Diagnostique" onAction="#goDiagnostique" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Gestion Medecin" onAction="#goGestionMedecin" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reclamation" onAction="#goGestionReclamation" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
-                <Button text="Statistiques" onAction="#goStatistiques" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
+                <Button text="Statistiques reclamation" onAction="#goStatistiques" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
+                <Button text="Statistique medecin" onAction="#goDoctorStats" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Mes Ordonnances et Diagnostique" onAction="#goPatientDiagnostique" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Gestion Reponse" onAction="#goGestionReponse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Tous Les Evenements" onAction="#goGestionEvenements" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />

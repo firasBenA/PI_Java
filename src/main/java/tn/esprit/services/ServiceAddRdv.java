@@ -27,13 +27,13 @@ public class ServiceAddRdv implements IService<RendeVous> {
             int patientId = 10; // Hardcoded patient ID
 
             // 1. Insérer le rendez-vous
-            String rdvQuery = "INSERT INTO `rendez_vous` ( `date`, `statut`, `type_rdv`, `cause`,`user_id`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String rdvQuery = "INSERT INTO `rendez_vous` ( `date`, `statut`, `type_rdv`, `cause`,`user_id`) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstRdv = cnx.prepareStatement(rdvQuery, Statement.RETURN_GENERATED_KEYS)) {
                 pstRdv.setDate(1, Date.valueOf(rdv.getDate()));
                 pstRdv.setString(2, rdv.getStatut());
                 pstRdv.setString(3, rdv.getType());
-                pstRdv.setString(3, rdv.getCause());
-                pstRdv.setInt(4, 11);
+                pstRdv.setString(4, rdv.getCause());
+                pstRdv.setInt(5, 11);
 
                 int affectedRows = pstRdv.executeUpdate();
                 if (affectedRows == 0) {
@@ -66,7 +66,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 pstConsult.setDate(2, Date.valueOf(consultation.getDate()));
                 pstConsult.setDouble(3, consultation.getPrix());
                 pstConsult.setString(4, consultation.getType_consultation());
-                pstConsult.setString(5, "11");
+                pstConsult.setInt(5, 11);
 
                 int consultAffected = pstConsult.executeUpdate();
                 if (consultAffected == 0) {
