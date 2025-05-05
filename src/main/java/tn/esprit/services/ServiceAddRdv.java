@@ -6,7 +6,6 @@ import tn.esprit.models.RendeVous;
 import tn.esprit.utils.MyDataBase;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,26 +23,27 @@ public class ServiceAddRdv implements IService<RendeVous> {
             autoCommit = cnx.getAutoCommit();
             cnx.setAutoCommit(false);
 
-            // 1. Insérer le rendez-vous
-            String rdvQuery = "INSERT INTO `rendez_vous`(`patient_id`, `medecin_id`, `date`, `statut`, `type_rdv`, `cause`) VALUES (?,?,?,?,?,?)";
+            // 🔹 Récupérer l'ID du patient connecté dynamiquement (changer pour ID 11)
+            int patientId = 10; // Hardcoded patient ID
 
+            // 1. Insérer le rendez-vous
+            String rdvQuery = "INSERT INTO `rendez_vous` ( `date`, `statut`, `type_rdv`, `cause`,`user_id`) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstRdv = cnx.prepareStatement(rdvQuery, Statement.RETURN_GENERATED_KEYS)) {
-                pstRdv.setInt(1, rdv.getIdPatient());
-                pstRdv.setInt(2, rdv.getIdMedecin());
-                pstRdv.setDate(3, Date.valueOf(rdv.getDate()));
-                pstRdv.setString(4, rdv.getStatut());
-                pstRdv.setString(5, rdv.getType());
-                pstRdv.setString(6, rdv.getCause());
+                pstRdv.setDate(1, Date.valueOf(rdv.getDate()));
+                pstRdv.setString(2, rdv.getStatut());
+                pstRdv.setString(3, rdv.getType());
+                pstRdv.setString(3, rdv.getCause());
+                pstRdv.setInt(4, 11);
 
                 int affectedRows = pstRdv.executeUpdate();
                 if (affectedRows == 0) {
                     throw new SQLException("Échec de l'insertion du rendez-vous");
                 }
 
-                // Récupérer l'ID généré
                 try (ResultSet generatedKeys = pstRdv.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         rdv.setId(generatedKeys.getInt(1));
+                        rdv.setIdPatient(patientId); // pour cohérence dans le modèle
                     } else {
                         throw new SQLException("Échec de la récupération de l'ID du rendez-vous");
                     }
@@ -53,23 +53,20 @@ public class ServiceAddRdv implements IService<RendeVous> {
             // 2. Créer la consultation associée
             Consultation consultation = new Consultation();
             consultation.setRendez_vous_id(rdv.getId());
-            consultation.setPatient_id(rdv.getIdPatient());
+            consultation.setPatient_id(patientId); // <- Remplacer patientId par l'ID utilisateur
             consultation.setMedecin_id(rdv.getIdMedecin());
             consultation.setDate(rdv.getDate());
             consultation.setPrix(0); // Prix par défaut
             consultation.setType_consultation(rdv.getType());
-            consultation.setUser_id(1); // À remplacer par l'ID de l'utilisateur connecté
 
-            String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?,?,?,?,?,?,?)";
-
+// Si le patient est stocké dans la table "user", utilisez l'ID de l'utilisateur (assurez-vous que `patientId` correspond bien à `user.id`)
+            String consultationQuery = "INSERT INTO `consultation` (`rendez_vous_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstConsult = cnx.prepareStatement(consultationQuery)) {
                 pstConsult.setInt(1, consultation.getRendez_vous_id());
-                pstConsult.setInt(2, consultation.getPatient_id());
-                pstConsult.setInt(3, consultation.getMedecin_id());
-                pstConsult.setDate(4, Date.valueOf(consultation.getDate()));
-                pstConsult.setDouble(5, consultation.getPrix());
-                pstConsult.setString(6, consultation.getType_consultation());
-                pstConsult.setInt(7, consultation.getUser_id());
+                pstConsult.setDate(2, Date.valueOf(consultation.getDate()));
+                pstConsult.setDouble(3, consultation.getPrix());
+                pstConsult.setString(4, consultation.getType_consultation());
+                pstConsult.setString(5, "11");
 
                 int consultAffected = pstConsult.executeUpdate();
                 if (consultAffected == 0) {
@@ -77,7 +74,6 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 }
             }
 
-            // Valider la transaction
             cnx.commit();
             System.out.println("Rendez-vous et consultation créés avec succès. ID RDV: " + rdv.getId());
 
@@ -120,16 +116,15 @@ public class ServiceAddRdv implements IService<RendeVous> {
 
     @Override
     public void update(RendeVous rdv) {
-        String query = "UPDATE `rendez_vous` SET `patient_id`=?, `medecin_id`=?, `date`=?, `statut`=?, `type_rdv`=?, `cause`=? WHERE `id`=?";
+        String query = "UPDATE `rendez_vous` SET  `user_id`=?, `date`=?, `statut`=?, `type_rdv`=?, `cause`=? WHERE `id`=?";
 
         try (PreparedStatement pst = cnx.prepareStatement(query)) {
-            pst.setInt(1, rdv.getIdPatient());
-            pst.setInt(2, rdv.getIdMedecin());
-            pst.setDate(3, Date.valueOf(rdv.getDate()));
-            pst.setString(4, rdv.getStatut());
-            pst.setString(5, rdv.getType());
-            pst.setString(6, rdv.getCause());
-            pst.setInt(7, rdv.getId());
+            pst.setInt(1, 11);
+            pst.setDate(2, Date.valueOf(rdv.getDate()));
+            pst.setString(3, rdv.getStatut());
+            pst.setString(4, rdv.getType());
+            pst.setString(5, rdv.getCause());
+            pst.setInt(6, rdv.getId());
 
             int affectedRows = pst.executeUpdate();
             if (affectedRows == 0) {
@@ -149,14 +144,12 @@ public class ServiceAddRdv implements IService<RendeVous> {
             autoCommit = cnx.getAutoCommit();
             cnx.setAutoCommit(false);
 
-            // 1. D'abord supprimer la consultation associée
             String deleteConsultQuery = "DELETE FROM `consultation` WHERE `rendez_vous_id`=?";
             try (PreparedStatement pstConsult = cnx.prepareStatement(deleteConsultQuery)) {
                 pstConsult.setInt(1, rdv.getId());
                 pstConsult.executeUpdate();
             }
 
-            // 2. Ensuite supprimer le rendez-vous
             String deleteRdvQuery = "DELETE FROM `rendez_vous` WHERE `id`=?";
             try (PreparedStatement pstRdv = cnx.prepareStatement(deleteRdvQuery)) {
                 pstRdv.setInt(1, rdv.getId());
@@ -188,7 +181,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
 
     public List<RendeVous> findByPatientId(int patientId) {
         List<RendeVous> rendezVousList = new ArrayList<>();
-        String query = "SELECT * FROM `rendez_vous` WHERE `patient_id`=?";
+        String query = "SELECT `id` FROM `rendez_vous` WHERE `user_id`=?";
 
         try (PreparedStatement pst = cnx.prepareStatement(query)) {
             pst.setInt(1, patientId);
@@ -210,8 +203,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
     private RendeVous mapResultSetToRendezVous(ResultSet rs) throws SQLException {
         RendeVous rdv = new RendeVous();
         rdv.setId(rs.getInt("id"));
-        rdv.setIdPatient(rs.getInt("patient_id"));
-        rdv.setIdMedecin(rs.getInt("medecin_id"));
+        rdv.setUserId(rs.getInt(11));
         rdv.setDate(rs.getDate("date").toLocalDate());
         rdv.setStatut(rs.getString("statut"));
         rdv.setType(rs.getString("type_rdv"));

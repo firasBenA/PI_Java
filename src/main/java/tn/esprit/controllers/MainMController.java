@@ -134,6 +134,16 @@ public class MainMController {
     }
 
     @FXML
+    public void handleConsultationClick(MouseEvent event) {
+        setCenterContent("/liste_consultations.fxml");
+
+        // Update style classes to show selection
+        diagnostiqueLabel.getStyleClass().remove("selected");
+        prescriptionLabel.getStyleClass().remove("selected");
+    }
+
+
+    @FXML
     public void handleEvenementClick(MouseEvent event) {
         setCenterContent("/Gerer.fxml");
 

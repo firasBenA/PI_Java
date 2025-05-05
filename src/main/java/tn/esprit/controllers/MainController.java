@@ -101,6 +101,14 @@ public class MainController {
     public void goGestionPatient() {
         loadUI("PatientDashboard");
     }
+    public void goGestionRdv() {
+        loadUI("listrdv");
+    }
+    public void goGestionStatDoc() {
+        loadUI("DoctorStats");
+    }
+
+
 
     public void goStatistiques() {
         loadUI("Statistiques");

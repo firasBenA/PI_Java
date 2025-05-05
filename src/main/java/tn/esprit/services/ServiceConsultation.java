@@ -40,7 +40,7 @@ public class ServiceConsultation {
                 consultation.setUser_id(rs.getInt("user_id"));
                 consultation.setPatientPrenom(rs.getString("patient_prenom"));
                 consultation.setPatientNom(rs.getString("patient_nom"));
-                consultation.setStatut(rs.getString("statut")); // Ajout du statut
+                consultation.setStatut(rs.getString("statut")); // Statut depuis rendez_vous
 
                 consultations.add(consultation);
             }
@@ -61,6 +61,7 @@ public class ServiceConsultation {
             System.err.println("Erreur lors de la mise à jour du statut: " + e.getMessage());
         }
     }
+
     public void updateConsultationDate(int consultationId, LocalDate newDate) {
         String query = "UPDATE consultation SET date = ? WHERE id = ?";
         try (PreparedStatement pst = connection.prepareStatement(query)) {
@@ -94,6 +95,37 @@ public class ServiceConsultation {
         return count;
     }
 
+    public String getPatientEmailById(int patientId) throws SQLException {
+        String query = "SELECT email FROM user WHERE id = ? AND roles LIKE '%PATIENT%'";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, patientId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+            throw new SQLException("Patient non trouvé ou non associé au rôle 'patient'");
+        }
+    }
 
+    public void updateConsultationDateAndPrice(int consultationId, LocalDate date, double price) {
+        // Mettre à jour la date et le prix dans consultation
+        String query = "UPDATE consultation SET date = ?, prix = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setDate(1, java.sql.Date.valueOf(date));
+            stmt.setDouble(2, price);
+            stmt.setInt(3, consultationId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la mise à jour de la consultation : " + e.getMessage());
+        }
 
+        // Mettre à jour le statut du rendez-vous correspondant
+        String queryRdv = "UPDATE rendez_vous SET statut = 'approuvé' WHERE id = (SELECT rendez_vous_id FROM consultation WHERE id = ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(queryRdv)) {
+            stmt.setInt(1, consultationId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise à jour du statut du rendez-vous : " + e.getMessage());
+        }
+    }
 }

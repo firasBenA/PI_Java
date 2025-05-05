@@ -1,28 +1,40 @@
 package tn.esprit.controllers;
 
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.util.Callback;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
 import tn.esprit.services.ServiceAddRdv;
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class GestionRendezVous implements Initializable {
 
-    @FXML private DatePicker date;
+    @FXML private CalendarView calendarView;
     @FXML private ComboBox<String> type_rdv;
     @FXML private ComboBox<String> medecin;
     @FXML private TextArea cause;
+    @FXML private Label notificationLabel;
+    @FXML private Button notificationButton;
 
     // Labels pour les messages d'erreur
     @FXML private Label dateError;
@@ -34,6 +46,13 @@ public class GestionRendezVous implements Initializable {
     private final ServiceAddRdv serviceAddRdv = new ServiceAddRdv();
     private Map<LocalDate, Integer> rdvCountByDate = new HashMap<>();
     private int currentMedecinId = -1;
+    private Consumer<String> notificationListener;
+    private final List<String> notificationHistory = new ArrayList<>();
+    private LocalDate selectedDate;
+
+    public void setNotificationListener(Consumer<String> listener) {
+        this.notificationListener = listener;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -46,11 +65,10 @@ public class GestionRendezVous implements Initializable {
         // Chargement des médecins
         loadMedecins();
 
-        // Configurer le DatePicker
-        configureDatePicker();
+        // Configurer le CalendarView
+        configureCalendarView();
 
         // Effacer les messages d'erreur lorsqu'on modifie les champs
-        date.valueProperty().addListener((obs, oldVal, newVal) -> dateError.setText(""));
         type_rdv.valueProperty().addListener((obs, oldVal, newVal) -> typeError.setText(""));
         medecin.valueProperty().addListener((obs, oldVal, newVal) -> {
             medecinError.setText("");
@@ -61,38 +79,37 @@ public class GestionRendezVous implements Initializable {
         cause.textProperty().addListener((obs, oldVal, newVal) -> causeError.setText(""));
     }
 
-    private void configureDatePicker() {
-        date.setDayCellFactory(new Callback<DatePicker, DateCell>() {
-            @Override
-            public DateCell call(DatePicker param) {
-                return new DateCell() {
-                    @Override
-                    public void updateItem(LocalDate item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                        if (item != null && !empty && currentMedecinId != -1) {
-                            int count = rdvCountByDate.getOrDefault(item, 0);
-
-                            if (count >= 3) {
-                                setStyle("-fx-background-color: #ffcccc;"); // Rouge
-                            } else if (count == 2) {
-                                setStyle("-fx-background-color: #ffebcc;"); // Orange
-                            } else if (count <= 1) {
-                                setStyle("-fx-background-color: #ccffcc;"); // Vert
-                            }
-
-                            setTooltip(new Tooltip(count + " consultation(s) ce jour"));
-
-                            // Désactiver les dates passées
-                            if (item.isBefore(LocalDate.now())) {
-                                setDisable(true);
-                                setStyle("-fx-background-color: #eeeeee;");
-                            }
-                        }
-                    }
-                };
-            }
+    private void configureCalendarView() {
+        calendarView.setOnDateSelected(date -> {
+            this.selectedDate = date;
+            dateError.setText("");
+            updateCalendarAppearance();
         });
+    }
+
+    private void updateCalendarAppearance() {
+        if (currentMedecinId != -1) {
+            calendarView.getCalendarDays().forEach(day -> {
+                LocalDate date = day.getDate();
+                int count = rdvCountByDate.getOrDefault(date, 0);
+
+                if (date.equals(selectedDate)) {
+                    day.setSelected(true);
+                }
+
+                if (count >= 3) {
+                    day.setStyle("-fx-background-color: #ffcccc;");
+                } else if (count == 2) {
+                    day.setStyle("-fx-background-color: #ffebcc;");
+                } else if (count <= 1 && !date.isBefore(LocalDate.now())) {
+                    day.setStyle("-fx-background-color: #ccffcc;");
+                }
+
+                if (date.isBefore(LocalDate.now())) {
+                    day.setDisable(true);
+                }
+            });
+        }
     }
 
     private void updateMedecinSelection() {
@@ -119,8 +136,8 @@ public class GestionRendezVous implements Initializable {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la récupération de l'ID du médecin : " + e.getMessage());
             showAlert("Erreur", "Problème lors de la sélection du médecin");
+            e.printStackTrace();
         }
     }
 
@@ -141,11 +158,10 @@ public class GestionRendezVous implements Initializable {
                 rdvCountByDate.put(date, count);
             }
 
-            // Rafraîchir le DatePicker
-            date.setValue(null);
-            date.show();
+            updateCalendarAppearance();
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des rendez-vous du médecin : " + e.getMessage());
+            showAlert("Erreur", "Erreur lors du chargement des rendez-vous");
+            e.printStackTrace();
         }
     }
 
@@ -154,14 +170,14 @@ public class GestionRendezVous implements Initializable {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
             System.out.println("Connexion réussie !");
         } catch (SQLException e) {
-            System.err.println("Erreur de connexion à la base de données : " + e.getMessage());
             showAlert("Erreur", "Impossible de se connecter à la base de données");
+            e.printStackTrace();
         }
     }
 
     private void loadMedecins() {
         ObservableList<String> medecinsList = FXCollections.observableArrayList();
-        String query = "SELECT nom, prenom FROM user WHERE roles LIKE '%MEDECIN%'";
+        String query = "SELECT nom, prenom FROM user WHERE user_type = 'MEDECIN'";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -173,9 +189,28 @@ public class GestionRendezVous implements Initializable {
             medecin.setItems(medecinsList);
 
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des médecins : " + e.getMessage());
-            showAlert("Erreur", "Impossible de charger la liste des médecins");
+            showAlert("Erreur", "Impossible de charger la liste des médecins : " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+    private String getDoctorName(int medecinId) {
+        String doctorName = "Inconnu";
+        try {
+            String query = "SELECT prenom, nom FROM user WHERE id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setInt(1, medecinId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    String prenom = rs.getString("prenom");
+                    String nom = rs.getString("nom");
+                    doctorName = prenom + " " + nom;
+                }
+            }
+        } catch (SQLException e) {
+            showAlert("Erreur", "Impossible de récupérer le nom du médecin");
+            e.printStackTrace();
+        }
+        return doctorName;
     }
 
     @FXML
@@ -190,7 +225,7 @@ public class GestionRendezVous implements Initializable {
 
                 // Création et sauvegarde du rendez-vous
                 RendeVous rdv = new RendeVous();
-                rdv.setDate(date.getValue());
+                rdv.setDate(selectedDate);
                 rdv.setType(type_rdv.getValue());
                 rdv.setCause(cause.getText());
                 rdv.setIdMedecin(currentMedecinId);
@@ -200,16 +235,42 @@ public class GestionRendezVous implements Initializable {
                 // Utilisation de ServiceAddRdv pour ajouter le rendez-vous
                 serviceAddRdv.add(rdv);
 
-                showAlert("Succès", "Rendez-vous enregistré avec succès");
-                clearFields();
+                // Afficher la notification
+                showNotification("Rendez-vous enregistré avec succès !");
+
+                // Envoyer la notification à l'historique
+                String doctorName = getDoctorName(currentMedecinId);
+                String notificationMessage = String.format("Rendez-vous avec Dr %s ajouté pour le %s. Veuillez attendre la réponse du médecin.",
+                        doctorName, rdv.getDate());
+                addNotification(notificationMessage);
+                if (notificationListener != null) {
+                    notificationListener.accept(notificationMessage);
+                }
 
                 // Mettre à jour le calendrier après l'ajout
                 loadRendezVousForMedecin();
+
+                // Redirection vers listrdv.fxml
+
             } catch (Exception e) {
-                System.err.println("Erreur lors de l'ajout du rendez-vous : " + e.getMessage());
                 showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");
+                e.printStackTrace();
             }
         }
+    }
+
+    private void showNotification(String message) {
+        notificationLabel.setText(message);
+        notificationLabel.setVisible(true);
+        notificationLabel.setManaged(true);
+
+        // Masquer la notification après 3 secondes
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> {
+            notificationLabel.setVisible(false);
+            notificationLabel.setManaged(false);
+        });
+        pause.play();
     }
 
     private boolean validerFormulaire() {
@@ -221,10 +282,10 @@ public class GestionRendezVous implements Initializable {
         medecinError.setText("");
         causeError.setText("");
 
-        if (date.getValue() == null) {
+        if (selectedDate == null) {
             dateError.setText("La date est obligatoire");
             isValid = false;
-        } else if (date.getValue().isBefore(LocalDate.now())) {
+        } else if (selectedDate.isBefore(LocalDate.now())) {
             dateError.setText("La date ne peut pas être dans le passé");
             isValid = false;
         }
@@ -251,7 +312,8 @@ public class GestionRendezVous implements Initializable {
     }
 
     private void clearFields() {
-        date.setValue(null);
+        calendarView.setSelectedDate(null);
+        selectedDate = null;
         type_rdv.getSelectionModel().clearSelection();
         cause.clear();
     }
@@ -264,27 +326,27 @@ public class GestionRendezVous implements Initializable {
         alert.showAndWait();
     }
 
-    public void setRendezVousToEdit(RendeVous rdv) {
+    @FXML
+    private void showNotificationHistory() {
         try {
-            // Récupérer le nom du médecin
-            String medecinQuery = "SELECT prenom, nom FROM user WHERE id = ?";
-            try (PreparedStatement ps = connection.prepareStatement(medecinQuery)) {
-                ps.setInt(1, rdv.getIdMedecin());
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    String nomMedecin = rs.getString("prenom") + " " + rs.getString("nom");
-                    medecin.setValue(nomMedecin);
-                    currentMedecinId = rdv.getIdMedecin();
-                    loadRendezVousForMedecin();
-                }
-            }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/notificationHistorique.fxml"));
+            Parent root = loader.load();
 
-            date.setValue(rdv.getDate());
-            type_rdv.setValue(rdv.getType());
-            cause.setText(rdv.getCause());
+            NotificationHistoryController controller = loader.getController();
+            controller.setNotifications(notificationHistory);
 
-        } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement du médecin : " + e.getMessage());
+            Stage stage = new Stage();
+            stage.setTitle("Historique des Notifications");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            showAlert("Erreur", "Impossible d'ouvrir l'historique des notifications");
+            e.printStackTrace();
         }
+    }
+
+    private void addNotification(String message) {
+        notificationHistory.add(message);
     }
 }
