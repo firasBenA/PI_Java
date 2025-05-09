@@ -14,7 +14,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceAddRdv;
+import tn.esprit.repository.UserRepository; // Adjust based on your actual package
 
 import java.io.IOException;
 import java.net.URL;
@@ -44,11 +47,53 @@ public class GestionRendezVous implements Initializable {
 
     private Connection connection;
     private final ServiceAddRdv serviceAddRdv = new ServiceAddRdv();
+    private final AuthService authService;
     private Map<LocalDate, Integer> rdvCountByDate = new HashMap<>();
     private int currentMedecinId = -1;
     private Consumer<String> notificationListener;
     private final List<String> notificationHistory = new ArrayList<>();
     private LocalDate selectedDate;
+
+    public GestionRendezVous() {
+        // Initialize UserRepository (replace with your actual implementation)
+        UserRepository userRepository = new UserRepository() {
+            @Override
+            public User save(User user) {
+                return null;
+            }
+
+            @Override
+            public User findByEmail(String email) {
+                return null;
+            }
+
+            @Override
+            public List<User> findAll() {
+                return List.of();
+            }
+
+            @Override
+            public void delete(int userId) {
+
+            }
+
+            @Override
+            public User findById(int userId) {
+                return null;
+            }
+
+            @Override
+            public List<User> getAllUsers() {
+                return List.of();
+            }
+
+            @Override
+            public List<User> searchUsers(String keyword) {
+                return List.of();
+            }
+        }; // Adjust based on your dependency injection
+        this.authService = AuthService.getInstance(userRepository);
+    }
 
     public void setNotificationListener(Consumer<String> listener) {
         this.notificationListener = listener;
@@ -56,6 +101,18 @@ public class GestionRendezVous implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Vérifier si un utilisateur est connecté et s'il est un patient
+        if (authService.getCurrentUser() == null) {
+            showAlert("Erreur", "Aucun utilisateur connecté", "Veuillez vous connecter pour accéder à cette page.");
+            redirectToLogin();
+            return;
+        }
+        if (!authService.getCurrentUser().getUserType().equals("PATIENT")) {
+            showAlert("Erreur", "Accès non autorisé", "Cette page est réservée aux patients.");
+            redirectToLogin();
+            return;
+        }
+
         // Initialisation des types de rendez-vous
         type_rdv.setItems(FXCollections.observableArrayList("consultation", "suivi", "urgence"));
 
@@ -136,8 +193,7 @@ public class GestionRendezVous implements Initializable {
                 }
             }
         } catch (SQLException e) {
-            showAlert("Erreur", "Problème lors de la sélection du médecin");
-            e.printStackTrace();
+            showAlert("Erreur", "Problème lors de la sélection du médecin", e.getMessage());
         }
     }
 
@@ -160,8 +216,7 @@ public class GestionRendezVous implements Initializable {
 
             updateCalendarAppearance();
         } catch (SQLException e) {
-            showAlert("Erreur", "Erreur lors du chargement des rendez-vous");
-            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors du chargement des rendez-vous", e.getMessage());
         }
     }
 
@@ -170,8 +225,7 @@ public class GestionRendezVous implements Initializable {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database_2", "root", "");
             System.out.println("Connexion réussie !");
         } catch (SQLException e) {
-            showAlert("Erreur", "Impossible de se connecter à la base de données");
-            e.printStackTrace();
+            showAlert("Erreur", "Impossible de se connecter à la base de données", e.getMessage());
         }
     }
 
@@ -189,8 +243,7 @@ public class GestionRendezVous implements Initializable {
             medecin.setItems(medecinsList);
 
         } catch (SQLException e) {
-            showAlert("Erreur", "Impossible de charger la liste des médecins");
-            e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger la liste des médecins", e.getMessage());
         }
     }
 
@@ -208,8 +261,7 @@ public class GestionRendezVous implements Initializable {
                 }
             }
         } catch (SQLException e) {
-            showAlert("Erreur", "Impossible de récupérer le nom du médecin");
-            e.printStackTrace();
+            showAlert("Erreur", "Impossible de récupérer le nom du médecin", e.getMessage());
         }
         return doctorName;
     }
@@ -230,7 +282,7 @@ public class GestionRendezVous implements Initializable {
                 rdv.setType(type_rdv.getValue());
                 rdv.setCause(cause.getText());
                 rdv.setIdMedecin(currentMedecinId);
-                rdv.setIdPatient(1); // À remplacer par l'ID du patient connecté
+                rdv.setIdPatient(authService.getCurrentUser().getId()); // Use current user's ID
                 rdv.setStatut("en_attente"); // Statut par défaut
 
                 // Utilisation de ServiceAddRdv pour ajouter le rendez-vous
@@ -254,8 +306,7 @@ public class GestionRendezVous implements Initializable {
                 // Redirection vers listrdv.fxml
 
             } catch (Exception e) {
-                showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous");
-                e.printStackTrace();
+                showAlert("Erreur", "Problème lors de l'enregistrement du rendez-vous", e.getMessage());
             }
         }
     }
@@ -319,10 +370,10 @@ public class GestionRendezVous implements Initializable {
         cause.clear();
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    private void showAlert(String title, String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
-        alert.setHeaderText(null);
+        alert.setHeaderText(header);
         alert.setContentText(message);
         alert.showAndWait();
     }
@@ -342,12 +393,37 @@ public class GestionRendezVous implements Initializable {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
         } catch (IOException e) {
-            showAlert("Erreur", "Impossible d'ouvrir l'historique des notifications");
-            e.printStackTrace();
+            showAlert("Erreur", "Impossible d'ouvrir l'historique des notifications", e.getMessage());
         }
     }
 
     private void addNotification(String message) {
         notificationHistory.add(message);
+    }
+
+    private void redirectToLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml")); // Adjust path to your login FXML
+            Parent root = loader.load();
+            Stage stage = (Stage) notificationLabel.getScene().getWindow(); // Get current stage
+            stage.setScene(new Scene(root));
+            stage.setTitle("Connexion");
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Erreur", "Redirection vers la page de connexion échouée", e.getMessage());
+        }
+    }
+
+    private void redirectToListRdv() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/listrdv.fxml")); // Adjust path to your listrdv FXML
+            Parent root = loader.load();
+            Stage stage = (Stage) notificationLabel.getScene().getWindow(); // Get current stage
+            stage.setScene(new Scene(root));
+            stage.setTitle("Liste des Rendez-vous");
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Erreur", "Redirection vers la liste des rendez-vous échouée", e.getMessage());
+        }
     }
 }

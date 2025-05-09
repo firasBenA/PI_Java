@@ -121,7 +121,7 @@ public class AjouterPrescriptionDepuisDiag {
         Connection connection = null;
         try {
             // Assuming you have a DataSource or DriverManager to get the connection
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ehealth_database_2", "root", "");
 
             // Start a transaction (disable auto-commit)
             connection.setAutoCommit(false);

@@ -37,7 +37,6 @@ public class ServiceConsultation {
                 consultation.setDate(rs.getDate("date").toLocalDate());
                 consultation.setPrix(rs.getDouble("prix"));
                 consultation.setType_consultation(rs.getString("type_consultation"));
-                consultation.setUser_id(rs.getInt("user_id"));
                 consultation.setPatientPrenom(rs.getString("patient_prenom"));
                 consultation.setPatientNom(rs.getString("patient_nom"));
                 consultation.setStatut(rs.getString("statut")); // Statut depuis rendez_vous
@@ -47,6 +46,9 @@ public class ServiceConsultation {
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération des consultations: " + e.getMessage());
         }
+
+
+
 
         return consultations;
     }

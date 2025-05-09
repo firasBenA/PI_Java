@@ -42,6 +42,8 @@ public class RendeVous {
         return patient_id;
     }
 
+
+
     public void setIdPatient(int patient_id) {
         this.patient_id = patient_id;
     }

@@ -13,7 +13,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceAddRdv;
+import tn.esprit.repository.UserRepository; // Adjust based on your actual package
 
 import java.io.IOException;
 import java.net.URL;
@@ -44,7 +47,7 @@ public class GestionListeRdv implements Initializable {
 
     // Services et données
     private final ServiceAddRdv serviceRendezVous = new ServiceAddRdv();
-    private final int patientId = 1;
+    private final AuthService authService;
     private final List<String> notificationHistory = new ArrayList<>();
     private Connection connection;
 
@@ -57,10 +60,56 @@ public class GestionListeRdv implements Initializable {
     // Sujet Firebase pour les notifications
     private static final String FIREBASE_TOPIC = "appointments";
 
+    public GestionListeRdv() {
+        // Initialize UserRepository (replace with your actual implementation)
+        UserRepository userRepository = new UserRepository() {
+            @Override
+            public User save(User user) {
+                return null;
+            }
+
+            @Override
+            public User findByEmail(String email) {
+                return null;
+            }
+
+            @Override
+            public List<User> findAll() {
+                return List.of();
+            }
+
+            @Override
+            public void delete(int userId) {
+
+            }
+
+            @Override
+            public User findById(int userId) {
+                return null;
+            }
+
+            @Override
+            public List<User> getAllUsers() {
+                return List.of();
+            }
+
+            @Override
+            public List<User> searchUsers(String keyword) {
+                return List.of();
+            }
+        }; // Adjust based on your dependency injection
+        this.authService = AuthService.getInstance(userRepository);
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            // Initialiser Firebase
+            // Vérifier si un utilisateur est connecté
+            if (authService.getCurrentUser() == null) {
+                showAlert("Erreur", "Aucun utilisateur connecté", "Veuillez vous connecter pour accéder à cette page.");
+                redirectToLogin();
+                return;
+            }
 
             connectDB();
             setupStatusFilter();
@@ -70,7 +119,7 @@ public class GestionListeRdv implements Initializable {
             // Envoyer une notification de test au démarrage
             addNotification("Application démarrée à " + LocalDateTime.now());
         } catch (Exception e) {
-            showAlert("Erreur", "Initialisation Firebase échouée", e.getMessage());
+            showAlert("Erreur", "Initialisation échouée", e.getMessage());
         }
     }
 
@@ -89,6 +138,8 @@ public class GestionListeRdv implements Initializable {
     }
 
     private void loadAllRdvs() {
+        // Utiliser l'ID de l'utilisateur connecté
+        int patientId = authService.getCurrentUser().getId();
         allRdvs = serviceRendezVous.findByPatientId(patientId);
         filterRdvs();
     }
@@ -112,7 +163,7 @@ public class GestionListeRdv implements Initializable {
     private void updatePagination() {
         int totalPages = (int) Math.ceil((double) filteredRdvs.size() / itemsPerPage);
         pageInfo.setText(String.format("Page %d/%d", currentPage, totalPages == 0 ? 1 : totalPages));
-        rdvContainer.getChildren().clear();
+        rdvContainer.getChildren().clear(); // Fixed the typo
 
         int startIndex = (currentPage - 1) * itemsPerPage;
         int endIndex = Math.min(startIndex + itemsPerPage, filteredRdvs.size());
@@ -223,7 +274,7 @@ public class GestionListeRdv implements Initializable {
 
             // Ajouter à l'historique et envoyer notification
             addNotification(message);
-            loadAllRdvs();
+            loadAllRdvs(); // Reload the list after deletion
         }
     }
 
@@ -234,9 +285,7 @@ public class GestionListeRdv implements Initializable {
             Parent root = loader.load();
 
             GestionRendezVous controller = loader.getController();
-            controller.setNotificationListener(message -> {
-                addNotification(message);
-            });
+            controller.setNotificationListener(this::addNotification);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -268,9 +317,6 @@ public class GestionListeRdv implements Initializable {
             showAlert("Erreur", "Impossible d'ouvrir l'historique", e.getMessage());
         }
     }
-
-
-
 
     private void addNotification(String message) {
         String fullMessage = LocalDateTime.now().toString() + " - " + message;
@@ -312,5 +358,18 @@ public class GestionListeRdv implements Initializable {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void redirectToLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml")); // Adjust path to your login FXML
+            Parent root = loader.load();
+            Stage stage = (Stage) rdvContainer.getScene().getWindow(); // Get current stage
+            stage.setScene(new Scene(root));
+            stage.setTitle("Connexion");
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Erreur", "Redirection vers la page de connexion échouée", e.getMessage());
+        }
     }
 }

@@ -97,6 +97,15 @@
                                 </Label>
                             </children>
                         </HBox>
+                        <HBox alignment="CENTER" onMouseClicked="#handleConsultationClick" prefHeight="42.0" prefWidth="211.0" spacing="15.0" styleClass="mouse-moved" stylesheets="@main/resources/CSS/style.css">
+                            <children>
+                                <Label fx:id="consultationLabel" contentDisplay="CENTER" prefHeight="43.0" prefWidth="105.0"  stylesheets="@CSS/style.css" text="Consultations" textAlignment="CENTER">
+                                    <font>
+                                        <Font name="Berlin Sans FB" size="18.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
                     </children>
                 </VBox>
             </children>

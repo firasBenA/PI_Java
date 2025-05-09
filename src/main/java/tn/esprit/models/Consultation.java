@@ -10,7 +10,6 @@ public class Consultation {
     private LocalDate date;
     private double prix;
     private String type_consultation;
-    private int user_id;
     private String statut;
 
     private String patientPrenom;
@@ -21,30 +20,29 @@ public class Consultation {
     }
 
     public Consultation(int rendez_vous_id, int patient_id, int medecin_id, LocalDate date,
-                        double prix, String type_consultation, int user_id) {
+                        double prix, String type_consultation) {
         this.rendez_vous_id = rendez_vous_id;
         this.patient_id = patient_id;
         this.medecin_id = medecin_id;
         this.date = date;
         this.prix = prix;
         this.type_consultation = type_consultation;
-        this.user_id = user_id;
         this.statut = "en_attente"; // Valeur par défaut
     }
 
     public Consultation(int rendez_vous_id, int patient_id, int medecin_id, LocalDate date,
-                        double prix, String type_consultation, int user_id,
+                        double prix, String type_consultation,
                         String patientPrenom, String patientNom) {
-        this(rendez_vous_id, patient_id, medecin_id, date, prix, type_consultation, user_id);
+        this(rendez_vous_id, patient_id, medecin_id, date, prix, type_consultation);
         this.patientPrenom = patientPrenom;
         this.patientNom = patientNom;
     }
 
     // Full constructor with status
     public Consultation(int rendez_vous_id, int patient_id, int medecin_id, LocalDate date,
-                        double prix, String type_consultation, int user_id,
+                        double prix, String type_consultation,
                         String patientPrenom, String patientNom, String statut) {
-        this(rendez_vous_id, patient_id, medecin_id, date, prix, type_consultation, user_id,
+        this(rendez_vous_id, patient_id, medecin_id, date, prix, type_consultation,
                 patientPrenom, patientNom);
         this.statut = statut;
     }
@@ -106,13 +104,7 @@ public class Consultation {
         this.type_consultation = type_consultation;
     }
 
-    public int getUser_id() {
-        return user_id;
-    }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
-    }
 
     // Getters and Setters for patient names
     public String getPatientPrenom() {
@@ -151,7 +143,6 @@ public class Consultation {
                 ", date=" + date +
                 ", prix=" + prix +
                 ", type_consultation='" + type_consultation + '\'' +
-                ", user_id=" + user_id +
                 ", statut='" + statut + '\'' +
                 '}';
     }

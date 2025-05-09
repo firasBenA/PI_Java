@@ -25,7 +25,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
             cnx.setAutoCommit(false);
 
             // 1. Insérer le rendez-vous
-            String rdvQuery = "INSERT INTO `rendez_vous`(`patient_id`, `medecin_id`, `date`, `statut`, `type_rdv`, `cause`, ) VALUES (?,?,?,?,?,?)";
+            String rdvQuery = "INSERT INTO `rendez_vous`(`patient_id`, `medecin_id`, `date`, `statut`, `type_rdv`, `cause` ) VALUES (?,?,?,?,?,?)";
 
             try (PreparedStatement pstRdv = cnx.prepareStatement(rdvQuery, Statement.RETURN_GENERATED_KEYS)) {
                 pstRdv.setInt(1, rdv.getIdPatient());
@@ -34,6 +34,8 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 pstRdv.setString(4, rdv.getStatut());
                 pstRdv.setString(5, rdv.getType());
                 pstRdv.setString(6, rdv.getCause());
+
+
 
                 int affectedRows = pstRdv.executeUpdate();
                 if (affectedRows == 0) {
@@ -58,9 +60,8 @@ public class ServiceAddRdv implements IService<RendeVous> {
             consultation.setDate(rdv.getDate());
             consultation.setPrix(0); // Prix par défaut
             consultation.setType_consultation(rdv.getType());
-            consultation.setUser_id(1); // À remplacer par l'ID de l'utilisateur connecté
 
-            String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_id`, `date`, `prix`, `type_consultation`, `user_id`) VALUES (?,?,?,?,?,?,?)";
+            String consultationQuery = "INSERT INTO `consultation`(`rendez_vous_id`, `patient_id`, `medecin_id`, `date`, `prix`, `type_consultation`) VALUES (?,?,?,?,?,?)";
 
             try (PreparedStatement pstConsult = cnx.prepareStatement(consultationQuery)) {
                 pstConsult.setInt(1, consultation.getRendez_vous_id());
@@ -69,7 +70,6 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 pstConsult.setDate(4, Date.valueOf(consultation.getDate()));
                 pstConsult.setDouble(5, consultation.getPrix());
                 pstConsult.setString(6, consultation.getType_consultation());
-                pstConsult.setInt(7, consultation.getUser_id());
 
                 int consultAffected = pstConsult.executeUpdate();
                 if (consultAffected == 0) {

@@ -125,6 +125,14 @@ public class MainMController {
         diagnostiqueLabel.getStyleClass().remove("selected");
     }
 
+    @FXML
+    public void handleConsultationClick(MouseEvent event) {
+        setCenterContent("/liste_consultations.fxml");
+
+        prescriptionLabel.getStyleClass().add("selected");
+
+        diagnostiqueLabel.getStyleClass().remove("selected");
+    }
 
     @FXML
     public void initialize() {
