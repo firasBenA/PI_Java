@@ -41,10 +41,9 @@ public class ServicePrescription implements IService<Prescription> {
     public List<Prescription> getAll() {
         List<Prescription> prescriptions = new ArrayList<>();
 
-        String qry ="SELECT * FROM `prescription`";
-        try {
-            Statement stm = cnx.createStatement();
-            ResultSet rs = stm.executeQuery(qry);
+        try (Connection conn = MyDataBase.getInstance().getCnx();  // Use your singleton or factory here
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM prescription")) {
 
             while(rs.next()){
                 Prescription p =new Prescription();

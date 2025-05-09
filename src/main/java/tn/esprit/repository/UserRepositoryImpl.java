@@ -201,6 +201,7 @@ public class UserRepositoryImpl implements UserRepository {
                     System.err.println("Error mapping user ID: " + rs.getInt("id") + ", email: " + rs.getString("email") + ": " + e.getMessage());
                 }
             }
+
             System.out.println("Total users loaded: " + users.size());
             return users;
         } catch (SQLException e) {

@@ -11,9 +11,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import tn.esprit.models.Prescription;
 import tn.esprit.models.User;
 import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
+import tn.esprit.services.ServicePrescription;
 import tn.esprit.utils.SceneManager;
 
 import javafx.scene.Node;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class AdminDashboard {
     private static final Logger LOGGER = Logger.getLogger(AdminDashboard.class.getName());
@@ -43,14 +46,20 @@ public class AdminDashboard {
     @FXML private Tab patientsTab;
     @FXML private Tab medecinsTab;
     @FXML private Tab blockedTab;
+
+    @FXML private Tab prescriptionTab;
     @FXML private FlowPane patientUserCards;
     @FXML private FlowPane medecinUserCards;
     @FXML private FlowPane blockedUserCards;
+
+    @FXML private FlowPane prescriptionCards;
 
     private User currentUser;
     private SceneManager sceneManager;
     private AuthService authService;
     private List<User> allUsers = new ArrayList<>();
+
+    private final ServicePrescription servicePrescription = new ServicePrescription();
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
@@ -72,7 +81,7 @@ public class AdminDashboard {
             // Debug: Verify default image
             InputStream defaultImageStream = getClass().getResourceAsStream(DEFAULT_PROFILE_IMAGE);
             LOGGER.info("Default image stream: " + (defaultImageStream != null ? "Found" : "Not found"));
-            // Warn about invalid image_profil and certificat values
+
             allUsers.forEach(user -> {
                 String imagePath = user.getImageProfil();
                 if (imagePath != null && !imagePath.isEmpty()) {
@@ -94,6 +103,7 @@ public class AdminDashboard {
             setupTabListener();
             setupSearchListener();
             displayUsers("PATIENT");
+            displayPrescriptions();
         } catch (Exception e) {
             showAlert("Erreur", "Erreur lors du chargement des utilisateurs: " + e.getMessage(), Alert.AlertType.ERROR);
         } catch (AuthException e) {
@@ -109,6 +119,8 @@ public class AdminDashboard {
                 displayUsers("MEDECIN");
             } else if (newTab == blockedTab) {
                 displayUsers("BLOCKED");
+            }else if (newTab == prescriptionTab) {
+                displayPrescriptions();
             }
         });
     }
@@ -137,6 +149,89 @@ public class AdminDashboard {
             }
         }
     }
+
+    private void displayPrescriptions() {
+        prescriptionCards.getChildren().clear();
+
+        List<Prescription> prescriptions = servicePrescription.getAll();
+        for (Prescription p : prescriptions) {
+            System.out.println("Titre: " + p.getTitre() + ", Date: " + p.getDate_prescription());
+        }
+        LOGGER.info("Displaying " + prescriptions.size() + " prescriptions");
+
+        if (prescriptions.isEmpty()) {
+            Label emptyLabel = new Label("Aucune prescription disponible.");
+            emptyLabel.getStyleClass().add("empty-label");
+            prescriptionCards.setAlignment(Pos.CENTER);
+            prescriptionCards.getChildren().add(emptyLabel);
+        } else {
+            prescriptionCards.setAlignment(Pos.TOP_LEFT);
+            for (Prescription prescription : prescriptions) {
+                prescriptionCards.getChildren().add(createPrescriptionCard(prescription));
+            }
+        }
+    }
+
+    private Node createPrescriptionCard(Prescription prescription) {
+        VBox prescriptionCard = new VBox(10);
+        prescriptionCard.getStyleClass().add("user-card");
+
+        // Content in HBox (Similar to the User card)
+        HBox content = new HBox(15);
+        content.getStyleClass().add("card-content");
+
+        // Prescription Info
+        VBox infoBox = new VBox(5);
+        infoBox.getStyleClass().add("prescription-info-box");
+
+        // Title
+        Label titleLabel = new Label("Titre: " + prescription.getTitre());
+        titleLabel.getStyleClass().add("title-label");
+
+        // Date
+        Label dateLabel = new Label("Date: " + prescription.getDate_prescription());
+        dateLabel.getStyleClass().add("date-label");
+
+        // Details (Description of the prescription)
+        Label detailsLabel = new Label("Détails: " + prescription.getContenue());
+        detailsLabel.getStyleClass().add("details-label");
+
+        infoBox.getChildren().addAll(titleLabel, dateLabel, detailsLabel);
+
+        content.getChildren().add(infoBox);
+
+        // Buttons (Optional - You can add buttons like "View Details" here, similar to the user card)
+        HBox buttonBox = new HBox(10);
+        buttonBox.getStyleClass().add("button-box");
+
+        // Delete Button
+        Button deleteButton = new Button("Supprimer");
+        deleteButton.getStyleClass().add("delete-button");
+
+        ServicePrescription servicePrescription = new ServicePrescription();
+
+        deleteButton.setOnAction(e -> {
+            servicePrescription.delete(prescription);
+        });
+
+
+        // Add the delete button to the button box
+        buttonBox.getChildren().add(deleteButton);
+
+        prescriptionCard.getChildren().addAll(content, buttonBox);
+
+        return prescriptionCard;
+    }
+
+
+    private List<Prescription> getFilteredPrescriptions(String userType) {
+        ServicePrescription service = new ServicePrescription();
+
+        List<Prescription> prescriptions = service.getAll();
+        return prescriptions.stream()
+                .collect(Collectors.toList());
+    }
+
 
     private void filterUsers(String keyword) {
         String selectedTab = tabPane.getSelectionModel().getSelectedItem().getText();
