@@ -25,7 +25,7 @@ public class ServiceAddRdv implements IService<RendeVous> {
             cnx.setAutoCommit(false);
 
             // 1. Insérer le rendez-vous
-            String rdvQuery = "INSERT INTO `rendez_vous`(`patient_id`, `medecin_id`, `date`, `statut`, `type_rdv`, `cause`, ) VALUES (?,?,?,?,?,?)";
+            String rdvQuery = "INSERT INTO `rendez_vous`(`patient_id`, `medecin_id`, `date`, `statut`, `type_rdv`, `cause`,`user_id` ) VALUES (?,?,?,?,?,?,?)";
 
             try (PreparedStatement pstRdv = cnx.prepareStatement(rdvQuery, Statement.RETURN_GENERATED_KEYS)) {
                 pstRdv.setInt(1, rdv.getIdPatient());
@@ -34,6 +34,9 @@ public class ServiceAddRdv implements IService<RendeVous> {
                 pstRdv.setString(4, rdv.getStatut());
                 pstRdv.setString(5, rdv.getType());
                 pstRdv.setString(6, rdv.getCause());
+                pstRdv.setInt(7, rdv.getUser_id());
+
+
 
                 int affectedRows = pstRdv.executeUpdate();
                 if (affectedRows == 0) {

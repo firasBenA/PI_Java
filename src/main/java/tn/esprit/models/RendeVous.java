@@ -6,6 +6,7 @@ public class RendeVous {
     private int id;
     private int patient_id;
     private int medecin_id;
+    private int user_id;
     private LocalDate date;
     private String statut;
     private String type;
@@ -15,7 +16,7 @@ public class RendeVous {
     public RendeVous() {
     }
 
-    public RendeVous(int id, int idPatient, int idMedecin, LocalDate date,
+    public RendeVous(int id, int idPatient, int idMedecin, int user_id, LocalDate date,
                      String statut, String type, String cause) {
         this.id = id;
         this.patient_id = patient_id;
@@ -24,6 +25,7 @@ public class RendeVous {
         this.statut = statut;
         this.type = type;
         this.cause = cause;
+        this.user_id = user_id;
     }
 
     public RendeVous(LocalDate selectedDate, String value, String text, Integer integer, Integer id, String enAttente) {
@@ -40,6 +42,14 @@ public class RendeVous {
 
     public int getIdPatient() {
         return patient_id;
+    }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
     public void setIdPatient(int patient_id) {

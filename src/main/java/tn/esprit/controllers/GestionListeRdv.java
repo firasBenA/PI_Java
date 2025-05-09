@@ -44,7 +44,7 @@ public class GestionListeRdv implements Initializable {
 
     // Services et données
     private final ServiceAddRdv serviceRendezVous = new ServiceAddRdv();
-    private final int patientId = 1;
+    private final int patientId = 10;
     private final List<String> notificationHistory = new ArrayList<>();
     private Connection connection;
 
