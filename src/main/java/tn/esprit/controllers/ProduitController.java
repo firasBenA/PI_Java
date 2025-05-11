@@ -3,140 +3,102 @@ package tn.esprit.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import tn.esprit.models.Produit;
 import tn.esprit.services.ServiceProduit;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.sql.Timestamp;
-
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.*;
+import java.sql.Timestamp;
+import java.util.List;
+
 public class ProduitController {
 
-    @FXML
-    private TableView<Produit> tableProduit;
-    @FXML
-    private TableColumn<Produit, Integer> colId;
-    @FXML
-    private TableColumn<Produit, String> colName;
-    @FXML
-    private TableColumn<Produit, Double> colPrice;
-    @FXML
-    private TableColumn<Produit, Integer> colStock;
-    @FXML
-    private TableColumn<Produit, String> colImage;
-    @FXML
-    private TableColumn<Produit, String> colDescription;
-
-    @FXML
-    private TextField tfNom;
-    @FXML
-    private TextField tfPrix;
-    @FXML
-    private TextField tfStock;
-    @FXML
-    private TextField tfImage;
-    @FXML
-    private TextArea taDescription;
+    @FXML private FlowPane flowPane;
+    @FXML private TextField tfNom, tfPrix, tfStock, tfImage;
+    @FXML private TextArea taDescription;
+    @FXML private ScrollPane scrollPane;
 
     private final ServiceProduit serviceProduit = new ServiceProduit();
-    private File selectedImageFile; // for keeping the selected real image
-
+    private File selectedImageFile;
+    private Produit selectedProduit;
     private static final Path IMAGE_DIRECTORY = Paths.get("uploaded_images");
 
     @FXML
     public void initialize() {
-        colId.setCellValueFactory(cellData -> new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getId()).asObject());
-        colName.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getNom()));
-        colPrice.setCellValueFactory(cellData -> new javafx.beans.property.SimpleDoubleProperty(cellData.getValue().getPrix()).asObject());
-        colStock.setCellValueFactory(cellData -> new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getStock()).asObject());
-        colImage.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getImage())
-        );
-
-// Custom CellFactory to show image thumbnail
-        colImage.setCellFactory(column -> {
-            return new TableCell<Produit, String>() {
-                private final ImageView imageView = new ImageView();
-
-                {
-                    imageView.setFitWidth(80);
-                    imageView.setFitHeight(80);
-                    imageView.setPreserveRatio(true);
-                }
-
-                @Override
-                protected void updateItem(String imageName, boolean empty) {
-                    super.updateItem(imageName, empty);
-                    if (empty || imageName == null || imageName.isEmpty()) {
-                        setGraphic(null);
-                    } else {
-                        File imageFile = new File("uploaded_images/" + imageName);
-                        if (imageFile.exists()) {
-                            imageView.setImage(new javafx.scene.image.Image(imageFile.toURI().toString()));
-                            setGraphic(imageView);
-                        } else {
-                            setGraphic(null);
-                        }
-                    }
-                }
-            };
-        });
-
-        colDescription.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDescription()));
-
-        // Create directory if not exists
         try {
-            if (!Files.exists(IMAGE_DIRECTORY)) {
-                Files.createDirectories(IMAGE_DIRECTORY);
-            }
+            if (!Files.exists(IMAGE_DIRECTORY)) Files.createDirectories(IMAGE_DIRECTORY);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        tableProduit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                tfNom.setText(newValue.getNom());
-                tfPrix.setText(String.valueOf(newValue.getPrix()));
-                tfStock.setText(String.valueOf(newValue.getStock()));
-                tfImage.setText(newValue.getImage()); // just showing image filename
-                taDescription.setText(newValue.getDescription());
+        refreshCards();
+    }
 
-                // Important: reset selectedImageFile to null (because you didn't choose a new file yet)
-                selectedImageFile = null;
-            }
+    private void refreshCards() {
+        flowPane.getChildren().clear();
+        List<Produit> produits = serviceProduit.getAll();
+
+        for (Produit produit : produits) {
+            VBox card = createProduitCard(produit);
+            flowPane.getChildren().add(card);
+        }
+    }
+
+    private VBox createProduitCard(Produit produit) {
+        VBox card = new VBox(5);
+        card.setPadding(new Insets(10));
+        card.setStyle("-fx-border-color: gray; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: #f9f9f9;");
+        card.setPrefWidth(160);
+
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(140);
+        imageView.setFitHeight(100);
+        imageView.setPreserveRatio(true);
+
+        File imageFile = new File("uploaded_images/" + produit.getImage());
+        if (imageFile.exists()) {
+            imageView.setImage(new Image(imageFile.toURI().toString()));
+        }
+
+        Label nameLabel = new Label("Nom: " + produit.getNom());
+        Label priceLabel = new Label("Prix: " + produit.getPrix() + " DT");
+        Label stockLabel = new Label("Stock: " + produit.getStock());
+        Label descLabel = new Label("Desc: " + produit.getDescription());
+        descLabel.setWrapText(true);
+
+        Button selectBtn = new Button("Select");
+        selectBtn.setOnAction(e -> {
+            selectedProduit = produit;
+            tfNom.setText(produit.getNom());
+            tfPrix.setText(String.valueOf(produit.getPrix()));
+            tfStock.setText(String.valueOf(produit.getStock()));
+            tfImage.setText(produit.getImage());
+            taDescription.setText(produit.getDescription());
+            selectedImageFile = null;
         });
 
-        refreshTable();
+        card.getChildren().addAll(imageView, nameLabel, priceLabel, stockLabel, descLabel, selectBtn);
+        return card;
     }
-
-    private void refreshTable() {
-        ObservableList<Produit> list = FXCollections.observableArrayList(serviceProduit.getAll());
-        tableProduit.setItems(list);
-    }
-
     @FXML
     private void addProduit() {
         try {
-            if (!validateFields()) {
-                return; // If not valid, stop here.
-            }
+            if (!validateFields()) return;
 
-            String savedImageName = saveImage(selectedImageFile); // Save and get image name
-
+            String savedImageName = saveImage(selectedImageFile);
             String nom = tfNom.getText().trim();
             String desc = taDescription.getText().trim();
             double prix = Double.parseDouble(tfPrix.getText().trim());
@@ -144,9 +106,10 @@ public class ProduitController {
 
             Produit produit = new Produit(nom, desc, prix, stock, savedImageName);
             serviceProduit.add(produit);
-            refreshTable();
+
             clearFields();
             selectedImageFile = null;
+            refreshCards();
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Erreur", "Erreur lors de l'ajout du produit.");
@@ -155,33 +118,60 @@ public class ProduitController {
 
     @FXML
     private void updateProduit() {
-        Produit selected = tableProduit.getSelectionModel().getSelectedItem();
-        if (selected != null) {
+        if (selectedProduit != null) {
             try {
-                if (!validateFields()) {
-                    return; // If not valid, stop here
-                }
+                if (!validateFields()) return;
 
-                selected.setNom(tfNom.getText().trim());
-                selected.setPrix(Double.parseDouble(tfPrix.getText().trim()));
-                selected.setStock(Integer.parseInt(tfStock.getText().trim()));
+                selectedProduit.setNom(tfNom.getText().trim());
+                selectedProduit.setPrix(Double.parseDouble(tfPrix.getText().trim()));
+                selectedProduit.setStock(Integer.parseInt(tfStock.getText().trim()));
+                selectedProduit.setDescription(taDescription.getText().trim());
+                selectedProduit.setMajLe(new Timestamp(System.currentTimeMillis()));
 
                 if (selectedImageFile != null) {
                     String savedImageName = saveImage(selectedImageFile);
-                    selected.setImage(savedImageName);
+                    selectedProduit.setImage(savedImageName);
                 }
 
-                selected.setDescription(taDescription.getText().trim());
-                selected.setMajLe(new Timestamp(System.currentTimeMillis()));
-
-                serviceProduit.update(selected);
-                refreshTable();
+                serviceProduit.update(selectedProduit);
                 clearFields();
                 selectedImageFile = null;
+                selectedProduit = null;
+                refreshCards();
             } catch (Exception e) {
                 e.printStackTrace();
                 showAlert("Erreur", "Erreur lors de la mise à jour du produit.");
             }
+        }
+    }
+
+    @FXML
+    private void deleteProduit() {
+        if (selectedProduit != null) {
+            try {
+                serviceProduit.delete(selectedProduit);
+                clearFields();
+                selectedImageFile = null;
+                selectedProduit = null;
+                refreshCards();
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "Erreur lors de la suppression.");
+            }
+        }
+    }
+
+    @FXML
+    private void handleSelectImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
+        );
+        File file = fileChooser.showOpenDialog(tfImage.getScene().getWindow());
+        if (file != null) {
+            selectedImageFile = file;
+            tfImage.setText(file.getName());
         }
     }
 
@@ -191,93 +181,44 @@ public class ProduitController {
         String stockText = tfStock.getText().trim();
         String desc = taDescription.getText().trim();
 
-        if (nom.isEmpty() || nom.length() < 2) {
-            showAlert("Validation Erreur", "Le nom du produit doit contenir au moins 2 caractères.");
+        if (nom.length() < 2) {
+            showAlert("Validation", "Nom doit contenir au moins 2 caractères.");
             return false;
         }
 
-        if (desc.isEmpty() || desc.length() < 5) {
-            showAlert("Validation Erreur", "La description du produit doit contenir au moins 5 caractères.");
-            return false;
-        }
-
-        if (prixText.isEmpty()) {
-            showAlert("Validation Erreur", "Le prix est obligatoire.");
+        if (desc.length() < 5) {
+            showAlert("Validation", "Description doit contenir au moins 5 caractères.");
             return false;
         }
 
         try {
             double prix = Double.parseDouble(prixText);
             if (prix <= 0) {
-                showAlert("Validation Erreur", "Le prix doit être supérieur à 0.");
+                showAlert("Validation", "Prix doit être supérieur à 0.");
                 return false;
             }
         } catch (NumberFormatException e) {
-            showAlert("Validation Erreur", "Le prix doit être un nombre valide.");
-            return false;
-        }
-
-        if (stockText.isEmpty()) {
-            showAlert("Validation Erreur", "Le stock est obligatoire.");
+            showAlert("Validation", "Prix invalide.");
             return false;
         }
 
         try {
             int stock = Integer.parseInt(stockText);
             if (stock < 0) {
-                showAlert("Validation Erreur", "Le stock ne peut pas être négatif.");
+                showAlert("Validation", "Stock ne peut pas être négatif.");
                 return false;
             }
         } catch (NumberFormatException e) {
-            showAlert("Validation Erreur", "Le stock doit être un nombre entier valide.");
+            showAlert("Validation", "Stock invalide.");
             return false;
         }
 
         if (selectedImageFile == null && tfImage.getText().isEmpty()) {
-            showAlert("Validation Erreur", "Veuillez sélectionner une image pour le produit.");
+            showAlert("Validation", "Veuillez sélectionner une image.");
             return false;
         }
 
         return true;
-    }
-
-
-    @FXML
-    private void deleteProduit() {
-        Produit selected = tableProduit.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            try {
-                serviceProduit.delete(selected);
-                refreshTable();
-                clearFields();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @FXML
-    private void handleSelectImage() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choisir une image");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg")
-        );
-        File file = fileChooser.showOpenDialog(tfImage.getScene().getWindow());
-
-        if (file != null) {
-            selectedImageFile = file;
-            tfImage.setText(file.getName()); // just show the filename in the textfield
-        }
-    }
-
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     private void clearFields() {
@@ -286,6 +227,15 @@ public class ProduitController {
         tfStock.clear();
         tfImage.clear();
         taDescription.clear();
+        selectedProduit = null;
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private String saveImage(File imageFile) throws IOException {
@@ -296,20 +246,17 @@ public class ProduitController {
 
         String uniqueName = System.currentTimeMillis() + "_" + imageFile.getName();
         File destinationFile = new File(uploadDir, uniqueName);
-
         Files.copy(imageFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-        return uniqueName; // return only the filename, to save in DB
+        return uniqueName;
     }
 
     @FXML
     private void handleDownloadPdf() {
         try {
-            // Select where to save the PDF
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save PDF");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files", "*.pdf"));
-            File file = fileChooser.showSaveDialog(tableProduit.getScene().getWindow());
+            File file = fileChooser.showSaveDialog(tfNom.getScene().getWindow());
 
             if (file != null) {
                 generatePdf(file.getAbsolutePath());
@@ -332,24 +279,20 @@ public class ProduitController {
         document.add(new Paragraph("Liste des Produits", titleFont));
         document.add(new Paragraph("\n"));
 
-        for (Produit produit : tableProduit.getItems()) {
+        for (Produit produit : serviceProduit.getAll()) {
             document.add(new Paragraph("Nom: " + produit.getNom(), normalFont));
             document.add(new Paragraph("Prix: " + produit.getPrix() + " DT", normalFont));
             document.add(new Paragraph("Stock: " + produit.getStock(), normalFont));
             document.add(new Paragraph("Description: " + produit.getDescription(), normalFont));
-
-            if (produit.getImage() != null && !produit.getImage().isEmpty()) {
-                File imageFile = new File("uploaded_images/" + produit.getImage());
-                if (imageFile.exists()) {
-                    Image img = Image.getInstance(imageFile.getAbsolutePath());
-                    img.scaleToFit(100, 100);
-                    document.add(img);
-                }
+            File imageFile = new File("uploaded_images/" + produit.getImage());
+            if (imageFile.exists()) {
+                com.itextpdf.text.Image img = com.itextpdf.text.Image.getInstance(imageFile.getAbsolutePath());
+                img.scaleToFit(100, 100);
+                document.add(img);
             }
             document.add(new Paragraph("\n--------------------------------\n"));
         }
 
         document.close();
     }
-
 }

@@ -40,7 +40,6 @@ tn\esprit\controllers\CallbackServerManager.class
 tn\esprit\controllers\GestionReponse.class
 tn\esprit\controllers\ModifierRendezVousController.class
 tn\esprit\test\TestMain.class
-tn\esprit\controllers\ProduitController$1.class
 tn\esprit\controllers\GestionRendezVous$1$1.class
 tn\esprit\controllers\GestionReponse$1.class
 tn\esprit\models\Reponse.class
