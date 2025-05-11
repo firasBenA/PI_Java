@@ -61,6 +61,9 @@
                         <FlowPane fx:id="evenementCards" styleClass="user-cards" hgap="15" vgap="15"/>
                     </ScrollPane>
                 </Tab>
+                <Tab fx:id="produitsTab" text="Gestion Produits" styleClass="tab">
+                    <AnchorPane fx:id="produitContainer"/>
+                </Tab>
             </tabs>
         </TabPane>
     </VBox>

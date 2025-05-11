@@ -22,7 +22,7 @@ public class MyDataBase {
     }
 
     public static MyDataBase getInstance() {
-        if (instance == null)// aandek l hak taaml instance wahda (sainglotant)
+        if (instance == null)
             instance = new MyDataBase();
 
         return instance;

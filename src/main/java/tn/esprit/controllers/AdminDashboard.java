@@ -50,6 +50,9 @@ public class AdminDashboard {
     @FXML private Tab evenementTab;
     @FXML private Tab blockedTab;
 
+    @FXML
+    private Tab produitsTab;
+
     @FXML private Tab prescriptionTab;
     @FXML private FlowPane patientUserCards;
     @FXML private FlowPane medecinUserCards;
@@ -58,11 +61,11 @@ public class AdminDashboard {
 
     @FXML private FlowPane evenementCards;
 
+    private AnchorPane produitContainer;
     private User currentUser;
     private SceneManager sceneManager;
     private AuthService authService;
     private List<User> allUsers = new ArrayList<>();
-
 
     private final ServicePrescription servicePrescription = new ServicePrescription();
     private final ServiceEvenement serviceEvenement = new ServiceEvenement();
@@ -129,8 +132,26 @@ public class AdminDashboard {
             }else if (newTab == prescriptionTab) {
                 displayPrescriptions();
             }
+            else if (newTab == produitsTab) {
+                loadProduitManagement();
+            }
         });
     }
+
+    private void loadProduitManagement() {
+        try {
+            AnchorPane produitView = javafx.fxml.FXMLLoader.load(getClass().getResource("/Produit.fxml"));
+            produitContainer.getChildren().setAll(produitView);
+            AnchorPane.setTopAnchor(produitView, 0.0);
+            AnchorPane.setBottomAnchor(produitView, 0.0);
+            AnchorPane.setLeftAnchor(produitView, 0.0);
+            AnchorPane.setRightAnchor(produitView, 0.0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors du chargement de Gestion Produits: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
 
     private void setupSearchListener() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> {
