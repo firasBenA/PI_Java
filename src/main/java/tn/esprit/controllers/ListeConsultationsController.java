@@ -4,22 +4,26 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.util.converter.LocalTimeStringConverter;
+import javafx.stage.Stage;
 import tn.esprit.models.Consultation;
+import tn.esprit.models.User;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceConsultation;
 import tn.esprit.services.EmailService;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -27,34 +31,57 @@ import java.util.stream.Collectors;
 
 public class ListeConsultationsController implements Initializable {
 
-    @FXML
-    private FlowPane consultationsContainer;
-    @FXML
-    private ComboBox<String> typeFilterComboBox;
-    @FXML
-    private Button prevPageButton;
-    @FXML
-    private Button nextPageButton;
-    @FXML
-    private Label pageInfoLabel;
+    @FXML private FlowPane consultationsContainer;
+    @FXML private ComboBox<String> typeFilterComboBox;
+    @FXML private Button prevPageButton;
+    @FXML private Button nextPageButton;
+    @FXML private Label pageInfoLabel;
 
     private final ServiceConsultation serviceConsultation = new ServiceConsultation();
     private final EmailService emailService = new EmailService();
-    private final int medecinId = 11;
+    private final AuthService authService;
     private final int itemsPerPage = 10;
     private int currentPage = 1;
     private int totalPages = 1;
     private List<Consultation> allConsultations;
     private String currentFilter = "Tous";
 
+    // Constructor to inject AuthService
+    public ListeConsultationsController(AuthService authService) {
+        this.authService = authService;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setupFilterComboBox();
-        loadAllConsultations();
-        setupPaginationControls();
+        Platform.runLater(() -> {
+            if (consultationsContainer == null) {
+                System.err.println("Error: consultationsContainer is null.");
+                showAlert(Alert.AlertType.ERROR, "Erreur", null, "Composant principal non initialisé.");
+                return;
+            }
+            // Vérifier si un utilisateur est connecté et s'il est un médecin
+            if (authService.getCurrentUser() == null) {
+                showAlert(Alert.AlertType.ERROR, "Erreur", null, "Aucun utilisateur connecté. Redirection vers la connexion.");
+                redirectToLogin();
+                return;
+            }
+            if (!authService.getCurrentUser().getUserType().equals("MEDECIN")) {
+                showAlert(Alert.AlertType.ERROR, "Erreur", null, "Accès non autorisé. Cette page est réservée aux médecins.");
+                redirectToLogin();
+                return;
+            }
+
+            setupFilterComboBox();
+            loadAllConsultations();
+            setupPaginationControls();
+        });
     }
 
     private void setupFilterComboBox() {
+        ObservableList<String> filterOptions = FXCollections.observableArrayList("Tous", "consultation", "suivi", "urgence");
+        typeFilterComboBox.setItems(filterOptions);
+        typeFilterComboBox.getSelectionModel().select("Tous");
+
         typeFilterComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             currentFilter = newVal;
             currentPage = 1;
@@ -63,6 +90,7 @@ public class ListeConsultationsController implements Initializable {
     }
 
     private void loadAllConsultations() {
+        int medecinId = authService.getCurrentUser().getId();
         allConsultations = serviceConsultation.getByMedecinId(medecinId);
         updateDisplayedConsultations();
     }
@@ -123,16 +151,13 @@ public class ListeConsultationsController implements Initializable {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);");
         card.setPrefWidth(300);
 
-        // Titre
         Label titleLabel = new Label("Consultation #" + consultation.getId());
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
 
-        // Informations
         Label dateLabel = new Label("Date: " + consultation.getDate());
         Label typeLabel = new Label("Type: " + consultation.getType_consultation());
         Label patientLabel = new Label("Patient: " + consultation.getPatientPrenom() + " " + consultation.getPatientNom());
 
-        // Statut
         Label statusLabel = new Label("Statut: " + consultation.getStatut());
         switch (consultation.getStatut()) {
             case "approuvé":
@@ -145,29 +170,25 @@ public class ListeConsultationsController implements Initializable {
                 statusLabel.setTextFill(Color.ORANGE);
         }
 
-        // Boutons
         HBox buttonBox = new HBox(10);
         Button btnModifier = new Button("Modifier");
         Button btnApprouver = new Button("Approuver");
         Button btnRefuser = new Button("Refuser");
 
-        // Style des boutons
         btnModifier.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
         btnApprouver.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         btnRefuser.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
 
-        // Désactiver les boutons si statut déjà défini
         boolean statutDefini = !consultation.isEnAttente();
         btnModifier.setDisable(statutDefini);
         btnApprouver.setDisable(statutDefini);
         btnRefuser.setDisable(statutDefini);
 
-        // Gestion des événements
         btnModifier.setOnAction(event -> {
             if (consultation.isEnAttente()) {
                 modifierDateConsultation(consultation);
             } else {
-                showAlert("Attention", "Seules les consultations en attente peuvent être modifiées");
+                showAlert(Alert.AlertType.WARNING, "Attention", null, "Seules les consultations en attente peuvent être modifiées");
             }
         });
 
@@ -179,10 +200,10 @@ public class ListeConsultationsController implements Initializable {
             try {
                 String patientEmail = serviceConsultation.getPatientEmailById(consultation.getPatient_id());
                 emailService.sendRejectionEmail(patientEmail);
-                showAlert("Succès", "Consultation refusée et email envoyé au patient");
+                showAlert(Alert.AlertType.INFORMATION, "Succès", null, "Consultation refusée et email envoyé au patient");
                 loadAllConsultations();
             } catch (Exception e) {
-                showAlert("Erreur", "Échec de l'envoi de l'email : " + e.getMessage());
+                showAlert(Alert.AlertType.ERROR, "Erreur", null, "Échec de l'envoi de l'email : " + e.getMessage());
             }
         });
 
@@ -198,13 +219,11 @@ public class ListeConsultationsController implements Initializable {
         dialog.setTitle("Approuver la consultation");
         dialog.setHeaderText("Définir le prix et l'heure de la consultation");
 
-        // Boutons
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         TextField priceField = new TextField();
         priceField.setPromptText("Prix (TND)");
 
-        // Champ Heure - Solution simplifiée
         TextField timeField = new TextField();
         timeField.setPromptText("HH:mm");
 
@@ -214,7 +233,6 @@ public class ListeConsultationsController implements Initializable {
                 timeField.positionCaret(3);
             }
         });
-
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -235,13 +253,13 @@ public class ListeConsultationsController implements Initializable {
                     String timeStr = timeField.getText();
 
                     if (!timeStr.matches("^([01]?\\d|2[0-3]):[0-5]\\d$")) {
-                        showAlert("Erreur", "Format d'heure invalide. Utilisez HH:mm");
+                        showAlert(Alert.AlertType.ERROR, "Erreur", null, "Format d'heure invalide. Utilisez HH:mm");
                         return null;
                     }
 
                     return new ApprovalData(consultation.getDate(), timeStr, price);
                 } catch (NumberFormatException e) {
-                    showAlert("Erreur", "Prix invalide");
+                    showAlert(Alert.AlertType.ERROR, "Erreur", null, "Prix invalide");
                     return null;
                 }
             }
@@ -260,10 +278,10 @@ public class ListeConsultationsController implements Initializable {
                         data.time,
                         data.price
                 );
-                showAlert("Succès", "Consultation approuvée");
+                showAlert(Alert.AlertType.INFORMATION, "Succès", null, "Consultation approuvée");
                 loadAllConsultations();
             } catch (Exception e) {
-                showAlert("Erreur", "Erreur d'envoi d'email");
+                showAlert(Alert.AlertType.ERROR, "Erreur", null, "Erreur d'envoi d'email : " + e.getMessage());
             }
         });
     }
@@ -298,16 +316,40 @@ public class ListeConsultationsController implements Initializable {
             serviceConsultation.updateConsultationDate(consultation.getId(), newDate);
             consultation.setDate(newDate);
             loadAllConsultations();
-            showAlert("Succès", "Date de consultation modifiée avec succès");
+            showAlert(Alert.AlertType.INFORMATION, "Succès", null, "Date de consultation modifiée avec succès");
         });
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    private void showAlert(Alert.AlertType type, String title, String header, String message) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
-        alert.setHeaderText(null);
+        alert.setHeaderText(header);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void redirectToLogin() {
+        if (consultationsContainer.getScene() == null) {
+            System.err.println("Error: Scene is not available for consultationsContainer.");
+            showAlert(Alert.AlertType.ERROR, "Erreur", null, "Impossible de rediriger : scène non disponible.");
+            return;
+        }
+
+        try {
+            String loginFxmlPath = "/login.fxml";
+            if (getClass().getResource(loginFxmlPath) == null) {
+                throw new IOException("Login FXML not found: " + loginFxmlPath);
+            }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(loginFxmlPath));
+            Parent root = loader.load();
+            Stage stage = (Stage) consultationsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Connexion");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Erreur", null, "Redirection vers la page de connexion échouée : " + e.getMessage());
+        }
     }
 
     private static class ApprovalData {

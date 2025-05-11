@@ -1,6 +1,7 @@
 package tn.esprit.controllers;
 
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,7 +14,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tn.esprit.models.RendeVous;
+import tn.esprit.models.User;
+import tn.esprit.repository.UserRepositoryImpl;
+import tn.esprit.services.AuthService;
 import tn.esprit.services.ServiceAddRdv;
+import tn.esprit.repository.UserRepository;
 
 import java.io.IOException;
 import java.net.URL;
@@ -44,7 +49,7 @@ public class GestionListeRdv implements Initializable {
 
     // Services et données
     private final ServiceAddRdv serviceRendezVous = new ServiceAddRdv();
-    private final int patientId = 11;
+    private final AuthService authService;
     private final List<String> notificationHistory = new ArrayList<>();
     private Connection connection;
 
@@ -55,12 +60,22 @@ public class GestionListeRdv implements Initializable {
     private List<RendeVous> filteredRdvs = new ArrayList<>();
 
     // Sujet Firebase pour les notifications
-    //private static final String FIREBASE_TOPIC = "appointments";
+    private static final String FIREBASE_TOPIC = "appointments";
+
+    public GestionListeRdv() {
+        UserRepository userRepository = new UserRepositoryImpl(); // Use real implementation
+        this.authService = AuthService.getInstance(userRepository);
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            // Initialiser Firebase
+            // Vérifier si un utilisateur est connecté
+            if (authService.getCurrentUser() == null) {
+                showAlert("Erreur", "Aucun utilisateur connecté", "Veuillez vous connecter pour accéder à cette page.");
+                Platform.runLater(this::redirectToLogin);
+                return;
+            }
 
             connectDB();
             setupStatusFilter();
@@ -70,7 +85,7 @@ public class GestionListeRdv implements Initializable {
             // Envoyer une notification de test au démarrage
             addNotification("Application démarrée à " + LocalDateTime.now());
         } catch (Exception e) {
-            showAlert("Erreur", "Initialisation Firebase échouée", e.getMessage());
+            showAlert("Erreur", "Initialisation échouée", e.getMessage());
         }
     }
 
@@ -89,6 +104,7 @@ public class GestionListeRdv implements Initializable {
     }
 
     private void loadAllRdvs() {
+        int patientId = authService.getCurrentUser().getId();
         allRdvs = serviceRendezVous.findByPatientId(patientId);
         filterRdvs();
     }
@@ -221,7 +237,6 @@ public class GestionListeRdv implements Initializable {
             String doctorName = getDoctorName(rdv.getIdMedecin());
             String message = String.format("Rendez-vous avec Dr %s du %s supprimé", doctorName, rdv.getDate());
 
-            // Ajouter à l'historique et envoyer notification
             addNotification(message);
             loadAllRdvs();
         }
@@ -234,9 +249,7 @@ public class GestionListeRdv implements Initializable {
             Parent root = loader.load();
 
             GestionRendezVous controller = loader.getController();
-            controller.setNotificationListener(message -> {
-                addNotification(message);
-            });
+            controller.setNotificationListener(this::addNotification);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -269,9 +282,6 @@ public class GestionListeRdv implements Initializable {
         }
     }
 
-
-
-
     private void addNotification(String message) {
         String fullMessage = LocalDateTime.now().toString() + " - " + message;
         notificationHistory.add(fullMessage);
@@ -301,7 +311,7 @@ public class GestionListeRdv implements Initializable {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            showAlert("Erreur", "Impossible de récupérer le nom du médecin", e.getMessage());
         }
         return "Inconnu";
     }
@@ -312,5 +322,18 @@ public class GestionListeRdv implements Initializable {
         alert.setHeaderText(header);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void redirectToLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) rdvContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Connexion");
+            stage.show();
+        } catch (IOException e) {
+            showAlert("Erreur", "Redirection vers la page de connexion échouée", e.getMessage());
+        }
     }
 }

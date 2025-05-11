@@ -18,10 +18,10 @@ public class ServiceConsultation {
 
     public List<Consultation> getByMedecinId(int medecinId) {
         List<Consultation> consultations = new ArrayList<>();
-        String query = "SELECT c.*, u.prenom as patient_prenom, u.nom as patient_nom, r.statut " +
+        String query = "SELECT c.*, u.prenom AS patient_prenom, u.nom AS patient_nom, r.statut " +
                 "FROM consultation c " +
-                "JOIN user u ON c.user_id = u.id " +
-                "JOIN rendez_vous r ON c.rendez_vous_id = r.id " +
+                "JOIN user u ON c.user_id = u.id " + // Join with user table for patient details
+                "JOIN rendez_vous r ON c.rendez_vous_id = r.id " + // Join with rendez_vous for statut
                 "WHERE c.user_id = ?";
 
         try (PreparedStatement pst = connection.prepareStatement(query)) {
@@ -32,7 +32,8 @@ public class ServiceConsultation {
                 Consultation consultation = new Consultation();
                 consultation.setId(rs.getInt("id"));
                 consultation.setRendez_vous_id(rs.getInt("rendez_vous_id"));
-                consultation.setUser_id(rs.getInt(11));
+                consultation.setPatient_id(rs.getInt("patient_id"));
+                consultation.setMedecin_id(rs.getInt("medecin_id"));
                 consultation.setDate(rs.getDate("date").toLocalDate());
                 consultation.setPrix(rs.getDouble("prix"));
                 consultation.setType_consultation(rs.getString("type_consultation"));
@@ -45,6 +46,9 @@ public class ServiceConsultation {
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération des consultations: " + e.getMessage());
         }
+
+
+
 
         return consultations;
     }
@@ -73,12 +77,12 @@ public class ServiceConsultation {
 
     public int getConsultationCountForDate(int medecinId, LocalDate date) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM consultation WHERE user_id = ? AND date = ?";
+        String sql = "SELECT COUNT(*) FROM consultation WHERE id_medecin = ? AND date = ?";
 
         try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, 11);
+            stmt.setInt(1, medecinId);
             stmt.setDate(2, java.sql.Date.valueOf(date));
 
             ResultSet rs = stmt.executeQuery();
