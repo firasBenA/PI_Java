@@ -42,7 +42,7 @@ public class ServiceEvenement implements IService<Evenement> {
 
         String query = "SELECT * FROM `evenement`";
         try {
-            Statement stm = cnx.createStatement();
+            Statement stm = MyDataBase.getInstance().getCnx().createStatement(); // ← Connexion toujours valide
             ResultSet rs = stm.executeQuery(query);
 
             while (rs.next()) {
@@ -88,13 +88,16 @@ public class ServiceEvenement implements IService<Evenement> {
     public void delete(Evenement evenement) {
         String query = "DELETE FROM `evenement` WHERE `id` = ?";
         try {
+            Connection cnx = MyDataBase.getInstance().getCnx();
             PreparedStatement pstm = cnx.prepareStatement(query);
             pstm.setInt(1, evenement.getId());
             pstm.executeUpdate();
+            System.out.println("Événement supprimé avec succès.");
         } catch (SQLException e) {
             System.out.println("Error while deleting evenement: " + e.getMessage());
         }
     }
+
 
     // Add a user to an event (participate)
     public void participate(User user, Evenement evenement) {

@@ -56,6 +56,11 @@
                         <FlowPane fx:id="prescriptionCards" styleClass="user-cards" hgap="15" vgap="15"/>
                     </ScrollPane>
                 </Tab>
+                <Tab fx:id="EvenementTab" text="Evenements" styleClass="tab">
+                    <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+                        <FlowPane fx:id="evenementCards" styleClass="user-cards" hgap="15" vgap="15"/>
+                    </ScrollPane>
+                </Tab>
             </tabs>
         </TabPane>
     </VBox>

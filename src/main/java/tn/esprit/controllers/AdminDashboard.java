@@ -11,10 +11,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import tn.esprit.models.Evenement;
 import tn.esprit.models.Prescription;
 import tn.esprit.models.User;
 import tn.esprit.services.AuthException;
 import tn.esprit.services.AuthService;
+import tn.esprit.services.ServiceEvenement;
 import tn.esprit.services.ServicePrescription;
 import tn.esprit.utils.SceneManager;
 
@@ -45,21 +47,25 @@ public class AdminDashboard {
     @FXML private TabPane tabPane;
     @FXML private Tab patientsTab;
     @FXML private Tab medecinsTab;
+    @FXML private Tab evenementTab;
     @FXML private Tab blockedTab;
 
     @FXML private Tab prescriptionTab;
     @FXML private FlowPane patientUserCards;
     @FXML private FlowPane medecinUserCards;
     @FXML private FlowPane blockedUserCards;
-
     @FXML private FlowPane prescriptionCards;
+
+    @FXML private FlowPane evenementCards;
 
     private User currentUser;
     private SceneManager sceneManager;
     private AuthService authService;
     private List<User> allUsers = new ArrayList<>();
 
+
     private final ServicePrescription servicePrescription = new ServicePrescription();
+    private final ServiceEvenement serviceEvenement = new ServiceEvenement();
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
@@ -104,6 +110,7 @@ public class AdminDashboard {
             setupSearchListener();
             displayUsers("PATIENT");
             displayPrescriptions();
+            displayEvenements();
         } catch (Exception e) {
             showAlert("Erreur", "Erreur lors du chargement des utilisateurs: " + e.getMessage(), Alert.AlertType.ERROR);
         } catch (AuthException e) {
@@ -151,7 +158,7 @@ public class AdminDashboard {
     }
 
     private void displayPrescriptions() {
-        prescriptionCards.getChildren().clear();
+        evenementCards.getChildren().clear();
 
         List<Prescription> prescriptions = servicePrescription.getAll();
         for (Prescription p : prescriptions) {
@@ -171,6 +178,70 @@ public class AdminDashboard {
             }
         }
     }
+
+    private void displayEvenements() {
+        evenementCards.getChildren().clear();
+
+        List<Evenement> evenements = serviceEvenement.getAll();
+        for (Evenement p : evenements) {
+            System.out.println("Titre: " + p.getNom() + ", Date: " + p.getDateEvent());
+        }
+
+        if (evenements.isEmpty()) {
+            Label emptyLabel = new Label("Aucune événement disponible.");
+            emptyLabel.getStyleClass().add("empty-label");
+            evenementCards.setAlignment(Pos.CENTER);
+            evenementCards.getChildren().add(emptyLabel);
+        } else {
+            evenementCards.setAlignment(Pos.TOP_LEFT);
+            for (Evenement evenement : evenements) {
+                evenementCards.getChildren().add(createEvenementCard(evenement));
+            }
+        }
+    }
+
+    private Node createEvenementCard(Evenement evenement) {
+        VBox evenementCard = new VBox(10);
+        evenementCard.getStyleClass().add("user-card");
+
+        // Content
+        HBox content = new HBox(15);
+        content.getStyleClass().add("card-content");
+
+        VBox infoBox = new VBox(5);
+        infoBox.getStyleClass().add("prescription-info-box");
+
+        Label titleLabel = new Label("Nom: " + evenement.getNom());
+        titleLabel.getStyleClass().add("title-label");
+
+        Label dateLabel = new Label("Date: " + evenement.getDateEvent());
+        dateLabel.getStyleClass().add("date-label");
+
+        Label detailsLabel = new Label("Lieu: " + evenement.getLieuxEvent());
+        detailsLabel.getStyleClass().add("details-label");
+
+        infoBox.getChildren().addAll(titleLabel, dateLabel, detailsLabel);
+        content.getChildren().add(infoBox);
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.getStyleClass().add("button-box");
+
+        Button deleteButton = new Button("Supprimer");
+        deleteButton.getStyleClass().add("delete-button");
+
+        deleteButton.setOnAction(e -> {
+            serviceEvenement.delete(evenement);
+            displayEvenements(); // Rafraîchir la liste après suppression
+        });
+
+        buttonBox.getChildren().add(deleteButton);
+
+        evenementCard.getChildren().addAll(content, buttonBox);
+
+        return evenementCard;
+    }
+
+
 
     private Node createPrescriptionCard(Prescription prescription) {
         VBox prescriptionCard = new VBox(10);
