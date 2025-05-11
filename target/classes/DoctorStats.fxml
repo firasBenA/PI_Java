@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.controllers.DoctorStatsController"
+      spacing="20" style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+
+    <!-- Titre principal -->
+    <Label text="Tableau de Bord des Statistiques Médicales"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;"/>
+
+    <!-- Sélection de la spécialité et médecin -->
+    <GridPane hgap="10" vgap="10" style="-fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5;">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" hgrow="NEVER"/>
+            <ColumnConstraints halignment="LEFT" hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <Label text="Spécialité:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold;"/>
+        <ComboBox fx:id="specialiteCombo" promptText="Choisir une spécialité"
+                  GridPane.rowIndex="0" GridPane.columnIndex="1"
+                  style="-fx-background-radius: 3; -fx-border-radius: 3;"/>
+
+        <Label text="Médecin:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold;"/>
+        <ComboBox fx:id="medecinCombo" promptText="Choisir un médecin"
+                  GridPane.rowIndex="1" GridPane.columnIndex="1" disable="true"
+                  style="-fx-background-radius: 3; -fx-border-radius: 3;"/>
+    </GridPane>
+
+    <Separator style="-fx-padding: 5 0 5 0;"/>
+
+    <!-- Section Spécialité -->
+    <VBox fx:id="statsSection" visible="false" spacing="5"
+          style="-fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5;">
+        <Label text="Spécialité" style="-fx-font-weight: bold; -fx-text-fill: #3498db;"/>
+        <Label fx:id="specialiteLabel" text="- " style="-fx-padding: 0 0 0 10;"/>
+        <Label text="- Médecin" style="-fx-font-weight: bold; -fx-text-fill: #3498db;"/>
+        <Label fx:id="nomMedecinLabel" text="  - " style="-fx-padding: 0 0 0 10;"/>
+    </VBox>
+
+    <VBox fx:id="statsDetails" visible="false" spacing="15"
+          style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 5;">
+
+        <Label fx:id="statsTitleLabel" text="Statistiques du médecin"
+               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+        <HBox spacing="20">
+            <Label fx:id="approvedLabel" text="- Rendez-vous approuvés : 0%"
+                   style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+            <Label fx:id="canceledLabel" text="- Rendez-vous annulés : 0%"
+                   style="-fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+        </HBox>
+
+        <VBox spacing="10">
+            <Label text="Répartition par sexe" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <PieChart fx:id="genderChart" legendVisible="true"
+                      style="-fx-background-color: transparent;"
+                      maxWidth="250" maxHeight="250"/>
+        </VBox>
+
+        <VBox spacing="10">
+            <Label text="Répartition par âge" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <BarChart fx:id="ageChart" legendVisible="false"
+                      style="-fx-background-color: transparent;"
+                      maxWidth="400" maxHeight="300">
+                <xAxis>
+                    <CategoryAxis label="Tranche d'âge"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Patients"/>
+                </yAxis>
+            </BarChart>
+        </VBox>
+
+        <!-- Répartition par jours - Mise en valeur -->
+        <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: #f8f9fa; -fx-background-radius: 5;">
+            <Label text="Répartition par jours"
+                   style="-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-size: 14px;"/>
+            <BarChart fx:id="dayChart" legendVisible="false"
+                      style="-fx-background-color: transparent;"
+                      maxWidth="500" maxHeight="300">
+                <xAxis>
+                    <CategoryAxis label="Jour de la semaine"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Nombre de rendez-vous"/>
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </VBox>
+</VBox>

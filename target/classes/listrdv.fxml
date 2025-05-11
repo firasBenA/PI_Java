@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="10" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.GestionListeRdv">
+    <!-- Notification Toast Container (fixed at bottom-left) -->
+    <StackPane fx:id="toastContainer" alignment="BOTTOM_LEFT" style="-fx-padding: 0 0 20 20;">
+        <!-- Notifications will be injected here -->
+    </StackPane>
+
+    <!-- Header -->
+    <HBox spacing="20" alignment="CENTER_LEFT">
+        <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Mes Rendez-vous" />
+
+        <!-- Filter ComboBox -->
+        <ComboBox fx:id="statusFilter" promptText="Filtrer par statut" style="-fx-pref-width: 150;" />
+
+        <!-- Spacer -->
+        <Region HBox.hgrow="ALWAYS" />
+
+        <!-- Notification Button -->
+        <Button fx:id="notificationButton" onAction="#showNotificationHistory" style="-fx-background-color: transparent; -fx-font-size: 18px;" text="🔔">
+            <tooltip>
+                <Tooltip text="Voir l'historique des notifications" />
+            </tooltip>
+        </Button>
+    </HBox>
+
+    <!-- RDV Cards Container -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+        <VBox fx:id="rdvContainer" spacing="10" style="-fx-background-color: transparent; -fx-padding: 5;" />
+    </ScrollPane>
+
+    <!-- Pagination Controls -->
+    <HBox alignment="CENTER" spacing="10">
+        <Button onAction="#previousPage" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Précédent" />
+        <Label fx:id="pageInfo" style="-fx-font-weight: bold;" />
+        <Button onAction="#nextPage" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Suivant" />
+    </HBox>
+
+    <!-- Add Button -->
+    <Button fx:id="addButton" onAction="#addNewRDV" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="Ajouter un Rendez-vous" />
+</VBox>
