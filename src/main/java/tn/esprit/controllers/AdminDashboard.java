@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -61,11 +62,12 @@ public class AdminDashboard {
 
     @FXML private FlowPane evenementCards;
 
-    private AnchorPane produitContainer;
+    @FXML private AnchorPane produitContainer;
     private User currentUser;
     private SceneManager sceneManager;
     private AuthService authService;
     private List<User> allUsers = new ArrayList<>();
+
 
     private final ServicePrescription servicePrescription = new ServicePrescription();
     private final ServiceEvenement serviceEvenement = new ServiceEvenement();
@@ -138,6 +140,7 @@ public class AdminDashboard {
         });
     }
 
+
     private void loadProduitManagement() {
         try {
             AnchorPane produitView = javafx.fxml.FXMLLoader.load(getClass().getResource("/Produit.fxml"));
@@ -151,7 +154,6 @@ public class AdminDashboard {
             showAlert("Erreur", "Erreur lors du chargement de Gestion Produits: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
-
 
     private void setupSearchListener() {
         searchField.textProperty().addListener((obs, oldValue, newValue) -> {

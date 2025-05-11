@@ -104,6 +104,9 @@ public class MainController {
     public void goGestionRdv() {
         loadUI("listrdv");
     }
+    public void goProduit() {
+        loadUI("listProduit");
+    }
     public void goGestionStatDoc() {
         loadUI("DoctorStats");
     }

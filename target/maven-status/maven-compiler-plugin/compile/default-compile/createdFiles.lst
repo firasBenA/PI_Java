@@ -62,6 +62,7 @@ tn\esprit\services\ServiceUser.class
 tn\esprit\controllers\CalendarView.class
 tn\esprit\services\models\Patient.class
 tn\esprit\models\Medecin.class
+tn\esprit\controllers\ListProduit.class
 tn\esprit\models\Admin.class
 tn\esprit\controllers\EmailService$1.class
 tn\esprit\services\models\Article.class

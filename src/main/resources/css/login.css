@@ -9,10 +9,41 @@
 }
 
 .form-container {
+<<<<<<< HEAD
     -fx-padding: 0 0 0 20px;
     -fx-min-width: 380px;
 }
 
+=======
+    -fx-background-color: #ffffff;
+    -fx-padding: 20;
+    -fx-spacing: 10;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-min-width: 380px;
+}
+
+.dialog-container {
+    -fx-background-color: #ffffff;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.dialog-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+.form-field {
+    -fx-pref-width: 300px;
+    -fx-background-color: #edf2f7;
+}
+.btn-primary {
+    -fx-background-color: #3182ce;
+    -fx-text-fill: #ffffff;
+    -fx-pref-width: 300px;
+}
+
+>>>>>>> omara
 .input-label {
     -fx-text-fill: #4a5568;
     -fx-font-size: 14px;
@@ -20,6 +51,7 @@
 }
 
 .form-field {
+<<<<<<< HEAD
     -fx-pref-height: 40px;
     -fx-padding: 0 10px;
     -fx-background-radius: 5px;
@@ -33,6 +65,25 @@
 .form-field:focused {
     -fx-border-color: #667eea;
     -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.2), 10, 0, 0, 0);
+=======
+    -fx-pref-width: 300px;
+    -fx-pref-height: 40px;
+    -fx-font-size: 14px;
+    -fx-background-color: #edf2f7;
+    -fx-border-color: #cbd5e0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+    -fx-font-family: "Arial";
+    -fx-transition: -fx-border-color 0.2s ease-in-out;
+}
+
+.form-field:focused {
+    -fx-border-color: #3182ce;
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #333333;
+    -fx-opacity: 1.0;
+>>>>>>> omara
 }
 
 .password-container {
@@ -42,7 +93,11 @@
 .toggle-password {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
+<<<<<<< HEAD
     -fx-padding: 0 5px;
+=======
+    -fx-padding: 0 5;
+>>>>>>> omara
     -fx-cursor: hand;
     -fx-pref-width: 30px;
     -fx-pref-height: 40px;
@@ -57,6 +112,7 @@
 }
 
 .btn-primary {
+<<<<<<< HEAD
     -fx-background-color: #667eea;
     -fx-text-fill: white;
     -fx-pref-height: 45px;
@@ -73,6 +129,33 @@
 
 .btn-primary:pressed {
     -fx-background-color: #4c51bf;
+=======
+    -fx-background-color: #3182ce;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-pref-width: 300px;
+    -fx-pref-height: 45px;
+    -fx-cursor: hand;
+    -fx-transition: -fx-background-color 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2b6cb0;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: #1a4971;
+}
+
+.btn-primary:disabled {
+    -fx-background-color: #a0aec0;
+    -fx-opacity: 0.7;
+    -fx-cursor: default;
+>>>>>>> omara
 }
 
 .link {
@@ -89,12 +172,34 @@
 .error-text {
     -fx-text-fill: #e53e3e;
     -fx-font-size: 12px;
+<<<<<<< HEAD
+=======
+    -fx-opacity: 0;
+    -fx-transition: -fx-opacity 0.3s ease-in-out;
+}
+
+.error-text {
+    -fx-opacity: 1;
+>>>>>>> omara
 }
 
 .error-message {
     -fx-text-fill: #e53e3e;
+<<<<<<< HEAD
     -fx-font-size: 14px;
     -fx-font-weight: bold;
+=======
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+    -fx-max-width: 300px;
+    -fx-opacity: 0;
+    -fx-transition: -fx-opacity 0.3s ease-in-out;
+}
+
+.error-message {
+    -fx-opacity: 1;
+>>>>>>> omara
 }
 
 .text-muted {
@@ -103,7 +208,19 @@
 }
 
 .separator {
+<<<<<<< HEAD
     -fx-padding: 10px 0;
     -fx-border-color: #e2e8f0;
     -fx-border-width: 1px 0 0 0;
+=======
+    -fx-padding: 10 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1 0 0 0;
+}
+
+.loading-indicator {
+    -fx-max-width: 30px;
+    -fx-max-height: 30px;
+    -fx-progress-color: #3182ce;
+>>>>>>> omara
 }

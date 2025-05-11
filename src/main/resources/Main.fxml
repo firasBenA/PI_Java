@@ -24,6 +24,7 @@
                 <Button text="Tous Les Evenements" onAction="#goGestionEvenements" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Tous Les Articles" onAction="#goGestionArticles" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
                 <Button text="Rendez-vous" onAction="#goGestionRdv" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
+                <Button text="Boutique" onAction="#goProduit" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" />
 
                 <!-- Spacer -->
                 <VBox fx:id="spacer" VBox.vgrow="ALWAYS" />
